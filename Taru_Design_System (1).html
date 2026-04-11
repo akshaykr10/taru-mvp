@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taru Design System v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  /* === BRAND COLORS === */
+  --forest:#1C4A3A; --moss:#2D6A4F; --leaf:#40916C; --sage:#74C69D;
+  --mint:#B7E4C7; --frost:#D8F3DC; --white:#F9FDFB;
+  --amber:#E8920A; --amber-lt:#FDF0DC; --amber-md:#F9C84A; --amber-dk:#7A4800;
+  --sky:#2166B2; --sky-lt:#EAF2FC; --sky-md:#90BFEE;
+  --coral:#E05B3A; --coral-lt:#FFF0EB;
+  --purple:#7B5EDD; --purple-lt:#F2EDFC;
+  --ink:#1A2B22; --ink-60:rgba(26,43,34,.6); --ink-30:rgba(26,43,34,.3); --ink-10:rgba(26,43,34,.08);
+  --surface:#FFFFFF; --bg:#F4FAF6; --border:rgba(26,43,34,.1);
+  /* === TYPOGRAPHY === */
+  --font-parent:'Plus Jakarta Sans',sans-serif;
+  --font-kid:'Nunito',sans-serif;
+  --font-display:'DM Serif Display',serif;
+  --font-mono:'JetBrains Mono',monospace;
+  /* === SPACING === */
+  --sp1:4px;--sp2:8px;--sp3:12px;--sp4:16px;--sp6:24px;--sp8:32px;--sp12:48px;
+  /* === RADII === */
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:24px;--r-pill:100px;
+  /* === SHADOWS === */
+  --shadow-sm:0 1px 3px rgba(26,43,34,.08);
+  --shadow-md:0 4px 16px rgba(26,43,34,.1);
+  --shadow-lg:0 8px 32px rgba(26,43,34,.12);
+}
+
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-parent);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;}
+
+/* PRINT */
+@media print{
+  .no-print{display:none!important;}
+  .page-break{page-break-before:always;}
+  body{background:white;}
+}
+
+/* ── LAYOUT ── */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--forest);overflow-y:auto;z-index:100;padding:28px 0 40px;}
+.main{margin-left:220px;min-height:100vh;}
+.section{padding:52px 52px 80px;max-width:900px;border-bottom:1px solid var(--border);}
+.section:last-child{border-bottom:none;}
+
+/* ── SIDEBAR ── */
+.sb-logo{padding:0 24px 28px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px;}
+.sb-wordmark{font-family:var(--font-display);font-size:28px;color:white;line-height:1;}
+.sb-version{font-size:11px;color:var(--sage);margin-top:4px;}
+.sb-group{padding:0 16px;margin-bottom:4px;}
+.sb-group-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:12px 8px 6px;}
+.sb-link{display:block;padding:7px 10px;border-radius:8px;color:rgba(255,255,255,.7);font-size:12px;font-weight:500;text-decoration:none;transition:all .15s;}
+.sb-link:hover,.sb-link.active{background:rgba(255,255,255,.12);color:white;}
+.sb-link.active{color:var(--amber-md);}
+
+/* ── SECTION HEADERS ── */
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--leaf);margin-bottom:6px;}
+.sec-title{font-family:var(--font-display);font-size:36px;color:var(--forest);margin-bottom:10px;line-height:1.15;}
+.sec-desc{font-size:15px;color:var(--ink-60);max-width:580px;margin-bottom:40px;line-height:1.7;}
+.sub-title{font-size:18px;font-weight:700;color:var(--forest);margin:36px 0 16px;}
+.label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-30);margin-bottom:12px;}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;}
+.card-sm{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.stack{display:flex;flex-direction:column;gap:12px;}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+
+/* ── HERO BAND ── */
+.hero-band{background:var(--forest);border-radius:var(--r-xl);padding:40px;color:white;margin-bottom:32px;position:relative;overflow:hidden;}
+.hero-band::before{content:'';position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:rgba(116,198,157,.1);}
+.hero-band::after{content:'';position:absolute;right:80px;bottom:-80px;width:200px;height:200px;border-radius:50%;background:rgba(116,198,157,.06);}
+.hero-wordmark{font-family:var(--font-display);font-size:64px;line-height:1;color:white;position:relative;z-index:1;}
+.hero-tagline{font-family:var(--font-display);font-style:italic;font-size:18px;color:var(--sage);margin-top:8px;}
+.hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;}
+.hero-pill{background:rgba(116,198,157,.18);color:var(--sage);font-size:12px;font-weight:600;padding:5px 14px;border-radius:var(--r-pill);border:1px solid rgba(116,198,157,.25);}
+
+/* ── COLORS ── */
+.ramp{display:flex;border-radius:var(--r-md);overflow:hidden;margin-bottom:8px;height:56px;}
+.swatch{flex:1;display:flex;align-items:flex-end;padding:5px 6px;}
+.swatch span{font-size:8px;font-weight:700;opacity:.65;writing-mode:vertical-rl;}
+
+.token-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:24px;}
+.token-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);}
+.token-dot{width:22px;height:22px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,.07);}
+.token-name{font-size:12px;font-weight:600;font-family:var(--font-mono);}
+.token-hex{font-size:11px;color:var(--ink-60);font-family:var(--font-mono);}
+
+/* ── TYPOGRAPHY ── */
+.type-specimen{padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:10px;}
+.type-meta{display:flex;gap:8px;margin-top:8px;}
+.type-tag{font-size:10px;padding:2px 8px;border-radius:var(--r-pill);font-weight:600;}
+.tag-g{background:var(--frost);color:var(--forest);}
+.tag-a{background:var(--amber-lt);color:var(--amber-dk);}
+.tag-b{background:var(--sky-lt);color:var(--sky);}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:var(--r-pill);font-family:var(--font-parent);font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .15s;text-decoration:none;}
+.btn-primary{background:var(--forest);color:white;}
+.btn-secondary{background:var(--frost);color:var(--forest);border:1px solid var(--mint);}
+.btn-ghost{background:transparent;color:var(--forest);border:1.5px solid var(--forest);}
+.btn-danger{background:var(--coral-lt);color:var(--coral);border:1px solid rgba(224,91,58,.2);}
+.btn-sm{padding:7px 14px;font-size:12px;}
+.btn-lg{padding:14px 28px;font-size:16px;}
+.btn-kid{font-family:var(--font-kid);font-weight:800;border-radius:var(--r-pill);padding:12px 24px;font-size:15px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;}
+.btn-kid-primary{background:var(--amber-md);color:#3D2A00;box-shadow:0 3px 0 #C97B00;}
+.btn-kid-green{background:var(--leaf);color:white;box-shadow:0 3px 0 #2D6A4F;}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--r-pill);font-size:12px;font-weight:600;}
+.badge-g{background:var(--frost);color:var(--forest);border:1px solid var(--mint);}
+.badge-a{background:var(--amber-lt);color:var(--amber-dk);border:1px solid #FDDBA8;}
+.badge-b{background:var(--sky-lt);color:var(--sky);border:1px solid var(--sky-md);}
+.badge-r{background:var(--coral-lt);color:var(--coral);border:1px solid rgba(224,91,58,.2);}
+
+/* ── INPUT ── */
+.input-label{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px;display:block;}
+.taru-input{width:100%;padding:10px 14px;border-radius:var(--r-md);border:1.5px solid var(--border);font-family:var(--font-parent);font-size:14px;color:var(--ink);background:var(--surface);outline:none;transition:border-color .15s;}
+
+/* ── XP BAR ── */
+.xp-wrap{background:var(--ink-10);border-radius:var(--r-pill);height:12px;overflow:hidden;}
+.xp-fill{height:100%;border-radius:var(--r-pill);background:linear-gradient(90deg,var(--leaf),var(--amber-md));}
+
+/* ── INVEST CARD ── */
+.invest-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;}
+
+/* ── CHORE ITEM ── */
+.chore-item{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;}
+.chore-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px;}
+.chore-done{background:#F4FAF6;border-color:var(--mint);}
+.chore-done::before{background:var(--leaf);}
+.chore-over{background:#FFF8F2;border-color:#FDDBA8;}
+.chore-over::before{background:var(--amber);}
+
+/* ── KID CARD ── */
+.kid-chore{background:var(--surface);border:2px solid var(--border);border-radius:20px;padding:16px;font-family:var(--font-kid);}
+
+/* ── MASCOT MOODS ── */
+.mood-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.mood-card{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:18px;text-align:center;}
+.mood-emoji{font-size:52px;margin-bottom:8px;display:block;}
+.mood-name{font-family:var(--font-kid);font-size:15px;font-weight:900;color:var(--forest);margin-bottom:4px;}
+.mood-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);display:inline-block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
+.mood-desc{font-size:11px;color:var(--ink-60);line-height:1.5;margin-bottom:10px;}
+.speech-bubble{background:var(--amber-lt);border:1.5px solid #FDDBA8;border-radius:12px;border-bottom-left-radius:2px;padding:10px 12px;font-family:var(--font-kid);font-size:11px;font-weight:700;color:#5A3500;text-align:left;}
+.use-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-30);margin-top:8px;display:block;}
+
+/* ── LEVEL CARDS ── */
+.level-card{border-radius:24px;padding:28px;margin-bottom:14px;color:white;position:relative;overflow:hidden;}
+.level-card::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.07);}
+.lc-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:relative;z-index:1;}
+.lc-icon{width:68px;height:68px;border-radius:16px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;}
+.lc-num{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.65;margin-bottom:4px;}
+.lc-title{font-family:var(--font-kid);font-size:22px;font-weight:900;line-height:1.1;margin-bottom:4px;}
+.lc-sub{font-size:12px;color:rgba(255,255,255,.7);line-height:1.5;}
+.lc-xp-label{font-size:10px;color:rgba(255,255,255,.6);margin:14px 0 4px;}
+.lc-bar{height:8px;background:rgba(255,255,255,.2);border-radius:var(--r-pill);overflow:hidden;}
+.lc-fill{height:100%;border-radius:var(--r-pill);background:rgba(255,255,255,.8);}
+.lc-row2{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;}
+
+.lv1{background:linear-gradient(135deg,#2D6A4F,#1C4A3A);}
+.lv2{background:linear-gradient(135deg,#3D7E62,#1C4A3A);}
+.lv3{background:linear-gradient(135deg,#C97B00,#8B5200);}
+.lv4{background:linear-gradient(135deg,#2166B2,#0C3A78);}
+.lv5{background:linear-gradient(135deg,#7B5EDD,#4B35A8);}
+.lv6{background:linear-gradient(135deg,#1A2B22,#0D1810);}
+
+/* ── UNLOCK GRID ── */
+.unlock-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.unlock-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;}
+.unlock-icon{font-size:20px;flex-shrink:0;}
+.unlock-name{font-size:12px;font-weight:600;}
+.unlock-desc{font-size:10px;color:var(--ink-60);}
+
+/* ── MOTION TABLE ── */
+.motion-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:24px;}
+.motion-table th{background:var(--bg);padding:10px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-60);border-bottom:1.5px solid var(--border);}
+.motion-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;}
+.motion-table tr:last-child td{border-bottom:none;}
+.motion-table code{font-family:var(--font-mono);font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--forest);}
+
+/* ── SPACING VIZ ── */
+.spacing-row{display:flex;align-items:center;gap:16px;padding:8px 0;border-bottom:1px solid var(--border);}
+.spacing-bar{background:var(--leaf);border-radius:2px;height:8px;flex-shrink:0;opacity:.7;}
+.sp-token{font-family:var(--font-mono);font-size:11px;color:var(--forest);font-weight:600;width:90px;}
+.sp-px{font-size:11px;color:var(--ink-60);width:40px;}
+.sp-use{font-size:12px;color:var(--ink-60);}
+
+/* ── ICONOGRAPHY ── */
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;}
+.icon-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.icon-emoji{font-size:22px;}
+.icon-label{font-size:9px;font-weight:600;color:var(--ink-60);text-align:center;text-transform:uppercase;letter-spacing:.04em;}
+
+/* ── CODE BLOCKS ── */
+.code-block{background:#0D1810;border-radius:var(--r-md);padding:16px 20px;font-family:var(--font-mono);font-size:12px;color:#B7E4C7;overflow-x:auto;margin-top:8px;line-height:1.6;}
+.code-block .comment{color:#40916C;}
+.code-block .key{color:var(--amber-md);}
+.code-block .val{color:#90BFEE;}
+
+/* ── USAGE NOTE ── */
+.usage-note{padding:12px 14px;border-radius:var(--r-md);font-size:13px;border-left:3px solid;margin-bottom:8px;}
+.note-g{background:var(--frost);border-color:var(--leaf);color:var(--forest);}
+.note-a{background:var(--amber-lt);border-color:var(--amber);color:var(--amber-dk);}
+.note-b{background:var(--sky-lt);border-color:var(--sky);color:var(--sky);}
+.note-r{background:var(--coral-lt);border-color:var(--coral);color:var(--coral);}
+
+/* ── PAGE TITLE COVER ── */
+.cover{min-height:100vh;background:var(--forest);display:flex;align-items:center;padding:80px 52px;position:relative;overflow:hidden;}
+.cover::before{content:'';position:absolute;right:-100px;top:-100px;width:500px;height:500px;border-radius:50%;background:rgba(116,198,157,.08);}
+.cover::after{content:'';position:absolute;left:60px;bottom:-80px;width:300px;height:300px;border-radius:50%;background:rgba(116,198,157,.05);}
+.cover-content{position:relative;z-index:1;}
+.cover-eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sage);margin-bottom:16px;}
+.cover-title{font-family:var(--font-display);font-size:72px;color:white;line-height:1;margin-bottom:16px;}
+.cover-subtitle{font-size:18px;color:rgba(255,255,255,.65);line-height:1.6;max-width:480px;margin-bottom:40px;}
+.cover-meta{display:flex;gap:24px;flex-wrap:wrap;}
+.cover-meta-item{font-size:13px;color:rgba(255,255,255,.5);}
+.cover-meta-item strong{color:var(--sage);display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+.cover-squirrel{position:absolute;right:80px;bottom:60px;font-size:120px;opacity:.4;z-index:1;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar no-print">
+  <div class="sb-logo">
+    <div class="sb-wordmark">Taru</div>
+    <div class="sb-version">Design System v1.0</div>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Foundation</div>
+    <a class="sb-link" href="#brand">Brand Identity</a>
+    <a class="sb-link" href="#colors">Color System</a>
+    <a class="sb-link" href="#typography">Typography</a>
+    <a class="sb-link" href="#spacing">Spacing & Layout</a>
+    <a class="sb-link" href="#motion">Motion & Easing</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Components</div>
+    <a class="sb-link" href="#buttons">Buttons</a>
+    <a class="sb-link" href="#badges">Badges & Status</a>
+    <a class="sb-link" href="#inputs">Form Inputs</a>
+    <a class="sb-link" href="#invest-cards">Investment Cards</a>
+    <a class="sb-link" href="#chore-cards">Chore Cards</a>
+    <a class="sb-link" href="#kid-components">Kid Components</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Identity</div>
+    <a class="sb-link" href="#mascot">Mascot — Gilli</a>
+    <a class="sb-link" href="#levels">Child Levels</a>
+    <a class="sb-link" href="#iconography">Iconography</a>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<!-- COVER -->
+<div class="cover page-break" id="top">
+  <div class="cover-content">
+    <div class="cover-eyebrow">Taru · Design System</div>
+    <div class="cover-title">Grow<br>together.</div>
+    <div class="cover-subtitle">A complete design system for Taru — India's dual-app ecosystem for parents to invest and kids to learn. Built for trust, warmth, and delight.</div>
+    <div class="cover-meta">
+      <div class="cover-meta-item"><strong>Version</strong>1.0 — April 2026</div>
+      <div class="cover-meta-item"><strong>Apps</strong>Taru (Parent) · Taru Jr. (Kid)</div>
+      <div class="cover-meta-item"><strong>Audience</strong>Urban parents · Kids 8–15</div>
+      <div class="cover-meta-item"><strong>Mascot</strong>Gilli the Squirrel 🐿️</div>
+    </div>
+  </div>
+  <div class="cover-squirrel" style="position:absolute;right:80px;bottom:40px;opacity:.55;z-index:1;">
+    <svg width="160" height="180" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Tail -->
+      <ellipse cx="120" cy="130" rx="38" ry="22" transform="rotate(-30 120 130)" fill="#74C69D" opacity="0.7"/>
+      <ellipse cx="118" cy="128" rx="28" ry="16" transform="rotate(-30 118 128)" fill="#B7E4C7" opacity="0.6"/>
+      <!-- Body -->
+      <ellipse cx="78" cy="130" rx="34" ry="38" fill="#C97B00"/>
+      <ellipse cx="78" cy="138" rx="22" ry="24" fill="#E8920A"/>
+      <!-- Belly -->
+      <ellipse cx="78" cy="142" rx="14" ry="16" fill="#FDF0DC"/>
+      <!-- Head -->
+      <ellipse cx="78" cy="82" rx="32" ry="30" fill="#C97B00"/>
+      <!-- Ears -->
+      <ellipse cx="54" cy="60" rx="10" ry="13" fill="#C97B00"/>
+      <ellipse cx="54" cy="60" rx="6" ry="8" fill="#F9C84A"/>
+      <ellipse cx="102" cy="60" rx="10" ry="13" fill="#C97B00"/>
+      <ellipse cx="102" cy="60" rx="6" ry="8" fill="#F9C84A"/>
+      <!-- Eyes -->
+      <circle cx="66" cy="80" r="7" fill="white"/>
+      <circle cx="90" cy="80" r="7" fill="white"/>
+      <circle cx="67" cy="81" r="4" fill="#1A2B22"/>
+      <circle cx="91" cy="81" r="4" fill="#1A2B22"/>
+      <circle cx="68" cy="79" r="1.5" fill="white"/>
+      <circle cx="92" cy="79" r="1.5" fill="white"/>
+      <!-- Nose -->
+      <ellipse cx="78" cy="91" rx="5" ry="4" fill="#7A4800"/>
+      <circle cx="78" cy="89" r="2" fill="#5A3500"/>
+      <!-- Smile -->
+      <path d="M70 96 Q78 103 86 96" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <!-- Cheeks -->
+      <circle cx="60" cy="90" r="7" fill="#F9C84A" opacity="0.5"/>
+      <circle cx="96" cy="90" r="7" fill="#F9C84A" opacity="0.5"/>
+      <!-- Arms -->
+      <ellipse cx="50" cy="125" rx="10" ry="18" transform="rotate(20 50 125)" fill="#C97B00"/>
+      <ellipse cx="106" cy="125" rx="10" ry="18" transform="rotate(-20 106 125)" fill="#C97B00"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ── 1. BRAND ── -->
+<div class="section" id="brand">
+  <div class="eyebrow">01 · Foundation</div>
+  <div class="sec-title">Brand Identity</div>
+  <div class="sec-desc">"Taru" is Sanskrit for tree — representing growth, roots, and the patient nurturing of wealth. Every design decision echoes this metaphor.</div>
+
+  <div class="hero-band">
+    <div style="position:relative;z-index:1;">
+      <div style="font-family:var(--font-display);font-size:64px;color:white;line-height:1;">Taru</div>
+      <div style="font-family:var(--font-display);font-style:italic;font-size:18px;color:var(--sage);margin-top:4px;">Grow together.</div>
+      <div class="hero-pills" style="margin-top:16px;">
+        <span class="hero-pill">Trustworthy</span>
+        <span class="hero-pill">Warm</span>
+        <span class="hero-pill">Playful</span>
+        <span class="hero-pill">Educational</span>
+        <span class="hero-pill">Premium</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-title">Dual App Personality</div>
+  <div class="grid-2">
+    <div style="background:var(--forest);border-radius:var(--r-xl);padding:24px;color:white;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.5;margin-bottom:6px;">Parent App — Taru</div>
+      <div style="font-family:var(--font-parent);font-size:20px;font-weight:700;margin-bottom:12px;">Invest for them.</div>
+      <div style="font-size:12px;opacity:.7;line-height:1.8;">
+        ● Clean, confident, premium<br>
+        ● Plus Jakarta Sans typeface<br>
+        ● Data-forward, calm layout<br>
+        ● Forest green primary palette<br>
+        ● Subtle animations only
+      </div>
+    </div>
+    <div style="background:#FFFBF0;border:2px solid #FDDBA8;border-radius:var(--r-xl);padding:24px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-dk);opacity:.65;margin-bottom:6px;">Kid App — Taru Jr.</div>
+      <div style="font-family:var(--font-kid);font-size:20px;font-weight:900;color:var(--ink);margin-bottom:12px;">Watch it grow! 🌱</div>
+      <div style="font-size:12px;color:var(--ink-60);line-height:1.8;">
+        ● Playful, energetic, rewarding<br>
+        ● Nunito typeface (rounder)<br>
+        ● Quest & achievement framing<br>
+        ● Warm amber accent palette<br>
+        ● Bouncy, expressive animations
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-title">Brand Metaphor System</div>
+  <div class="grid-3">
+    <div class="card-sm" style="text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;">🌱</div>
+      <div style="font-size:13px;font-weight:600;color:var(--forest);">Seed → Sapling</div>
+      <div style="font-size:12px;color:var(--ink-60);margin-top:4px;">First investment = planting a seed. Growth visualised as a tree over time.</div>
+    </div>
+    <div class="card-sm" style="text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;">
+        <svg width="40" height="44" viewBox="10 18 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M60 65 Q82 52 78 32 Q74 14 64 20 Q57 25 61 44 Q63 54 60 65Z" fill="#E8920A"/>
+          <ellipse cx="40" cy="67" rx="22" ry="25" fill="#C97B00"/>
+          <ellipse cx="40" cy="72" rx="13" ry="16" fill="#FDF0DC"/>
+          <ellipse cx="40" cy="42" rx="22" ry="20" fill="#C97B00"/>
+          <ellipse cx="24" cy="27" rx="7" ry="10" fill="#C97B00"/><ellipse cx="24" cy="27" rx="4" ry="6" fill="#F9C84A"/>
+          <ellipse cx="56" cy="27" rx="7" ry="10" fill="#C97B00"/><ellipse cx="56" cy="27" rx="4" ry="6" fill="#F9C84A"/>
+          <path d="M30 39 Q34 34 38 39" stroke="#1A2B22" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M42 39 Q46 34 50 39" stroke="#1A2B22" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="26" cy="46" r="5" fill="#F9C84A" opacity="0.5"/>
+          <circle cx="54" cy="46" r="5" fill="#F9C84A" opacity="0.5"/>
+          <ellipse cx="40" cy="49" rx="3.5" ry="2.5" fill="#7A4800"/>
+          <path d="M33 54 Q40 60 47 54" stroke="#7A4800" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--forest);">Squirrel saves</div>
+      <div style="font-size:12px;color:var(--ink-60);margin-top:4px;">Gilli reinforces the savings instinct — patient, clever, preparing for the future.</div>
+    </div>
+    <div class="card-sm" style="text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;">🌳</div>
+      <div style="font-size:13px;font-weight:600;color:var(--forest);">Forest of wealth</div>
+      <div style="font-size:12px;color:var(--ink-60);margin-top:4px;">Each fund is a tree. Together they form your family's financial forest.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 2. COLORS ── -->
+<div class="section page-break" id="colors">
+  <div class="eyebrow">02 · Foundation</div>
+  <div class="sec-title">Color System</div>
+  <div class="sec-desc">Rooted in forest greens — calm, trustworthy, and alive. Amber brings warmth and reward. Sky blue signals information. Red and coral are used sparingly for alerts only.</div>
+
+  <div class="sub-title">Forest Green — Primary brand palette</div>
+  <div class="ramp">
+    <div class="swatch" style="background:#F4FAF6"><span style="color:#1C4A3A">50</span></div>
+    <div class="swatch" style="background:#D8F3DC"><span style="color:#1C4A3A">100</span></div>
+    <div class="swatch" style="background:#B7E4C7"><span style="color:#1C4A3A">200</span></div>
+    <div class="swatch" style="background:#74C69D"><span style="color:#1C4A3A">300</span></div>
+    <div class="swatch" style="background:#40916C"><span style="color:white">400</span></div>
+    <div class="swatch" style="background:#2D6A4F"><span style="color:white">500</span></div>
+    <div class="swatch" style="background:#1C4A3A"><span style="color:white">600</span></div>
+    <div class="swatch" style="background:#0D2C21"><span style="color:white">700</span></div>
+  </div>
+
+  <div class="sub-title" style="margin-top:20px;">Amber — Reward, achievement, kids accent</div>
+  <div class="ramp">
+    <div class="swatch" style="background:#FDF0DC"><span style="color:#3D2A00">50</span></div>
+    <div class="swatch" style="background:#FDDBA8"><span style="color:#3D2A00">100</span></div>
+    <div class="swatch" style="background:#F9C84A"><span style="color:#3D2A00">200</span></div>
+    <div class="swatch" style="background:#E8920A"><span style="color:white">400</span></div>
+    <div class="swatch" style="background:#C97B00"><span style="color:white">500</span></div>
+    <div class="swatch" style="background:#92580A"><span style="color:white">600</span></div>
+    <div class="swatch" style="background:#5A3500"><span style="color:white">700</span></div>
+  </div>
+
+  <div class="sub-title" style="margin-top:20px;">Sky Blue — Informational, learning states</div>
+  <div class="ramp">
+    <div class="swatch" style="background:#EAF2FC"><span style="color:#0C3A78">50</span></div>
+    <div class="swatch" style="background:#C0D9F5"><span style="color:#0C3A78">100</span></div>
+    <div class="swatch" style="background:#90BFEE"><span style="color:#0C3A78">200</span></div>
+    <div class="swatch" style="background:#4E93DA"><span style="color:white">400</span></div>
+    <div class="swatch" style="background:#2166B2"><span style="color:white">500</span></div>
+    <div class="swatch" style="background:#144D8A"><span style="color:white">600</span></div>
+    <div class="swatch" style="background:#0C3A78"><span style="color:white">700</span></div>
+  </div>
+
+  <div class="sub-title" style="margin-top:20px;">Coral Red — Errors and alerts only</div>
+  <div class="ramp">
+    <div class="swatch" style="background:#FFF0EB"><span style="color:#7A1E08">50</span></div>
+    <div class="swatch" style="background:#FECABB"><span style="color:#7A1E08">100</span></div>
+    <div class="swatch" style="background:#F79078"><span style="color:#7A1E08">200</span></div>
+    <div class="swatch" style="background:#E05B3A"><span style="color:white">400</span></div>
+    <div class="swatch" style="background:#B83F22"><span style="color:white">500</span></div>
+    <div class="swatch" style="background:#7A1E08"><span style="color:white">700</span></div>
+  </div>
+
+  <div class="sub-title">Semantic Design Tokens</div>
+  <div class="token-grid">
+    <div class="token-row"><div class="token-dot" style="background:#1C4A3A"></div><div><div class="token-name">--color-brand</div><div class="token-hex">#1C4A3A</div></div></div>
+    <div class="token-row"><div class="token-dot" style="background:#40916C"></div><div><div class="token-name">--color-brand-accent</div><div class="token-hex">#40916C</div></div></div>
+    <div class="token-row"><div class="token-dot" style="background:#D8F3DC"></div><div><div class="token-name">--color-brand-surface</div><div class="token-hex">#D8F3DC</div></div></div>
+    <div class="token-row"><div class="token-dot" style="background:#E8920A"></div><div><div class="token-name">--color-reward</div><div class="token-hex">#E8920A</div></div></div>
+    <div class="token-row"><div class="token-dot" style="background:#F9C84A"></div><div><div class="token-name">--color-reward-light</div><div class="token-hex">#F9C84A</div></div></div>
+    <div class="token-row"><div class="token-dot" style="background:#2166B2"></div><div><div class="token-name">--color-info</div><div class="token-hex">#2166B2</div></div></div>
+    <div class="token-row"><div class="token-dot" style="background:#E05B3A"></div><div><div class="token-name">--color-danger</div><div class="token-hex">#E05B3A</div></div></div>
+    <div class="token-row"><div class="token-dot" style="background:#1A7A4A"></div><div><div class="token-name">--color-positive</div><div class="token-hex">#1A7A4A</div></div></div>
+    <div class="token-row"><div class="token-dot" style="background:#F4FAF6"></div><div><div class="token-name">--color-bg</div><div class="token-hex">#F4FAF6</div></div></div>
+    <div class="token-row"><div class="token-dot" style="background:#1A2B22;border-color:rgba(255,255,255,.3)"></div><div><div class="token-name">--color-text-primary</div><div class="token-hex">#1A2B22</div></div></div>
+  </div>
+
+  <div class="sub-title">Usage Rules</div>
+  <div class="usage-note note-g"><strong>Parent app:</strong> Forest green primary, white surfaces, minimal amber (rewards only)</div>
+  <div class="usage-note note-a"><strong>Kid app:</strong> Amber as primary accent, green for confirmation/growth, white surfaces</div>
+  <div class="usage-note note-b"><strong>Educational:</strong> Sky blue backgrounds for all learning cards and quiz states</div>
+  <div class="usage-note note-r"><strong>Alerts only:</strong> Coral/red reserved for errors, negative returns, and critical warnings</div>
+</div>
+
+<!-- ── 3. TYPOGRAPHY ── -->
+<div class="section page-break" id="typography">
+  <div class="eyebrow">03 · Foundation</div>
+  <div class="sec-title">Typography</div>
+  <div class="sec-desc">Two typefaces for two worlds. Plus Jakarta Sans for the trusted, data-driven parent experience. Nunito for the warm, rounded, approachable kid experience.</div>
+
+  <div class="grid-2" style="margin-bottom:28px;">
+    <div class="card">
+      <div class="label">Parent App Typeface</div>
+      <div style="font-family:var(--font-parent);font-size:28px;font-weight:700;color:var(--forest);margin-bottom:4px;">Plus Jakarta Sans</div>
+      <div style="font-size:12px;color:var(--ink-60);margin-bottom:12px;">Clean · Modern · Confident</div>
+      <div style="font-family:var(--font-parent);font-size:14px;line-height:1.8;">Aa Bb Cc Dd Ee Ff Gg<br>1234567890 ₹ % . , /</div>
+      <div style="margin-top:12px;font-size:11px;color:var(--ink-60);">Weights used: 400, 600, 700, 800</div>
+    </div>
+    <div class="card" style="background:#FFFBF0;border-color:#FDDBA8;">
+      <div class="label">Kid App Typeface</div>
+      <div style="font-family:var(--font-kid);font-size:28px;font-weight:900;color:var(--amber-dk);margin-bottom:4px;">Nunito</div>
+      <div style="font-size:12px;color:var(--ink-60);margin-bottom:12px;">Rounded · Warm · Energetic</div>
+      <div style="font-family:var(--font-kid);font-size:14px;line-height:1.8;">Aa Bb Cc Dd Ee Ff Gg<br>1234567890 🌱 ⭐ 🏆</div>
+      <div style="margin-top:12px;font-size:11px;color:var(--ink-60);">Weights used: 700, 800, 900</div>
+    </div>
+  </div>
+
+  <div class="label">Parent App — Type Scale</div>
+  <div class="type-specimen">
+    <div style="font-family:var(--font-parent);font-size:32px;font-weight:700;color:var(--forest);line-height:1.2;">Display — ₹1,24,560</div>
+    <div class="type-meta"><span class="type-tag tag-g">32px / 700</span><span class="type-tag tag-b">Portfolio values, large numbers</span></div>
+  </div>
+  <div class="type-specimen">
+    <div style="font-family:var(--font-parent);font-size:22px;font-weight:700;line-height:1.3;">Heading 1 — Your portfolio is growing</div>
+    <div class="type-meta"><span class="type-tag tag-g">22px / 700</span><span class="type-tag tag-b">Screen titles</span></div>
+  </div>
+  <div class="type-specimen">
+    <div style="font-family:var(--font-parent);font-size:17px;font-weight:600;line-height:1.4;">Heading 2 — Nifty 50 Index Fund</div>
+    <div class="type-meta"><span class="type-tag tag-g">17px / 600</span><span class="type-tag tag-b">Card titles, section heads</span></div>
+  </div>
+  <div class="type-specimen">
+    <div style="font-family:var(--font-parent);font-size:14px;font-weight:400;line-height:1.7;">Body — This fund tracks the top 50 companies in India by market cap. It's a low-cost way to invest in India's growth story for your children.</div>
+    <div class="type-meta"><span class="type-tag tag-g">14px / 400</span><span class="type-tag tag-b">Body text, descriptions</span></div>
+  </div>
+  <div class="type-specimen">
+    <div style="font-family:var(--font-parent);font-size:12px;font-weight:500;color:var(--ink-60);text-transform:uppercase;letter-spacing:.06em;">LABEL — INVESTED SINCE JAN 2024</div>
+    <div class="type-meta"><span class="type-tag tag-g">12px / 500</span><span class="type-tag tag-b">Labels, captions, metadata</span></div>
+  </div>
+
+  <div class="label" style="margin-top:28px;">Kid App — Type Scale</div>
+  <div class="type-specimen" style="background:#FFFBF0;border-color:#FDDBA8;">
+    <div style="font-family:var(--font-kid);font-size:28px;font-weight:900;color:var(--amber-dk);line-height:1.2;">Display — You earned ⭐ 50 XP!</div>
+    <div class="type-meta"><span class="type-tag tag-a">28px / 900</span><span class="type-tag tag-b">Achievement moments</span></div>
+  </div>
+  <div class="type-specimen" style="background:#FFFBF0;border-color:#FDDBA8;">
+    <div style="font-family:var(--font-kid);font-size:20px;font-weight:800;line-height:1.3;">Heading — What is compound interest?</div>
+    <div class="type-meta"><span class="type-tag tag-a">20px / 800</span><span class="type-tag tag-b">Lesson titles, screen headers</span></div>
+  </div>
+  <div class="type-specimen" style="background:#FFFBF0;border-color:#FDDBA8;">
+    <div style="font-family:var(--font-kid);font-size:15px;font-weight:600;line-height:1.6;">Body — When your money makes more money, that's compound interest! It's like a snowball that gets bigger as it rolls downhill.</div>
+    <div class="type-meta"><span class="type-tag tag-a">15px / 600</span><span class="type-tag tag-b">Lesson body, quest text</span></div>
+  </div>
+</div>
+
+<!-- ── 4. SPACING ── -->
+<div class="section" id="spacing">
+  <div class="eyebrow">04 · Foundation</div>
+  <div class="sec-title">Spacing & Layout</div>
+  <div class="sec-desc">An 4px base grid. All spacing tokens are multiples of 4. Border radii range from subtle (8px) to expressive pill shapes for kid components.</div>
+
+  <div class="sub-title">Spacing Tokens</div>
+  <div class="stack" style="gap:0;">
+    <div class="spacing-row"><div class="spacing-bar" style="width:4px"></div><span class="sp-token">--space-1</span><span class="sp-px">4px</span><span class="sp-use">Icon gap, tight inline elements</span></div>
+    <div class="spacing-row"><div class="spacing-bar" style="width:8px"></div><span class="sp-token">--space-2</span><span class="sp-px">8px</span><span class="sp-use">Button padding, badge gap</span></div>
+    <div class="spacing-row"><div class="spacing-bar" style="width:12px"></div><span class="sp-token">--space-3</span><span class="sp-px">12px</span><span class="sp-use">Component internal gap</span></div>
+    <div class="spacing-row"><div class="spacing-bar" style="width:16px"></div><span class="sp-token">--space-4</span><span class="sp-px">16px</span><span class="sp-use">Card padding, list gap</span></div>
+    <div class="spacing-row"><div class="spacing-bar" style="width:24px"></div><span class="sp-token">--space-6</span><span class="sp-px">24px</span><span class="sp-use">Card inner padding, section gap</span></div>
+    <div class="spacing-row"><div class="spacing-bar" style="width:32px"></div><span class="sp-token">--space-8</span><span class="sp-px">32px</span><span class="sp-use">Section spacing, hero padding</span></div>
+    <div class="spacing-row"><div class="spacing-bar" style="width:48px"></div><span class="sp-token">--space-12</span><span class="sp-px">48px</span><span class="sp-use">Screen padding, page rhythm</span></div>
+  </div>
+
+  <div class="sub-title">Border Radius Tokens</div>
+  <div class="grid-4">
+    <div class="card-sm" style="text-align:center;"><div style="width:40px;height:40px;background:var(--forest);border-radius:8px;margin:0 auto 8px;"></div><div style="font-family:var(--font-mono);font-size:11px;color:var(--forest);">--r-sm</div><div style="font-size:11px;color:var(--ink-60);">8px · inputs</div></div>
+    <div class="card-sm" style="text-align:center;"><div style="width:40px;height:40px;background:var(--forest);border-radius:12px;margin:0 auto 8px;"></div><div style="font-family:var(--font-mono);font-size:11px;color:var(--forest);">--r-md</div><div style="font-size:11px;color:var(--ink-60);">12px · badges</div></div>
+    <div class="card-sm" style="text-align:center;"><div style="width:40px;height:40px;background:var(--forest);border-radius:16px;margin:0 auto 8px;"></div><div style="font-family:var(--font-mono);font-size:11px;color:var(--forest);">--r-lg</div><div style="font-size:11px;color:var(--ink-60);">16px · cards</div></div>
+    <div class="card-sm" style="text-align:center;"><div style="width:40px;height:40px;background:var(--forest);border-radius:24px;margin:0 auto 8px;"></div><div style="font-family:var(--font-mono);font-size:11px;color:var(--forest);">--r-xl</div><div style="font-size:11px;color:var(--ink-60);">24px · panels</div></div>
+  </div>
+</div>
+
+<!-- ── 5. MOTION ── -->
+<div class="section page-break" id="motion">
+  <div class="eyebrow">05 · Foundation</div>
+  <div class="sec-title">Motion & Easing</div>
+  <div class="sec-desc">Motion is purposeful and emotionally calibrated. The parent app moves with calm confidence. The kid app celebrates with delight. Never animate for decoration.</div>
+
+  <div class="sub-title">Easing Tokens</div>
+  <table class="motion-table">
+    <tr><th>Token</th><th>Value</th><th>Use case</th></tr>
+    <tr><td><code>--ease-brand</code></td><td><code>cubic-bezier(0.16, 1, 0.3, 1)</code></td><td>Parent app screen transitions, modals</td></tr>
+    <tr><td><code>--ease-bounce</code></td><td><code>cubic-bezier(0.36, 0.07, 0.19, 0.97)</code></td><td>Kid app celebrations, badge pops</td></tr>
+    <tr><td><code>--ease-spring</code></td><td><code>cubic-bezier(0.34, 1.56, 0.64, 1)</code></td><td>Button press, toggles, checkmarks</td></tr>
+    <tr><td><code>--ease-out-soft</code></td><td><code>cubic-bezier(0, 0, 0.2, 1)</code></td><td>Drawers, tooltips, dropdowns</td></tr>
+  </table>
+
+  <div class="sub-title">Duration Tokens</div>
+  <table class="motion-table">
+    <tr><th>Token</th><th>Duration</th><th>Use case</th></tr>
+    <tr><td><code>--dur-instant</code></td><td>80ms</td><td>Hover state color fills, icon changes</td></tr>
+    <tr><td><code>--dur-quick</code></td><td>150ms</td><td>Button press, badge appear, checkmark</td></tr>
+    <tr><td><code>--dur-standard</code></td><td>250ms</td><td>Screen transitions, modals, overlays</td></tr>
+    <tr><td><code>--dur-deliberate</code></td><td>400ms</td><td>XP bar fill, chart draw-in, number count-up</td></tr>
+    <tr><td><code>--dur-celebration</code></td><td>600–800ms</td><td>Achievement unlock, level-up sequence</td></tr>
+  </table>
+
+  <div class="sub-title">Animation Principles</div>
+  <div class="grid-2">
+    <div class="usage-note note-g" style="border-radius:var(--r-md);padding:16px;">
+      <strong>Parent App</strong><br><br>
+      Numbers count up smoothly. Screens slide or fade. Nothing bounces or jiggles. Portfolio values should feel trustworthy — precision > delight here.
+    </div>
+    <div class="usage-note note-a" style="border-radius:var(--r-md);padding:16px;">
+      <strong>Kid App</strong><br><br>
+      Achievements bounce in. XP bars fill with a gleam. Coins fly on reward. Gilli floats gently when idle. Every interaction should feel rewarding.
+    </div>
+  </div>
+</div>
+
+<!-- ── 6. BUTTONS ── -->
+<div class="section" id="buttons">
+  <div class="eyebrow">06 · Components</div>
+  <div class="sec-title">Buttons</div>
+  <div class="sec-desc">Parent buttons are clean and direct. Kid buttons are bold and tactile with a physical "press" shadow effect.</div>
+
+  <div class="label">Parent App Buttons</div>
+  <div class="row" style="margin-bottom:16px;">
+    <button class="btn btn-primary">Invest Now</button>
+    <button class="btn btn-secondary">View Details</button>
+    <button class="btn btn-ghost">Learn More</button>
+    <button class="btn btn-danger">Remove</button>
+  </div>
+  <div class="row" style="margin-bottom:28px;">
+    <button class="btn btn-primary btn-sm">Confirm</button>
+    <button class="btn btn-primary">Default</button>
+    <button class="btn btn-primary btn-lg">Start Investing →</button>
+  </div>
+
+  <div class="label">Kid App Buttons</div>
+  <div class="row">
+    <button class="btn-kid btn-kid-primary">⭐ Claim Reward!</button>
+    <button class="btn-kid btn-kid-green">🌱 Start Quest</button>
+  </div>
+
+  <div class="code-block" style="margin-top:20px;"><span class="comment">/* Parent Primary */</span>
+<span class="key">.btn-primary</span> {
+  background: <span class="val">#1C4A3A</span>;
+  color: <span class="val">white</span>;
+  border-radius: <span class="val">100px</span>;
+  padding: <span class="val">10px 20px</span>;
+  font-weight: <span class="val">600</span>;
+  font-size: <span class="val">14px</span>;
+}
+
+<span class="comment">/* Kid Primary (press effect) */</span>
+<span class="key">.btn-kid-primary</span> {
+  background: <span class="val">#F9C84A</span>;
+  color: <span class="val">#3D2A00</span>;
+  font-family: <span class="val">'Nunito'</span>;
+  font-weight: <span class="val">800</span>;
+  box-shadow: <span class="val">0 3px 0 #C97B00</span>;
+  border-radius: <span class="val">100px</span>;
+}</div>
+</div>
+
+<!-- ── 7. BADGES ── -->
+<div class="section" id="badges">
+  <div class="eyebrow">07 · Components</div>
+  <div class="sec-title">Badges & Status Pills</div>
+
+  <div class="label">Status Badges</div>
+  <div class="row" style="margin-bottom:24px;">
+    <span class="badge badge-g">✓ Active</span>
+    <span class="badge badge-a">⏳ Pending</span>
+    <span class="badge badge-b">📚 Learning</span>
+    <span class="badge badge-r">↓ -2.4%</span>
+    <span class="badge badge-g">↑ +8.3%</span>
+  </div>
+
+  <table class="motion-table">
+    <tr><th>Variant</th><th>Background</th><th>Text color</th><th>When to use</th></tr>
+    <tr><td>Green</td><td>#D8F3DC</td><td>#1C4A3A</td><td>Active, success, positive return</td></tr>
+    <tr><td>Amber</td><td>#FDF0DC</td><td>#7A4800</td><td>Pending, locked, processing</td></tr>
+    <tr><td>Blue</td><td>#EAF2FC</td><td>#2166B2</td><td>Informational, learning state</td></tr>
+    <tr><td>Red</td><td>#FFF0EB</td><td>#E05B3A</td><td>Error, negative return, overdue</td></tr>
+  </table>
+</div>
+
+<!-- ── 8. INPUTS ── -->
+<div class="section" id="inputs">
+  <div class="eyebrow">08 · Components</div>
+  <div class="sec-title">Form Inputs</div>
+
+  <div class="grid-2" style="margin-bottom:24px;">
+    <div>
+      <label class="input-label">Investment Amount</label>
+      <div style="position:relative;">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-60);font-weight:600;">₹</span>
+        <input class="taru-input" type="text" value="1,000" style="padding-left:28px;">
+      </div>
+    </div>
+    <div>
+      <label class="input-label">Child's Name</label>
+      <input class="taru-input" type="text" placeholder="e.g. Aarav">
+    </div>
+  </div>
+
+  <div class="code-block"><span class="key">.taru-input</span> {
+  border: <span class="val">1.5px solid rgba(26,43,34,0.1)</span>;
+  border-radius: <span class="val">12px</span>;
+  padding: <span class="val">10px 14px</span>;
+  font-family: <span class="val">'Plus Jakarta Sans'</span>;
+  font-size: <span class="val">14px</span>;
+  transition: <span class="val">border-color 0.15s</span>;
+}
+<span class="key">.taru-input:focus</span> {
+  border-color: <span class="val">#40916C</span>;
+  box-shadow: <span class="val">0 0 0 3px rgba(64,145,108,0.12)</span>;
+  outline: <span class="val">none</span>;
+}</div>
+</div>
+
+<!-- ── 9. INVEST CARDS ── -->
+<div class="section page-break" id="invest-cards">
+  <div class="eyebrow">09 · Components</div>
+  <div class="sec-title">Investment Cards</div>
+
+  <div class="grid-2">
+    <div class="invest-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+        <div><div style="font-size:15px;font-weight:600;">Parag Parikh Flexi Cap</div><div style="font-size:11px;color:var(--ink-60);margin-top:2px;">Flexi Cap · Equity</div></div>
+        <span class="badge badge-g">↑ Active</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;">
+        <div><div style="font-size:10px;color:var(--ink-60);margin-bottom:2px;">Current Value</div><div style="font-family:var(--font-display);font-size:24px;color:var(--forest);">₹24,580</div></div>
+        <div style="text-align:right;"><div style="font-size:12px;font-weight:600;color:#1A7A4A;">↑ +18.4%</div><div style="font-size:11px;color:var(--ink-60);">since Jan 2023</div></div>
+      </div>
+      <svg viewBox="0 0 220 48" fill="none" style="width:100%;height:48px;margin:8px 0;">
+        <polyline points="0,38 30,32 55,35 80,22 110,18 140,24 165,12 190,8 220,4" stroke="#40916C" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <polygon points="0,38 30,32 55,35 80,22 110,18 140,24 165,12 190,8 220,4 220,48 0,48" fill="#D8F3DC" opacity="0.6"/>
+      </svg>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink-60);margin-bottom:4px;"><span>Invested: ₹20,000</span><span>Goal: ₹50,000</span></div>
+      <div class="xp-wrap"><div class="xp-fill" style="width:49%"></div></div>
+    </div>
+    <div class="invest-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+        <div><div style="font-size:15px;font-weight:600;">Mirae Asset ELSS</div><div style="font-size:11px;color:var(--ink-60);margin-top:2px;">ELSS · Tax Saving</div></div>
+        <span class="badge badge-a">⏳ Locked</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;">
+        <div><div style="font-size:10px;color:var(--ink-60);margin-bottom:2px;">Current Value</div><div style="font-family:var(--font-display);font-size:24px;color:var(--forest);">₹8,240</div></div>
+        <div style="text-align:right;"><div style="font-size:12px;font-weight:600;color:#1A7A4A;">↑ +9.2%</div><div style="font-size:11px;color:var(--ink-60);">since Mar 2024</div></div>
+      </div>
+      <svg viewBox="0 0 220 48" fill="none" style="width:100%;height:48px;margin:8px 0;">
+        <polyline points="0,40 30,38 55,36 80,32 110,30 140,28 165,20 190,16 220,14" stroke="#40916C" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <polygon points="0,40 30,38 55,36 80,32 110,30 140,28 165,20 190,16 220,14 220,48 0,48" fill="#D8F3DC" opacity="0.6"/>
+      </svg>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink-60);margin-bottom:4px;"><span>Invested: ₹7,500</span><span>Unlocks Dec 2026</span></div>
+      <div class="xp-wrap"><div class="xp-fill" style="width:60%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 10. CHORE CARDS ── -->
+<div class="section" id="chore-cards">
+  <div class="eyebrow">10 · Components</div>
+  <div class="sec-title">Chore Cards</div>
+  <div class="sec-desc">Two views for the same data. The parent app shows a clean task list with status. The kid app presents chores as gamified quests with XP and streaks.</div>
+
+  <div class="label">Parent App — List View</div>
+  <div class="stack" style="max-width:480px;margin-bottom:28px;">
+    <div class="chore-item chore-done">
+      <div style="width:44px;height:44px;border-radius:12px;background:var(--frost);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🧹</div>
+      <div style="flex:1;"><div style="font-size:14px;font-weight:600;text-decoration:line-through;color:var(--ink-60);">Clean your room</div><div style="display:flex;gap:8px;margin-top:3px;"><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--frost);color:var(--forest);">+₹20</span><span style="font-size:11px;color:var(--ink-60);">Done at 9:30 AM</span></div></div>
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--leaf);border:2px solid var(--leaf);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;">✓</div>
+    </div>
+    <div class="chore-item" style="border-left:4px solid var(--border);">
+      <div style="width:44px;height:44px;border-radius:12px;background:var(--ink-10);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📚</div>
+      <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Finish homework</div><div style="display:flex;gap:8px;margin-top:3px;"><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--amber-lt);color:var(--amber-dk);">+₹30</span><span style="font-size:11px;color:var(--ink-60);">Due by 6:00 PM</span></div></div>
+      <div style="width:32px;height:32px;border-radius:50%;border:2px solid var(--border);"></div>
+    </div>
+    <div class="chore-item chore-over">
+      <div style="width:44px;height:44px;border-radius:12px;background:var(--amber-lt);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🐕</div>
+      <div style="flex:1;"><div style="font-size:14px;font-weight:600;">Walk the dog</div><div style="display:flex;gap:8px;margin-top:3px;"><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--amber-lt);color:var(--amber-dk);">+₹25</span><span style="font-size:11px;color:var(--amber);font-weight:600;">⚠ Overdue 2 hrs</span></div></div>
+      <div style="width:32px;height:32px;border-radius:50%;border:2px solid var(--amber);">  </div>
+    </div>
+  </div>
+
+  <div class="label">Kid App — Quest View</div>
+  <div class="grid-2" style="max-width:480px;">
+    <div class="kid-chore" style="background:var(--frost);border-color:var(--mint);">
+      <div style="width:52px;height:52px;border-radius:14px;background:white;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:10px;">🧹</div>
+      <div style="font-size:13px;font-weight:800;text-decoration:line-through;color:var(--ink-60);margin-bottom:6px;">Clean your room</div>
+      <span style="font-size:11px;font-weight:900;padding:3px 8px;border-radius:100px;background:var(--mint);color:var(--forest);">✓ +20 XP earned</span>
+    </div>
+    <div class="kid-chore">
+      <div style="width:52px;height:52px;border-radius:14px;background:#EAF2FC;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:10px;">📚</div>
+      <div style="font-size:13px;font-weight:800;margin-bottom:6px;">Finish homework</div>
+      <span style="font-size:11px;font-weight:900;padding:3px 8px;border-radius:100px;background:var(--amber-md);color:#3D2A00;">⭐ +30 XP</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 11. KID COMPONENTS ── -->
+<div class="section page-break" id="kid-components">
+  <div class="eyebrow">11 · Components</div>
+  <div class="sec-title">Kid App Components</div>
+
+  <div class="label">Learning Card</div>
+  <div style="background:#FFFBF0;border:2px solid #FDDBA8;border-radius:var(--r-xl);padding:20px;max-width:360px;font-family:var(--font-kid);margin-bottom:24px;">
+    <span style="font-size:36px;display:block;margin-bottom:10px;">🌱</span>
+    <div style="font-size:17px;font-weight:800;margin-bottom:6px;">What is a Mutual Fund?</div>
+    <div style="font-size:13px;color:var(--ink-60);line-height:1.6;">Imagine lots of friends pooling their pocket money together to buy something big — that's a mutual fund!</div>
+    <div style="display:flex;gap:4px;margin-top:12px;font-size:18px;">⭐⭐⭐☆☆</div>
+  </div>
+
+  <div class="label">XP Progress System</div>
+  <div style="background:#FFFBF0;border:1.5px solid #FDDBA8;border-radius:var(--r-xl);padding:20px;max-width:360px;font-family:var(--font-kid);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-size:15px;font-weight:800;">Aarav's Level</div>
+      <div style="background:var(--amber-md);color:#3D2A00;font-size:12px;font-weight:900;padding:4px 12px;border-radius:var(--r-pill);">🐿️ Sapling · Lv 3</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink-60);margin-bottom:6px;"><span>490 / 600 XP to Level 4</span><span>🌲 Branch Builder!</span></div>
+    <div class="xp-wrap" style="height:16px;"><div class="xp-fill" style="width:82%;"></div></div>
+  </div>
+</div>
+
+<!-- ── 12. MASCOT ── -->
+<div class="section" id="mascot">
+  <div class="eyebrow">12 · Identity</div>
+  <div class="sec-title">Mascot — Gilli</div>
+  <div class="sec-desc">Taru's cheerful squirrel companion. Gilli appears across both apps but plays different roles — enthusiastic guide for kids, thoughtful advisor for parents.</div>
+
+  <!-- SVG DEFS for Gilli base shapes (reusable) -->
+  <svg width="0" height="0" style="position:absolute;">
+    <defs>
+      <!-- Subtle grain filter -->
+      <filter id="gilli-shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="rgba(26,43,34,0.18)"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="label">6 Mood States</div>
+  <div class="mood-grid" style="margin-bottom:36px;">
+
+    <!-- ── HAPPY GILLI ── -->
+    <div class="mood-card" style="background:linear-gradient(160deg,#F9FDFB 0%,#D8F3DC 100%);">
+      <div style="display:flex;justify-content:center;margin-bottom:8px;">
+        <svg width="90" height="100" viewBox="0 0 90 100" fill="none" xmlns="http://www.w3.org/2000/svg" filter="url(#gilli-shadow)">
+          <!-- Tail -->
+          <path d="M62 72 Q90 55 85 30 Q80 10 68 18 Q60 24 65 45 Q68 58 62 72Z" fill="#E8920A"/>
+          <path d="M64 70 Q88 56 83 34 Q79 16 70 22 Q63 27 67 46 Q70 58 64 70Z" fill="#F9C84A" opacity="0.6"/>
+          <!-- Body -->
+          <ellipse cx="42" cy="74" rx="24" ry="27" fill="#C97B00"/>
+          <!-- Belly -->
+          <ellipse cx="42" cy="80" rx="14" ry="17" fill="#FDF0DC"/>
+          <!-- Head -->
+          <ellipse cx="42" cy="44" rx="24" ry="22" fill="#C97B00"/>
+          <!-- Ears -->
+          <ellipse cx="24" cy="27" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="24" cy="27" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="27" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="60" cy="27" rx="5" ry="7" fill="#F9C84A"/>
+          <!-- Eyes — happy squint -->
+          <path d="M31 41 Q35 36 39 41" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M45 41 Q49 36 53 41" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <!-- Cheeks -->
+          <circle cx="27" cy="48" r="6" fill="#F9C84A" opacity="0.55"/>
+          <circle cx="57" cy="48" r="6" fill="#F9C84A" opacity="0.55"/>
+          <!-- Nose -->
+          <ellipse cx="42" cy="51" rx="4" ry="3" fill="#7A4800"/>
+          <!-- Smile -->
+          <path d="M34 57 Q42 64 50 57" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <!-- Arms -->
+          <ellipse cx="20" cy="72" rx="8" ry="14" transform="rotate(15 20 72)" fill="#C97B00"/>
+          <ellipse cx="64" cy="72" rx="8" ry="14" transform="rotate(-15 64 72)" fill="#C97B00"/>
+          <!-- Acorn in hand -->
+          <ellipse cx="14" cy="84" rx="6" ry="7" fill="#92580A"/>
+          <rect x="11" y="76" width="6" height="5" rx="2" fill="#5A3500"/>
+          <line x1="14" y1="76" x2="14" y2="72" stroke="#5A3500" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="mood-name">Happy Gilli</div>
+      <span class="mood-badge" style="background:var(--frost);color:var(--forest);">Default · Everyday</span>
+      <div class="mood-desc">Warm, present, ready to help. Baseline state for greetings and home screens.</div>
+      <div class="speech-bubble">"Hey! Ready to check your acorns today? 🌰"</div>
+      <span class="use-tag">Home screen · Greetings · Idle</span>
+    </div>
+
+    <!-- ── PARTY GILLI ── -->
+    <div class="mood-card" style="background:linear-gradient(160deg,#FFFBF0 0%,#FEF4C7 100%);">
+      <div style="display:flex;justify-content:center;margin-bottom:8px;">
+        <svg width="90" height="110" viewBox="0 0 90 110" fill="none" xmlns="http://www.w3.org/2000/svg" filter="url(#gilli-shadow)">
+          <!-- Confetti -->
+          <rect x="8" y="12" width="6" height="6" rx="1" fill="#E05B3A" transform="rotate(25 8 12)"/>
+          <rect x="72" y="8" width="5" height="5" rx="1" fill="#2166B2" transform="rotate(-15 72 8)"/>
+          <rect x="80" y="28" width="5" height="5" rx="1" fill="#40916C" transform="rotate(40 80 28)"/>
+          <rect x="5" y="38" width="4" height="4" rx="1" fill="#7B5EDD" transform="rotate(10 5 38)"/>
+          <circle cx="76" cy="50" r="3" fill="#F9C84A"/>
+          <circle cx="12" cy="22" r="2.5" fill="#74C69D"/>
+          <!-- Party hat on head -->
+          <polygon points="42,4 30,32 54,32" fill="#E05B3A"/>
+          <polygon points="42,4 38,18 46,18" fill="#F9C84A" opacity="0.7"/>
+          <line x1="42" y1="4" x2="42" y2="0" stroke="#F9C84A" stroke-width="1.5"/>
+          <circle cx="42" cy="0" r="3" fill="#F9C84A"/>
+          <!-- Tail -->
+          <path d="M63 75 Q92 58 86 32 Q80 12 68 20 Q60 26 65 48 Q68 62 63 75Z" fill="#E8920A"/>
+          <path d="M65 73 Q90 59 84 36 Q79 18 70 24 Q63 29 67 49 Q70 61 65 73Z" fill="#F9C84A" opacity="0.55"/>
+          <!-- Body -->
+          <ellipse cx="42" cy="78" rx="24" ry="27" fill="#C97B00"/>
+          <ellipse cx="42" cy="84" rx="14" ry="17" fill="#FDF0DC"/>
+          <!-- Head -->
+          <ellipse cx="42" cy="48" rx="24" ry="22" fill="#C97B00"/>
+          <!-- Ears -->
+          <ellipse cx="24" cy="31" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="24" cy="31" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="31" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="60" cy="31" rx="5" ry="7" fill="#F9C84A"/>
+          <!-- Eyes — star eyes -->
+          <circle cx="34" cy="46" r="6" fill="white"/>
+          <circle cx="50" cy="46" r="6" fill="white"/>
+          <text x="31" y="50" font-size="9" fill="#F9C84A">★</text>
+          <text x="47" y="50" font-size="9" fill="#F9C84A">★</text>
+          <!-- Cheeks -->
+          <circle cx="27" cy="53" r="6" fill="#F9C84A" opacity="0.6"/>
+          <circle cx="57" cy="53" r="6" fill="#F9C84A" opacity="0.6"/>
+          <!-- Nose + big grin -->
+          <ellipse cx="42" cy="55" rx="4" ry="3" fill="#7A4800"/>
+          <path d="M32 62 Q42 72 52 62" stroke="#7A4800" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <!-- Arms raised up -->
+          <path d="M20 72 Q10 55 16 46" stroke="#C97B00" stroke-width="10" stroke-linecap="round" fill="none"/>
+          <path d="M64 72 Q74 55 68 46" stroke="#C97B00" stroke-width="10" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div class="mood-name">Party Gilli</div>
+      <span class="mood-badge" style="background:#FEF4C7;color:#7A4800;">Celebrate · Achievement</span>
+      <div class="mood-desc">Pure joy. Level-ups, first investments, chore streaks, quiz wins.</div>
+      <div class="speech-bubble">"WOOHOO! You're a Sapling Grower now! 🎉"</div>
+      <span class="use-tag">Level-up · Chore done · Streak bonus</span>
+    </div>
+
+    <!-- ── WISE GILLI ── -->
+    <div class="mood-card" style="background:linear-gradient(160deg,#F9FDFB 0%,#EAF2FC 100%);">
+      <div style="display:flex;justify-content:center;margin-bottom:8px;">
+        <svg width="90" height="108" viewBox="0 0 90 108" fill="none" xmlns="http://www.w3.org/2000/svg" filter="url(#gilli-shadow)">
+          <!-- Graduation cap -->
+          <rect x="20" y="28" width="44" height="6" rx="3" fill="#2166B2"/>
+          <polygon points="42,18 18,30 42,36 66,30" fill="#1C4A3A"/>
+          <line x1="66" y1="30" x2="70" y2="42" stroke="#1C4A3A" stroke-width="2"/>
+          <circle cx="70" cy="44" r="3" fill="#F9C84A"/>
+          <!-- Tail -->
+          <path d="M62 78 Q90 62 85 36 Q80 14 68 22 Q60 28 65 50 Q68 64 62 78Z" fill="#E8920A"/>
+          <path d="M64 76 Q88 62 83 38 Q79 18 70 24 Q63 29 67 51 Q70 63 64 76Z" fill="#F9C84A" opacity="0.5"/>
+          <!-- Body -->
+          <ellipse cx="42" cy="80" rx="24" ry="27" fill="#C97B00"/>
+          <ellipse cx="42" cy="86" rx="14" ry="17" fill="#FDF0DC"/>
+          <!-- Head -->
+          <ellipse cx="42" cy="50" rx="24" ry="22" fill="#C97B00"/>
+          <!-- Ears -->
+          <ellipse cx="24" cy="33" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="24" cy="33" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="33" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="60" cy="33" rx="5" ry="7" fill="#F9C84A"/>
+          <!-- Glasses -->
+          <circle cx="34" cy="49" r="7" fill="none" stroke="#1C4A3A" stroke-width="2"/>
+          <circle cx="50" cy="49" r="7" fill="none" stroke="#1C4A3A" stroke-width="2"/>
+          <line x1="41" y1="49" x2="43" y2="49" stroke="#1C4A3A" stroke-width="1.5"/>
+          <line x1="18" y1="48" x2="27" y2="49" stroke="#1C4A3A" stroke-width="1.5"/>
+          <line x1="57" y1="49" x2="65" y2="48" stroke="#1C4A3A" stroke-width="1.5"/>
+          <!-- Eyes behind glasses -->
+          <circle cx="34" cy="49" r="3.5" fill="#1A2B22"/>
+          <circle cx="50" cy="49" r="3.5" fill="#1A2B22"/>
+          <circle cx="35" cy="48" r="1.2" fill="white"/>
+          <circle cx="51" cy="48" r="1.2" fill="white"/>
+          <!-- Cheeks -->
+          <circle cx="25" cy="57" r="6" fill="#F9C84A" opacity="0.5"/>
+          <circle cx="59" cy="57" r="6" fill="#F9C84A" opacity="0.5"/>
+          <!-- Thoughtful mouth -->
+          <path d="M36 61 Q42 65 48 61" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <!-- Arms — one holding book -->
+          <ellipse cx="20" cy="78" rx="8" ry="14" transform="rotate(10 20 78)" fill="#C97B00"/>
+          <ellipse cx="64" cy="76" rx="8" ry="14" transform="rotate(-5 64 76)" fill="#C97B00"/>
+          <!-- Book -->
+          <rect x="56" y="80" width="16" height="20" rx="2" fill="#2166B2"/>
+          <rect x="57" y="81" width="7" height="18" rx="1" fill="#90BFEE" opacity="0.5"/>
+          <line x1="64" y1="82" x2="64" y2="98" stroke="#1C4A3A" stroke-width="1"/>
+          <!-- Lightbulb above head -->
+          <circle cx="72" cy="18" r="8" fill="#F9C84A" opacity="0.9"/>
+          <rect x="69" y="26" width="6" height="4" rx="1" fill="#E8920A"/>
+          <line x1="72" y1="8" x2="72" y2="4" stroke="#F9C84A" stroke-width="1.5"/>
+          <line x1="65" y1="11" x2="62" y2="8" stroke="#F9C84A" stroke-width="1.5"/>
+          <line x1="79" y1="11" x2="82" y2="8" stroke="#F9C84A" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="mood-name">Wise Gilli</div>
+      <span class="mood-badge" style="background:var(--sky-lt);color:var(--sky);">Explain · Educate</span>
+      <div class="mood-desc">Patient and curious. All learning modules, concept cards, quiz intros.</div>
+      <div class="speech-bubble">"Did you know? Compound interest means your money earns money! 💡"</div>
+      <span class="use-tag">Lessons · Quizzes · Concepts</span>
+    </div>
+
+    <!-- ── NUDGE GILLI ── -->
+    <div class="mood-card" style="background:linear-gradient(160deg,#FFFBF0 0%,#FEF3E2 100%);">
+      <div style="display:flex;justify-content:center;margin-bottom:8px;">
+        <svg width="90" height="108" viewBox="0 0 90 108" fill="none" xmlns="http://www.w3.org/2000/svg" filter="url(#gilli-shadow)">
+          <!-- Tail -->
+          <path d="M62 78 Q90 62 85 36 Q80 14 68 22 Q60 28 65 50 Q68 64 62 78Z" fill="#E8920A"/>
+          <path d="M64 76 Q88 62 83 38 Q79 18 70 24 Q63 29 67 51 Q70 63 64 76Z" fill="#F9C84A" opacity="0.5"/>
+          <!-- Body -->
+          <ellipse cx="42" cy="80" rx="24" ry="27" fill="#C97B00"/>
+          <ellipse cx="42" cy="86" rx="14" ry="17" fill="#FDF0DC"/>
+          <!-- Head -->
+          <ellipse cx="42" cy="50" rx="24" ry="22" fill="#C97B00"/>
+          <!-- Ears -->
+          <ellipse cx="24" cy="33" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="24" cy="33" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="33" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="60" cy="33" rx="5" ry="7" fill="#F9C84A"/>
+          <!-- Eyes — one raised brow nudge look -->
+          <circle cx="34" cy="48" r="6" fill="white"/>
+          <circle cx="50" cy="48" r="6" fill="white"/>
+          <circle cx="34" cy="49" r="3.5" fill="#1A2B22"/>
+          <circle cx="50" cy="49" r="3.5" fill="#1A2B22"/>
+          <circle cx="35" cy="47" r="1.2" fill="white"/>
+          <circle cx="51" cy="47" r="1.2" fill="white"/>
+          <!-- Eyebrow raised on one side -->
+          <path d="M28 40 Q34 37 40 40" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M44 41 Q50 40 56 41" stroke="#7A4800" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <!-- Cheeks -->
+          <circle cx="27" cy="56" r="6" fill="#F9C84A" opacity="0.5"/>
+          <circle cx="57" cy="56" r="6" fill="#F9C84A" opacity="0.5"/>
+          <!-- Nose -->
+          <ellipse cx="42" cy="57" rx="4" ry="3" fill="#7A4800"/>
+          <!-- Small knowing smile -->
+          <path d="M36 63 Q42 68 48 63" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <!-- Finger pointing (one arm up) -->
+          <path d="M64 76 Q72 65 70 54" stroke="#C97B00" stroke-width="10" stroke-linecap="round" fill="none"/>
+          <circle cx="70" cy="51" r="5" fill="#C97B00"/>
+          <line x1="70" y1="44" x2="70" y2="38" stroke="#C97B00" stroke-width="4" stroke-linecap="round"/>
+          <!-- Other arm -->
+          <ellipse cx="20" cy="78" rx="8" ry="14" transform="rotate(10 20 78)" fill="#C97B00"/>
+          <!-- Clock badge -->
+          <circle cx="16" cy="20" r="14" fill="white" stroke="#E8920A" stroke-width="2.5"/>
+          <circle cx="16" cy="20" r="2" fill="#E8920A"/>
+          <line x1="16" y1="20" x2="16" y2="10" stroke="#E8920A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="16" y1="20" x2="23" y2="22" stroke="#E8920A" stroke-width="2" stroke-linecap="round"/>
+          <!-- Exclamation -->
+          <circle cx="76" cy="16" r="10" fill="#E8920A"/>
+          <rect x="73.5" y="9" width="5" height="10" rx="2" fill="white"/>
+          <circle cx="76" cy="22" r="2.5" fill="white"/>
+        </svg>
+      </div>
+      <div class="mood-name">Nudge Gilli</div>
+      <span class="mood-badge" style="background:#FEF3E2;color:#844900;">Reminder · Prompt</span>
+      <div class="mood-desc">Gently persistent. Never scolding. For missed chores, pending SIPs.</div>
+      <div class="speech-bubble">"Psst… Arjun hasn't done his homework chore yet! ⏰"</div>
+      <span class="use-tag">Reminder · Missed chore · SIP due</span>
+    </div>
+
+    <!-- ── CHEER GILLI ── -->
+    <div class="mood-card" style="background:linear-gradient(160deg,#F9FDFB 0%,#D8F3DC 100%);">
+      <div style="display:flex;justify-content:center;margin-bottom:8px;">
+        <svg width="90" height="108" viewBox="0 0 90 108" fill="none" xmlns="http://www.w3.org/2000/svg" filter="url(#gilli-shadow)">
+          <!-- Tail — bushy and upright, energetic -->
+          <path d="M60 70 Q88 48 82 22 Q76 4 64 12 Q55 19 62 44 Q66 58 60 70Z" fill="#E8920A"/>
+          <path d="M62 68 Q87 49 81 26 Q76 8 66 15 Q58 21 64 45 Q68 58 62 68Z" fill="#F9C84A" opacity="0.55"/>
+          <!-- Pom-poms -->
+          <circle cx="8" cy="52" r="12" fill="#40916C" opacity="0.85"/>
+          <circle cx="8" cy="52" r="8" fill="#74C69D"/>
+          <circle cx="5" cy="49" r="2.5" fill="white" opacity="0.6"/>
+          <circle cx="78" cy="52" r="12" fill="#40916C" opacity="0.85"/>
+          <circle cx="78" cy="52" r="8" fill="#74C69D"/>
+          <circle cx="75" cy="49" r="2.5" fill="white" opacity="0.6"/>
+          <!-- Body -->
+          <ellipse cx="42" cy="80" rx="24" ry="27" fill="#C97B00"/>
+          <ellipse cx="42" cy="86" rx="14" ry="17" fill="#FDF0DC"/>
+          <!-- Head -->
+          <ellipse cx="42" cy="50" rx="24" ry="22" fill="#C97B00"/>
+          <!-- Ears -->
+          <ellipse cx="24" cy="33" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="24" cy="33" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="33" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="60" cy="33" rx="5" ry="7" fill="#F9C84A"/>
+          <!-- Excited eyes -->
+          <circle cx="34" cy="48" r="7" fill="white"/>
+          <circle cx="50" cy="48" r="7" fill="white"/>
+          <circle cx="35" cy="49" r="4" fill="#1A2B22"/>
+          <circle cx="51" cy="49" r="4" fill="#1A2B22"/>
+          <circle cx="36" cy="47" r="1.5" fill="white"/>
+          <circle cx="52" cy="47" r="1.5" fill="white"/>
+          <!-- Eyebrows up excited -->
+          <path d="M28 39 Q34 35 40 39" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M44 39 Q50 35 56 39" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <!-- Cheeks big -->
+          <circle cx="26" cy="56" r="7" fill="#F9C84A" opacity="0.6"/>
+          <circle cx="58" cy="56" r="7" fill="#F9C84A" opacity="0.6"/>
+          <!-- Nose -->
+          <ellipse cx="42" cy="57" rx="4" ry="3" fill="#7A4800"/>
+          <!-- Big grin -->
+          <path d="M32 63 Q42 74 52 63" stroke="#7A4800" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <!-- Arms with pom-poms -->
+          <path d="M20 76 Q10 65 8 52" stroke="#C97B00" stroke-width="9" stroke-linecap="round" fill="none"/>
+          <path d="M64 76 Q74 65 78 52" stroke="#C97B00" stroke-width="9" stroke-linecap="round" fill="none"/>
+          <!-- Star sparkles -->
+          <text x="30" y="20" font-size="14" fill="#F9C84A">✦</text>
+          <text x="50" y="14" font-size="10" fill="#40916C">✦</text>
+          <text x="14" y="30" font-size="8" fill="#E8920A">✦</text>
+        </svg>
+      </div>
+      <div class="mood-name">Cheer Gilli</div>
+      <span class="mood-badge" style="background:#F0FBF5;color:#1A7A4A;">Encourage · Support</span>
+      <div class="mood-desc">Your biggest fan. Appears when a child is close to a goal.</div>
+      <div class="speech-bubble">"You're SO close to Level 5! 2 more quests! 💪"</div>
+      <span class="use-tag">Near-goal · Mid-task · Boost</span>
+    </div>
+
+    <!-- ── CALM GILLI ── -->
+    <div class="mood-card" style="background:linear-gradient(160deg,#F9FDFB 0%,#F2EDFC 100%);">
+      <div style="display:flex;justify-content:center;margin-bottom:8px;">
+        <svg width="90" height="108" viewBox="0 0 90 108" fill="none" xmlns="http://www.w3.org/2000/svg" filter="url(#gilli-shadow)">
+          <!-- Stars and moon bg -->
+          <circle cx="75" cy="14" r="8" fill="#F2EDFC"/>
+          <path d="M75 8 Q78 14 75 20 Q82 17 88 14 Q82 11 75 8Z" fill="#7B5EDD" opacity="0.7"/>
+          <circle cx="14" cy="22" r="2" fill="#7B5EDD" opacity="0.5"/>
+          <circle cx="22" cy="10" r="1.5" fill="#7B5EDD" opacity="0.4"/>
+          <circle cx="80" cy="30" r="1.5" fill="#7B5EDD" opacity="0.5"/>
+          <!-- Tail — relaxed drooping -->
+          <path d="M62 80 Q85 72 82 50 Q79 32 68 36 Q60 40 64 58 Q66 68 62 80Z" fill="#E8920A" opacity="0.9"/>
+          <path d="M64 78 Q84 72 81 53 Q78 36 70 39 Q63 42 66 59 Q68 67 64 78Z" fill="#F9C84A" opacity="0.45"/>
+          <!-- Body -->
+          <ellipse cx="42" cy="82" rx="24" ry="25" fill="#C97B00"/>
+          <ellipse cx="42" cy="87" rx="14" ry="16" fill="#FDF0DC"/>
+          <!-- Scarf / blanket wrap -->
+          <ellipse cx="42" cy="80" rx="28" ry="9" fill="#7B5EDD" opacity="0.75"/>
+          <ellipse cx="42" cy="80" rx="23" ry="6" fill="#9B7EED" opacity="0.5"/>
+          <!-- Head tilted slightly -->
+          <ellipse cx="44" cy="50" rx="24" ry="22" fill="#C97B00"/>
+          <!-- Ears -->
+          <ellipse cx="26" cy="33" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="26" cy="33" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="62" cy="33" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="62" cy="33" rx="5" ry="7" fill="#F9C84A"/>
+          <!-- Half-closed calm eyes -->
+          <ellipse cx="36" cy="49" rx="7" ry="5" fill="white"/>
+          <ellipse cx="52" cy="49" rx="7" ry="5" fill="white"/>
+          <ellipse cx="36" cy="50" rx="4.5" ry="3.5" fill="#1A2B22"/>
+          <ellipse cx="52" cy="50" rx="4.5" ry="3.5" fill="#1A2B22"/>
+          <!-- Drowsy eyelids -->
+          <path d="M29 47 Q36 43 43 47" stroke="#C97B00" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M45 47 Q52 43 59 47" stroke="#C97B00" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <!-- Cheeks soft -->
+          <circle cx="28" cy="56" r="6" fill="#7B5EDD" opacity="0.3"/>
+          <circle cx="60" cy="56" r="6" fill="#7B5EDD" opacity="0.3"/>
+          <!-- Serene smile -->
+          <path d="M37 61 Q44 66 51 61" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <!-- Nose -->
+          <ellipse cx="44" cy="57" rx="4" ry="3" fill="#7A4800"/>
+          <!-- Arms tucked in scarf -->
+          <ellipse cx="18" cy="80" rx="7" ry="10" transform="rotate(15 18 80)" fill="#7B5EDD" opacity="0.6"/>
+          <ellipse cx="66" cy="80" rx="7" ry="10" transform="rotate(-15 66 80)" fill="#7B5EDD" opacity="0.6"/>
+          <!-- Tea cup -->
+          <rect x="50" y="84" width="18" height="14" rx="3" fill="white" stroke="#7B5EDD" stroke-width="1.5"/>
+          <path d="M68 89 Q74 89 74 94 Q74 99 68 99" stroke="#7B5EDD" stroke-width="1.5" fill="none"/>
+          <path d="M53 82 Q55 76 57 82" stroke="#74C69D" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+          <path d="M58 80 Q60 74 62 80" stroke="#74C69D" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="mood-name">Calm Gilli</div>
+      <span class="mood-badge" style="background:var(--purple-lt);color:var(--purple);">Reassure · Simplify</span>
+      <div class="mood-desc">Soft, slow, reassuring. Market dips, complex topics, parent advisories.</div>
+      <div class="speech-bubble">"Markets go up and down — that's normal. Your tree still grows. 🌙"</div>
+      <span class="use-tag">Market dip · Parent advisory</span>
+    </div>
+  </div>
+
+  <!-- ── SIZE VARIANTS ── -->
+  <div class="sub-title">Sizing Variants</div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;margin-bottom:28px;">
+    <div style="display:flex;align-items:flex-end;gap:32px;flex-wrap:wrap;">
+      <!-- Full body 96px -->
+      <div style="text-align:center;">
+        <svg width="96" height="108" viewBox="0 0 90 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M62 72 Q90 55 85 30 Q80 10 68 18 Q60 24 65 45 Q68 58 62 72Z" fill="#E8920A"/>
+          <path d="M64 70 Q88 56 83 34 Q79 16 70 22 Q63 27 67 46 Q70 58 64 70Z" fill="#F9C84A" opacity="0.55"/>
+          <ellipse cx="42" cy="74" rx="24" ry="27" fill="#C97B00"/>
+          <ellipse cx="42" cy="80" rx="14" ry="17" fill="#FDF0DC"/>
+          <ellipse cx="42" cy="44" rx="24" ry="22" fill="#C97B00"/>
+          <ellipse cx="24" cy="27" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="24" cy="27" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="27" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="60" cy="27" rx="5" ry="7" fill="#F9C84A"/>
+          <path d="M31 41 Q35 36 39 41" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M45 41 Q49 36 53 41" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="27" cy="48" r="6" fill="#F9C84A" opacity="0.55"/>
+          <circle cx="57" cy="48" r="6" fill="#F9C84A" opacity="0.55"/>
+          <ellipse cx="42" cy="51" rx="4" ry="3" fill="#7A4800"/>
+          <path d="M34 57 Q42 64 50 57" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <ellipse cx="20" cy="72" rx="8" ry="14" transform="rotate(15 20 72)" fill="#C97B00"/>
+          <ellipse cx="64" cy="72" rx="8" ry="14" transform="rotate(-15 64 72)" fill="#C97B00"/>
+        </svg>
+        <div style="font-size:10px;font-weight:600;color:var(--ink-60);margin-top:6px;">Full Body</div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--ink-30);">96px · Celebration</div>
+      </div>
+      <!-- Bust 60px -->
+      <div style="text-align:center;">
+        <svg width="60" height="60" viewBox="20 28 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="42" cy="44" rx="24" ry="22" fill="#C97B00"/>
+          <ellipse cx="24" cy="27" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="24" cy="27" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="27" rx="8" ry="11" fill="#C97B00"/>
+          <ellipse cx="60" cy="27" rx="5" ry="7" fill="#F9C84A"/>
+          <path d="M31 41 Q35 36 39 41" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M45 41 Q49 36 53 41" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="27" cy="48" r="6" fill="#F9C84A" opacity="0.55"/>
+          <circle cx="57" cy="48" r="6" fill="#F9C84A" opacity="0.55"/>
+          <ellipse cx="42" cy="51" rx="4" ry="3" fill="#7A4800"/>
+          <path d="M34 57 Q42 64 50 57" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div style="font-size:10px;font-weight:600;color:var(--ink-60);margin-top:6px;">Head / Bust</div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--ink-30);">60px · Tips & Nudges</div>
+      </div>
+      <!-- Icon 32px -->
+      <div style="text-align:center;">
+        <svg width="32" height="32" viewBox="18 26 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="42" cy="50" rx="24" ry="22" fill="#C97B00"/>
+          <ellipse cx="24" cy="33" rx="7" ry="10" fill="#C97B00"/>
+          <ellipse cx="24" cy="33" rx="4" ry="6" fill="#F9C84A"/>
+          <ellipse cx="60" cy="33" rx="7" ry="10" fill="#C97B00"/>
+          <ellipse cx="60" cy="33" rx="4" ry="6" fill="#F9C84A"/>
+          <circle cx="36" cy="50" r="5" fill="white"/>
+          <circle cx="48" cy="50" r="5" fill="white"/>
+          <circle cx="36.5" cy="51" r="3" fill="#1A2B22"/>
+          <circle cx="48.5" cy="51" r="3" fill="#1A2B22"/>
+          <ellipse cx="42" cy="58" rx="4" ry="3" fill="#7A4800"/>
+          <path d="M36 64 Q42 70 48 64" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="28" cy="58" r="5" fill="#F9C84A" opacity="0.5"/>
+          <circle cx="56" cy="58" r="5" fill="#F9C84A" opacity="0.5"/>
+        </svg>
+        <div style="font-size:10px;font-weight:600;color:var(--ink-60);margin-top:6px;">Icon</div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--ink-30);">32px · Brand Mark</div>
+      </div>
+      <!-- Favicon 24px -->
+      <div style="text-align:center;">
+        <svg width="24" height="24" viewBox="18 26 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="42" cy="50" r="26" fill="#C97B00"/>
+          <circle cx="35" cy="48" r="5" fill="white"/>
+          <circle cx="49" cy="48" r="5" fill="white"/>
+          <circle cx="35.5" cy="49" r="3" fill="#1A2B22"/>
+          <circle cx="49.5" cy="49" r="3" fill="#1A2B22"/>
+          <ellipse cx="42" cy="58" rx="4" ry="3" fill="#7A4800"/>
+        </svg>
+        <div style="font-size:10px;font-weight:600;color:var(--ink-60);margin-top:6px;">Micro</div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--ink-30);">24px · Favicon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LEVEL ACCESSORIES ── -->
+  <div class="sub-title">Level Accessories</div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;margin-bottom:28px;">
+    <div style="display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;">
+      <!-- Lv1 plain -->
+      <div style="text-align:center;">
+        <svg width="70" height="80" viewBox="0 0 90 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M62 72 Q90 55 85 30 Q80 10 68 18 Q60 24 65 45 Q68 58 62 72Z" fill="#E8920A"/>
+          <ellipse cx="42" cy="74" rx="24" ry="27" fill="#C97B00"/>
+          <ellipse cx="42" cy="80" rx="14" ry="17" fill="#FDF0DC"/>
+          <ellipse cx="42" cy="44" rx="24" ry="22" fill="#C97B00"/>
+          <ellipse cx="24" cy="27" rx="8" ry="11" fill="#C97B00"/><ellipse cx="24" cy="27" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="27" rx="8" ry="11" fill="#C97B00"/><ellipse cx="60" cy="27" rx="5" ry="7" fill="#F9C84A"/>
+          <path d="M31 41 Q35 36 39 41" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M45 41 Q49 36 53 41" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="27" cy="48" r="5" fill="#F9C84A" opacity="0.55"/>
+          <circle cx="57" cy="48" r="5" fill="#F9C84A" opacity="0.55"/>
+          <ellipse cx="42" cy="51" rx="4" ry="3" fill="#7A4800"/>
+          <path d="M34 57 Q42 64 50 57" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <ellipse cx="20" cy="72" rx="8" ry="14" transform="rotate(15 20 72)" fill="#C97B00"/>
+          <ellipse cx="64" cy="72" rx="8" ry="14" transform="rotate(-15 64 72)" fill="#C97B00"/>
+        </svg>
+        <div style="font-size:10px;font-weight:700;color:var(--forest);margin-top:4px;">Lv 1</div>
+        <div style="font-size:9px;color:var(--ink-30);">Plain</div>
+      </div>
+      <!-- Lv2 scarf -->
+      <div style="text-align:center;">
+        <svg width="70" height="80" viewBox="0 0 90 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M62 72 Q90 55 85 30 Q80 10 68 18 Q60 24 65 45 Q68 58 62 72Z" fill="#E8920A"/>
+          <ellipse cx="42" cy="74" rx="24" ry="27" fill="#C97B00"/>
+          <ellipse cx="42" cy="80" rx="14" ry="17" fill="#FDF0DC"/>
+          <ellipse cx="42" cy="44" rx="24" ry="22" fill="#C97B00"/>
+          <ellipse cx="24" cy="27" rx="8" ry="11" fill="#C97B00"/><ellipse cx="24" cy="27" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="27" rx="8" ry="11" fill="#C97B00"/><ellipse cx="60" cy="27" rx="5" ry="7" fill="#F9C84A"/>
+          <path d="M31 41 Q35 36 39 41" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M45 41 Q49 36 53 41" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="27" cy="48" r="5" fill="#F9C84A" opacity="0.55"/>
+          <circle cx="57" cy="48" r="5" fill="#F9C84A" opacity="0.55"/>
+          <ellipse cx="42" cy="51" rx="4" ry="3" fill="#7A4800"/>
+          <path d="M34 57 Q42 64 50 57" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <ellipse cx="20" cy="72" rx="8" ry="14" transform="rotate(15 20 72)" fill="#C97B00"/>
+          <ellipse cx="64" cy="72" rx="8" ry="14" transform="rotate(-15 64 72)" fill="#C97B00"/>
+          <!-- Scarf -->
+          <path d="M20 65 Q42 70 64 65 Q64 73 42 78 Q20 73 20 65Z" fill="#74C69D"/>
+          <path d="M20 65 Q42 60 64 65" stroke="#40916C" stroke-width="1.5" fill="none"/>
+          <rect x="16" y="64" width="10" height="18" rx="3" fill="#74C69D"/>
+        </svg>
+        <div style="font-size:10px;font-weight:700;color:var(--forest);margin-top:4px;">Lv 2</div>
+        <div style="font-size:9px;color:var(--ink-30);">Scarf</div>
+      </div>
+      <!-- Lv3 hat -->
+      <div style="text-align:center;">
+        <svg width="70" height="85" viewBox="0 0 90 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Hat -->
+          <ellipse cx="42" cy="26" rx="26" ry="5" fill="#E8920A"/>
+          <rect x="28" y="10" width="28" height="18" rx="3" fill="#C97B00"/>
+          <rect x="28" y="10" width="28" height="6" rx="2" fill="#E8920A"/>
+          <path d="M62 72 Q90 55 85 30 Q80 10 68 18 Q60 24 65 45 Q68 58 62 72Z" fill="#E8920A"/>
+          <ellipse cx="42" cy="74" rx="24" ry="27" fill="#C97B00"/>
+          <ellipse cx="42" cy="80" rx="14" ry="17" fill="#FDF0DC"/>
+          <ellipse cx="42" cy="48" rx="24" ry="22" fill="#C97B00"/>
+          <ellipse cx="24" cy="31" rx="8" ry="11" fill="#C97B00"/><ellipse cx="24" cy="31" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="31" rx="8" ry="11" fill="#C97B00"/><ellipse cx="60" cy="31" rx="5" ry="7" fill="#F9C84A"/>
+          <path d="M31 45 Q35 40 39 45" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M45 45 Q49 40 53 45" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="27" cy="52" r="5" fill="#F9C84A" opacity="0.55"/>
+          <circle cx="57" cy="52" r="5" fill="#F9C84A" opacity="0.55"/>
+          <ellipse cx="42" cy="55" rx="4" ry="3" fill="#7A4800"/>
+          <path d="M34 61 Q42 68 50 61" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <ellipse cx="20" cy="76" rx="8" ry="14" transform="rotate(15 20 76)" fill="#C97B00"/>
+          <ellipse cx="64" cy="76" rx="8" ry="14" transform="rotate(-15 64 76)" fill="#C97B00"/>
+        </svg>
+        <div style="font-size:10px;font-weight:700;color:var(--forest);margin-top:4px;">Lv 3</div>
+        <div style="font-size:9px;color:var(--ink-30);">Hat</div>
+      </div>
+      <!-- Lv4 cape -->
+      <div style="text-align:center;">
+        <svg width="70" height="85" viewBox="0 0 90 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M62 72 Q90 55 85 30 Q80 10 68 18 Q60 24 65 45 Q68 58 62 72Z" fill="#E8920A"/>
+          <ellipse cx="42" cy="74" rx="24" ry="27" fill="#C97B00"/>
+          <!-- Cape -->
+          <path d="M18 65 Q42 58 66 65 Q70 90 56 100 Q42 105 28 100 Q14 90 18 65Z" fill="#2166B2" opacity="0.9"/>
+          <path d="M18 65 Q42 62 66 65" stroke="#1C4A3A" stroke-width="1.5" fill="none"/>
+          <path d="M42 58 L42 105" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" fill="none"/>
+          <ellipse cx="42" cy="80" rx="14" ry="17" fill="#FDF0DC"/>
+          <ellipse cx="42" cy="48" rx="24" ry="22" fill="#C97B00"/>
+          <ellipse cx="24" cy="31" rx="8" ry="11" fill="#C97B00"/><ellipse cx="24" cy="31" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="31" rx="8" ry="11" fill="#C97B00"/><ellipse cx="60" cy="31" rx="5" ry="7" fill="#F9C84A"/>
+          <path d="M31 45 Q35 40 39 45" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M45 45 Q49 40 53 45" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="27" cy="52" r="5" fill="#F9C84A" opacity="0.55"/>
+          <circle cx="57" cy="52" r="5" fill="#F9C84A" opacity="0.55"/>
+          <ellipse cx="42" cy="55" rx="4" ry="3" fill="#7A4800"/>
+          <path d="M34 61 Q42 68 50 61" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div style="font-size:10px;font-weight:700;color:var(--forest);margin-top:4px;">Lv 4</div>
+        <div style="font-size:9px;color:var(--ink-30);">Cape</div>
+      </div>
+      <!-- Lv5 crown -->
+      <div style="text-align:center;">
+        <svg width="70" height="88" viewBox="0 0 90 108" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Crown -->
+          <path d="M20 28 L28 14 L42 22 L56 14 L64 28 L20 28Z" fill="#F9C84A"/>
+          <circle cx="28" cy="14" r="4" fill="#E8920A"/>
+          <circle cx="42" cy="22" r="3" fill="#E8920A"/>
+          <circle cx="56" cy="14" r="4" fill="#E8920A"/>
+          <rect x="18" y="26" width="48" height="8" rx="2" fill="#E8920A"/>
+          <path d="M62 76 Q90 59 85 34 Q80 14 68 22 Q60 28 65 50 Q68 64 62 76Z" fill="#E8920A"/>
+          <ellipse cx="42" cy="78" rx="24" ry="27" fill="#C97B00"/>
+          <ellipse cx="42" cy="84" rx="14" ry="17" fill="#FDF0DC"/>
+          <ellipse cx="42" cy="52" rx="24" ry="22" fill="#C97B00"/>
+          <ellipse cx="24" cy="35" rx="8" ry="11" fill="#C97B00"/><ellipse cx="24" cy="35" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="35" rx="8" ry="11" fill="#C97B00"/><ellipse cx="60" cy="35" rx="5" ry="7" fill="#F9C84A"/>
+          <path d="M31 49 Q35 44 39 49" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M45 49 Q49 44 53 49" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="27" cy="56" r="5" fill="#F9C84A" opacity="0.55"/>
+          <circle cx="57" cy="56" r="5" fill="#F9C84A" opacity="0.55"/>
+          <ellipse cx="42" cy="59" rx="4" ry="3" fill="#7A4800"/>
+          <path d="M34 65 Q42 72 50 65" stroke="#7A4800" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <ellipse cx="20" cy="80" rx="8" ry="14" transform="rotate(15 20 80)" fill="#C97B00"/>
+          <ellipse cx="64" cy="80" rx="8" ry="14" transform="rotate(-15 64 80)" fill="#C97B00"/>
+        </svg>
+        <div style="font-size:10px;font-weight:700;color:var(--forest);margin-top:4px;">Lv 5</div>
+        <div style="font-size:9px;color:var(--ink-30);">Crown</div>
+      </div>
+      <!-- Lv6 forest suit -->
+      <div style="text-align:center;">
+        <svg width="70" height="88" viewBox="0 0 90 108" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Leaves crown -->
+          <ellipse cx="30" cy="20" rx="10" ry="6" transform="rotate(-30 30 20)" fill="#40916C"/>
+          <ellipse cx="42" cy="14" rx="10" ry="6" fill="#40916C"/>
+          <ellipse cx="54" cy="20" rx="10" ry="6" transform="rotate(30 54 20)" fill="#40916C"/>
+          <ellipse cx="31" cy="21" rx="6" ry="4" transform="rotate(-30 31 21)" fill="#74C69D"/>
+          <ellipse cx="42" cy="15" rx="6" ry="4" fill="#74C69D"/>
+          <ellipse cx="53" cy="21" rx="6" ry="4" transform="rotate(30 53 21)" fill="#74C69D"/>
+          <!-- Forest suit body -->
+          <ellipse cx="42" cy="78" rx="24" ry="27" fill="#1C4A3A"/>
+          <path d="M62 76 Q90 59 85 34 Q80 14 68 22 Q60 28 65 50 Q68 64 62 76Z" fill="#40916C"/>
+          <!-- Suit details -->
+          <ellipse cx="42" cy="84" rx="14" ry="17" fill="#2D6A4F"/>
+          <path d="M34 66 L42 62 L50 66 L50 96 L34 96Z" fill="#D8F3DC" opacity="0.2"/>
+          <ellipse cx="42" cy="52" rx="24" ry="22" fill="#C97B00"/>
+          <ellipse cx="24" cy="35" rx="8" ry="11" fill="#C97B00"/><ellipse cx="24" cy="35" rx="5" ry="7" fill="#F9C84A"/>
+          <ellipse cx="60" cy="35" rx="8" ry="11" fill="#C97B00"/><ellipse cx="60" cy="35" rx="5" ry="7" fill="#F9C84A"/>
+          <path d="M31 49 Q35 44 39 49" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M45 49 Q49 44 53 49" stroke="#1A2B22" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="27" cy="56" r="5" fill="#F9C84A" opacity="0.6"/>
+          <circle cx="57" cy="56" r="5" fill="#F9C84A" opacity="0.6"/>
+          <ellipse cx="42" cy="59" rx="4" ry="3" fill="#7A4800"/>
+          <path d="M34 65 Q42 72 50 65" stroke="#7A4800" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <ellipse cx="20" cy="80" rx="8" ry="14" transform="rotate(15 20 80)" fill="#1C4A3A"/>
+          <ellipse cx="64" cy="80" rx="8" ry="14" transform="rotate(-15 64 80)" fill="#1C4A3A"/>
+          <!-- Star badge -->
+          <circle cx="34" cy="74" r="7" fill="#F9C84A"/>
+          <text x="30" y="78" font-size="9" fill="#7A4800">★</text>
+        </svg>
+        <div style="font-size:10px;font-weight:700;color:var(--forest);margin-top:4px;">Lv 6</div>
+        <div style="font-size:9px;color:var(--ink-30);">Forest Suit</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-title">Mascot Rules</div>
+  <div class="grid-2">
+    <div class="card-sm"><strong style="color:var(--forest);display:block;margin-bottom:4px;">Personality</strong><div style="font-size:12px;color:var(--ink-60);">Optimistic but honest. Uses simple analogies. Never condescending. Celebrates small wins as much as big ones. Never uses adult financial jargon with kids.</div></div>
+    <div class="card-sm"><strong style="color:var(--forest);display:block;margin-bottom:4px;">Sizing</strong><div style="font-size:12px;color:var(--ink-60);">Full-body (80–100px): celebration. Head/bust (48–60px): tips and nudges. Icon (24–32px): brand marker. Never in transaction flows or dashboards.</div></div>
+    <div class="card-sm"><strong style="color:var(--forest);display:block;margin-bottom:4px;">App Context</strong><div style="font-size:12px;color:var(--ink-60);"><strong>Kid app:</strong> Gilli is always present — guides, celebrates, teaches. <strong>Parent app:</strong> Gilli appears only for insights, milestones, and educational nudges.</div></div>
+    <div class="card-sm" style="border-color:var(--coral-lt);background:var(--coral-lt);"><strong style="color:var(--coral);display:block;margin-bottom:4px;">⚠ Restrictions</strong><div style="font-size:12px;color:var(--coral);">Never show Gilli sad, scared, or disappointed. No negative emotional states. Never during error flows or transaction failures.</div></div>
+  </div>
+</div>
+
+<!-- ── 13. LEVELS ── -->
+<div class="section page-break" id="levels">
+  <div class="eyebrow">13 · Identity</div>
+  <div class="sec-title">Child Progression — 6 Levels</div>
+  <div class="sec-desc">Each level represents deeper financial understanding. Gilli evolves his vocabulary and grants new accessories as kids grow.</div>
+
+  <div class="level-card lv1" style="margin-bottom:12px;">
+    <div class="lc-row"><div><div class="lc-num">Level 1</div><div class="lc-title">Acorn Finder 🌰</div><div class="lc-sub">You found your first acorn! Every big tree starts right here. XP: 0–100</div></div><div class="lc-icon">🌰</div></div>
+    <div class="lc-xp-label">Unlocks: Quest Board · My Money Tree · 3 Intro Lessons · Meet Gilli</div>
+  </div>
+  <div class="level-card lv2" style="margin-bottom:12px;">
+    <div class="lc-row"><div><div class="lc-num">Level 2</div><div class="lc-title">Seed Planter 🌱</div><div class="lc-sub">You know that money grows! Now planting seeds in the right soil. XP: 100–300</div></div><div class="lc-icon">🌱</div></div>
+    <div class="lc-xp-label">Unlocks: Fund Peekaboo · Goal Setting · Quizzes · Gilli's Scarf</div>
+  </div>
+  <div class="level-card lv3" style="margin-bottom:12px;">
+    <div class="lc-row"><div><div class="lc-num">Level 3</div><div class="lc-title">Sapling Grower 🌿</div><div class="lc-sub">Your money tree has real branches! You understand ups and downs. XP: 300–600</div></div><div class="lc-icon">🌿</div></div>
+    <div class="lc-xp-label">Unlocks: Market Pulse · Gilli's News · Leaderboard · Gilli's Hat</div>
+  </div>
+  <div class="level-card lv4" style="margin-bottom:12px;">
+    <div class="lc-row"><div><div class="lc-num">Level 4</div><div class="lc-title">Branch Builder 🌲</div><div class="lc-sub">You can explain investing to your friends! You understand NAV and SIP. XP: 600–1000</div></div><div class="lc-icon">🌲</div></div>
+    <div class="lc-xp-label">Unlocks: Fund Deep Dive · Ask Gilli · Compound Calculator · Gilli's Cape</div>
+  </div>
+  <div class="level-card lv5" style="margin-bottom:12px;">
+    <div class="lc-row"><div><div class="lc-num">Level 5</div><div class="lc-title">Tree Keeper 🌳</div><div class="lc-sub">You can read a fund factsheet. You understand risk and diversification. XP: 1000–1600</div></div><div class="lc-icon">🌳</div></div>
+    <div class="lc-xp-label">Unlocks: Factsheet Reader · Risk-o-Meter · Family Portfolio Report · Gilli's Crown</div>
+  </div>
+  <div class="level-card lv6" style="margin-bottom:0;">
+    <div class="lc-row"><div><div class="lc-num">Level 6 · Final</div><div class="lc-title">Forest Guardian 🏔️</div><div class="lc-sub">You've built a forest. You know more about money than most adults. XP: 1600+</div></div><div class="lc-icon">🏔️</div></div>
+    <div class="lc-xp-label">Unlocks: Savings Account eligibility · Taru Jr. Card (Phase 2) · Certificate · Gilli's Forest Suit</div>
+  </div>
+</div>
+
+<!-- ── 14. ICONOGRAPHY ── -->
+<div class="section" id="iconography">
+  <div class="eyebrow">14 · Identity</div>
+  <div class="sec-title">Iconography</div>
+  <div class="sec-desc">Two icon registers. Outlined (24px, 2px stroke) for the parent app. Filled and rounded (28px) for the kid app.</div>
+
+  <div class="label">Navigation — Parent App</div>
+  <div class="icon-grid" style="margin-bottom:20px;">
+    <div class="icon-item"><span class="icon-emoji">📊</span><span class="icon-label">Portfolio</span></div>
+    <div class="icon-item"><span class="icon-emoji">💸</span><span class="icon-label">Invest</span></div>
+    <div class="icon-item"><span class="icon-emoji">✅</span><span class="icon-label">Chores</span></div>
+    <div class="icon-item"><span class="icon-emoji">👤</span><span class="icon-label">Profile</span></div>
+    <div class="icon-item"><span class="icon-emoji">🔔</span><span class="icon-label">Alerts</span></div>
+    <div class="icon-item"><span class="icon-emoji">⚙️</span><span class="icon-label">Settings</span></div>
+  </div>
+
+  <div class="label">Navigation — Kid App</div>
+  <div class="icon-grid" style="margin-bottom:20px;">
+    <div class="icon-item" style="background:#FFFBF0;border-color:#FDDBA8;"><span class="icon-emoji">🌳</span><span class="icon-label">My Tree</span></div>
+    <div class="icon-item" style="background:#FFFBF0;border-color:#FDDBA8;"><span class="icon-emoji">⚔️</span><span class="icon-label">Quests</span></div>
+    <div class="icon-item" style="background:#FFFBF0;border-color:#FDDBA8;"><span class="icon-emoji">🏆</span><span class="icon-label">Badges</span></div>
+    <div class="icon-item" style="background:#FFFBF0;border-color:#FDDBA8;"><span class="icon-emoji">📖</span><span class="icon-label">Learn</span></div>
+    <div class="icon-item" style="background:#FFFBF0;border-color:#FDDBA8;"><span class="icon-emoji">🐿️</span><span class="icon-label">Gilli</span></div>
+  </div>
+
+  <div class="label">Financial Concepts (Shared)</div>
+  <div class="icon-grid">
+    <div class="icon-item"><span class="icon-emoji">📈</span><span class="icon-label">Growth</span></div>
+    <div class="icon-item"><span class="icon-emoji">📉</span><span class="icon-label">Decline</span></div>
+    <div class="icon-item"><span class="icon-emoji">🏦</span><span class="icon-label">Savings</span></div>
+    <div class="icon-item"><span class="icon-emoji">💰</span><span class="icon-label">Returns</span></div>
+    <div class="icon-item"><span class="icon-emoji">🎯</span><span class="icon-label">Goal</span></div>
+    <div class="icon-item"><span class="icon-emoji">🔒</span><span class="icon-label">Locked</span></div>
+    <div class="icon-item"><span class="icon-emoji">⏰</span><span class="icon-label">SIP</span></div>
+    <div class="icon-item"><span class="icon-emoji">🌱</span><span class="icon-label">Start</span></div>
+  </div>
+
+  <div class="sub-title">Icon Style Rules</div>
+  <div class="grid-2">
+    <div class="usage-note note-g" style="border-radius:var(--r-md);padding:16px;"><strong>Parent App</strong> — 24px outlined icons · 2px stroke · Lucide or Phosphor icon sets · Forest green primary, ink-60 for secondary</div>
+    <div class="usage-note note-a" style="border-radius:var(--r-md);padding:16px;"><strong>Kid App</strong> — 28px filled icons · Rounded corners · Custom illustration layer OK · Amber primary, forest green secondary</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="padding:48px 52px;background:var(--forest);color:rgba(255,255,255,.6);display:flex;justify-content:space-between;align-items:center;flex-wrap:gap;">
+  <div>
+    <div style="font-family:var(--font-display);font-size:24px;color:white;margin-bottom:4px;">Taru</div>
+    <div style="font-size:12px;">Design System v1.0 · April 2026</div>
+  </div>
+  <div style="font-size:12px;text-align:right;">
+    <div>Confidential · Internal use only</div>
+    <div style="margin-top:4px;">Parent App · Taru Jr. · Gilli the Squirrel</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// Active nav highlighting on scroll
+const sections = document.querySelectorAll('.section[id], .cover[id]');
+const navLinks = document.querySelectorAll('.sb-link');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      navLinks.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector('.sb-link[href="#'+e.target.id+'"]');
+      if(active) active.classList.add('active');
+    }
+  });
+}, {threshold:0.3});
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

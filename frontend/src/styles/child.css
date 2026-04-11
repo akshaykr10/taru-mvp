@@ -1,0 +1,764 @@
+/* ══════════════════════════════════════════════════════════════
+   Child app styles — all values via design-system tokens only.
+   No hardcoded hex codes or font-family strings allowed here.
+   ══════════════════════════════════════════════════════════════ */
+
+.child-shell {
+  min-height: 100dvh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ── Loading screen ──────────────────────────────────────────── */
+.child-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp4);
+  padding: var(--sp8);
+}
+
+.child-loading__plant {
+  font-size: 52px;
+  animation: plantFloat 3s ease-in-out infinite;
+}
+
+.child-loading__text {
+  font-size: 15px;
+  color: var(--ink-60);
+}
+
+/* ── Error screen ────────────────────────────────────────────── */
+.child-error {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp8) var(--sp6);
+  text-align: center;
+}
+
+.child-error__penny { font-size: 56px; margin-bottom: var(--sp4); }
+
+.child-error__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--forest);
+  margin-bottom: var(--sp3);
+}
+
+.child-error__body {
+  font-size: 15px;
+  color: var(--ink-60);
+  line-height: 1.6;
+  max-width: 300px;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────── */
+.garden-shell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.garden-topbar {
+  background: var(--forest);
+  padding: var(--sp4) var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.garden-topbar__logo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--amber-md);
+}
+
+.garden-topbar__greeting {
+  font-size: 13px;
+  color: rgba(249, 253, 251, 0.65); /* ds-white at 65% */
+}
+
+/* ── Plant area ──────────────────────────────────────────────── */
+.garden-plant-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--sp6) var(--sp4) var(--sp8);
+  text-align: center;
+  overflow-y: auto;
+}
+
+/* ── Plant emoji — smooth floating animation ─────────────────── */
+.garden-plant {
+  font-size: 96px;
+  margin-bottom: var(--sp6);
+  animation: plantFloat 4s ease-in-out infinite;
+  will-change: transform;
+  display: inline-block;
+}
+
+/*
+  Smooth float: gentle vertical drift + very subtle scale breath.
+  scale(1.04) at peak keeps it organic rather than mechanical.
+*/
+@keyframes plantFloat {
+  0%, 100% { transform: translateY(0)     scale(1);    }
+  40%       { transform: translateY(-10px) scale(1.04); }
+  60%       { transform: translateY(-8px)  scale(1.03); }
+}
+
+/* Seed-stage pulse — applied via .garden-plant--seed class in JSX */
+@keyframes seedPulse {
+  0%, 100% { transform: scale(1);    }
+  50%       { transform: scale(1.10); }
+}
+
+.garden-plant--seed {
+  animation: seedPulse 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .garden-plant,
+  .garden-plant--seed,
+  .child-loading__plant { animation: none; }
+}
+
+/* ── Goal Card ──────────────────────────────────────────────────
+   The card that wraps goal name, progress bar, and milestones.
+   Uses surface + shadow to visually lift it off the bg.
+   ─────────────────────────────────────────────────────────────── */
+.garden-goal-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-md);
+  padding: var(--sp6) var(--sp4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp3);
+}
+
+.garden-goal-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp2);
+}
+
+.garden-goal-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--forest);
+  line-height: 1.2;
+}
+
+.garden-stage-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: var(--r-pill);
+  background: var(--amber-md);
+  color: var(--amber-dk);
+  font-family: var(--font-kid);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: capitalize;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Progress bar ────────────────────────────────────────────── */
+.garden-progress-wrap { width: 100%; }
+
+.garden-progress-bar {
+  height: 10px;
+  background: var(--ink-10);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.garden-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--leaf), var(--amber-md));
+  border-radius: var(--r-pill);
+  transition: width 0.8s ease;
+}
+
+.garden-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--ink-60);
+  margin-top: var(--sp1);
+}
+
+/* ── Milestones inside Goal Card ─────────────────────────────── */
+.garden-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp3);
+  padding-top: var(--sp2);
+  border-top: 1px solid var(--border);
+}
+
+.garden-milestones__label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+}
+
+.garden-milestone-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sp2);
+}
+
+.garden-milestone-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--sp2) var(--sp1);
+  border-radius: var(--r-md);
+  text-align: center;
+  transition: transform 0.2s var(--ease-bounce);
+}
+
+.garden-milestone-badge--locked {
+  background: var(--bg);
+  border: 1.5px dashed var(--border);
+}
+
+.garden-milestone-badge--unlocked {
+  background: var(--amber-lt);
+  border: 1.5px solid #FDDBA8;
+  animation: badgeGlow 3s ease-in-out infinite;
+}
+
+@keyframes badgeGlow {
+  0%, 100% { box-shadow: 0 0 0 0   rgba(232, 146, 10, 0);    }
+  50%       { box-shadow: 0 0 0 6px rgba(232, 146, 10, 0.18); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .garden-milestone-badge--unlocked { animation: none; }
+}
+
+.garden-milestone-badge__icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.garden-milestone-badge--locked .garden-milestone-badge__icon { opacity: 0.35; }
+
+.garden-milestone-badge__pct {
+  font-family: var(--font-kid);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--forest);
+}
+
+.garden-milestone-badge--locked .garden-milestone-badge__pct { color: var(--ink-30); }
+.garden-milestone-badge--unlocked .garden-milestone-badge__pct { color: var(--amber-dk); }
+
+/* ── Penny bubble ────────────────────────────────────────────── */
+.penny-bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--sp4) var(--space-5);
+  margin: var(--sp4) var(--sp4) 0;
+  position: relative;
+  text-align: left;
+}
+
+.penny-bubble::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 28px;
+  width: 16px;
+  height: 16px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+  transform: rotate(45deg);
+}
+
+.penny-bubble__penny { font-size: 22px; margin-bottom: var(--sp2); }
+
+.penny-bubble__text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+/* ── Bottom nav ──────────────────────────────────────────────── */
+.garden-nav {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  height: calc(64px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.garden-nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  font-family: var(--font-parent);
+  cursor: pointer;
+  color: var(--ink-30);
+  transition: color 0.15s;
+  min-height: var(--tap-target);
+}
+
+.garden-nav__item.active { color: var(--forest); }
+
+.garden-nav__icon  { font-size: 20px; line-height: 1; }
+.garden-nav__label { font-size: 11px; font-weight: 600; }
+
+/* ── Tasks tab ───────────────────────────────────────────────── */
+.garden-tasks {
+  padding: var(--sp4) var(--space-5);
+  flex: 1;
+  overflow-y: auto;
+}
+
+.garden-tasks__header { margin-bottom: var(--space-5); }
+
+.garden-tasks__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--forest);
+  margin-bottom: var(--sp1);
+}
+
+.garden-tasks__sub {
+  font-size: 13px;
+  color: var(--ink-60);
+  line-height: 1.5;
+}
+
+.child-task-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--sp4);
+  margin-bottom: var(--sp3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp3);
+}
+
+.child-task-card__info { flex: 1; min-width: 0; }
+
+.child-task-card__name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.child-task-card__coins {
+  font-size: 13px;
+  color: var(--ink-60);
+}
+
+.child-task-card__btn {
+  flex-shrink: 0;
+  background: var(--forest);
+  color: var(--ds-white);
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: var(--font-parent);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 var(--sp4);
+  height: 38px;
+  min-width: 64px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.child-task-card__btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.child-task-card__pending {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--amber);
+  font-weight: 600;
+  text-align: right;
+  max-width: 100px;
+  line-height: 1.4;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Learn tab — vertical timeline layout
+   ══════════════════════════════════════════════════════════════ */
+.garden-learn {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp6) var(--sp4) var(--sp8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp4);
+}
+
+/* Section header: "This Week" / "Recent Updates" */
+.learn-section-heading {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--forest);
+  line-height: 1.2;
+  margin-bottom: var(--sp1);
+}
+
+.learn-section-sub {
+  font-size: 12px;
+  color: var(--ink-60);
+}
+
+/* Divider label between sections */
+.learn-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+  padding: var(--sp2) 0 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp3);
+}
+
+.learn-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Base card ── */
+.learn-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp3);
+}
+
+/* Current week — prominent left accent */
+.learn-card--current {
+  border-left: 4px solid var(--leaf);
+  background: var(--surface);
+}
+
+/* Past trigger cards — subtly muted */
+.learn-card--trigger {
+  background: var(--bg);
+  border-color: var(--border);
+  opacity: 0.95;
+}
+
+/* Empty fallback */
+.learn-card--empty { border-style: dashed; }
+
+/* Week badge */
+.learn-card__week-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--leaf);
+  background: var(--frost);
+  border: 1px solid var(--mint);
+  border-radius: var(--r-pill);
+  padding: 2px 10px;
+}
+
+/* Trigger badge */
+.learn-card__trigger-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: var(--sp1);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--sky);
+  background: var(--sky-lt);
+  border: 1px solid var(--sky-md);
+  border-radius: var(--r-pill);
+  padding: 2px 10px;
+}
+
+/* Card title — display font for clear hierarchy */
+.learn-card__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--forest);
+  line-height: 1.25;
+}
+
+.learn-card__title--sm { font-size: 18px; }
+
+/* Penny row */
+.learn-card__penny-row {
+  display: flex;
+  gap: var(--sp3);
+  align-items: flex-start;
+  background: var(--frost);
+  border-radius: var(--r-md);
+  padding: var(--sp3) var(--sp3);
+}
+
+.learn-card__penny-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.learn-card__penny-says {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--forest);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* Body text */
+.learn-card__body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-60);
+}
+
+/* Closing question */
+.learn-card__question {
+  background: var(--amber-lt);
+  border: 1px solid #FDDBA8;
+  border-radius: var(--r-md);
+  padding: var(--sp3) var(--sp4);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--amber-dk);
+  font-weight: 600;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Gullak tab
+   ══════════════════════════════════════════════════════════════ */
+
+/* Coin rain overlay */
+.coin-rain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 300;
+  overflow: hidden;
+}
+
+.coin-rain__coin {
+  position: absolute;
+  top: 0;
+  display: block;
+  animation: coinFall 1.2s var(--ease-bounce) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes coinFall {
+  0%   { transform: translateY(-48px) rotate(-20deg); opacity: 0; }
+  6%   { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { transform: translateY(105vh) rotate(560deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coin-rain { display: none; }
+}
+
+/* Gullak container */
+.gullak {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp6);
+  padding: var(--sp6) var(--space-5) var(--space-10);
+}
+
+/* Coin counter */
+.gullak-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp2);
+  padding: var(--sp6) var(--sp4);
+  background: var(--amber-lt);
+  border: 1.5px solid #FDDBA8;
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.gullak-counter__jar {
+  font-size: 52px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(232, 146, 10, 0.35));
+}
+
+.gullak-counter__number {
+  font-family: var(--font-kid);
+  font-weight: 900;
+  font-size: 80px;
+  line-height: 1;
+  color: var(--amber);
+  letter-spacing: -2px;
+  animation: coinPop 0.45s var(--ease-bounce) both;
+}
+
+@keyframes coinPop {
+  0%   { transform: scale(0.7); opacity: 0.4; }
+  100% { transform: scale(1);   opacity: 1;   }
+}
+
+.gullak-counter__label {
+  font-family: var(--font-kid);
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--amber-dk);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Gullak info section */
+.gullak-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp3);
+}
+
+.gullak-info__header {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+}
+
+.gullak-info__body {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp4);
+  font-size: 14px;
+  color: var(--ink-60);
+  line-height: 1.6;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp3);
+}
+
+.gullak-info__body span { font-size: 36px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gullak-counter__number { animation: none; }
+  .garden-milestone-badge--unlocked { animation: none; }
+}
+
+/* Milestone section in Gullak (legacy — kept for Gullak's progress bar) */
+.gullak-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp4);
+}
+
+.gullak-milestones__header {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-30);
+}
+
+.gullak-progress {
+  position: relative;
+  height: 10px;
+  background: var(--ink-10);
+  border-radius: var(--r-pill);
+  overflow: visible;
+}
+
+.gullak-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber), var(--amber-md));
+  border-radius: var(--r-pill);
+  transition: width 0.6s var(--ease-bounce);
+}
+
+.gullak-progress__tick {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.gullak-progress__tick.reached {
+  border-color: var(--amber);
+  background: var(--amber);
+}
+
+.gullak-progress__label {
+  font-size: 12px;
+  color: var(--ink-60);
+  text-align: right;
+  margin-top: var(--sp2);
+}
+
+.gullak-milestones__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp3);
+  padding: var(--sp8) var(--sp4);
+  text-align: center;
+  color: var(--ink-60);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.gullak-milestones__empty span { font-size: 36px; }

@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node src/index.js)",
+      "Bash(curl -s http://localhost:3001/health)",
+      "Bash(node -e ':*)",
+      "Bash(npx vite:*)",
+      "Bash(npm install:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(node -e \"require\\('dotenv'\\).config\\(\\); require\\('./src/index.js'\\)\")",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(netstat -ano)",
+      "Bash(xargs -I{} taskkill //PID {} //F)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X POST http://localhost:3001/api/casparser/token)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X POST http://localhost:3001/api/casparser/fund-tags/DUMMY)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/api/casparser/fund-tags)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" -X POST http://localhost:3001/api/activity)",
+      "Bash(node -e \"require\\('./backend/src/routes/children'\\)\")",
+      "Bash(curl -s -o /dev/null -w \"Token endpoint: %{http_code}\\\\n\" -X POST http://localhost:3001/api/children/test-id/token)",
+      "Bash(curl -s -o /dev/null -w \"Regen endpoint: %{http_code}\\\\n\" -X POST http://localhost:3001/api/children/test-id/token/regenerate)",
+      "Bash(curl -s -o /dev/null -w \"Health:  %{http_code}\\\\n\" http://localhost:3001/health)",
+      "Bash(curl -s -o /dev/null -w \"Token:   %{http_code}\\\\n\" -X POST http://localhost:3001/api/children/test-id/token)",
+      "Bash(curl -s -o /dev/null -w \"Regen:   %{http_code}\\\\n\" -X POST http://localhost:3001/api/children/test-id/token/regenerate)",
+      "Bash(curl -s -o /dev/null -w \"Garden:  %{http_code}\\\\n\" http://localhost:3001/api/child/garden)",
+      "Bash(python3 -c \"import sys,json; p=json.load\\(sys.stdin\\); print\\('main:', p.get\\('main'\\)\\); print\\('module:', p.get\\('module'\\)\\); print\\('exports:', list\\(p.get\\('exports',{}\\).keys\\(\\)\\)[:5]\\)\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const p=JSON.parse\\(fs.readFileSync\\('/dev/stdin','utf8'\\)\\);console.log\\('main:',p.main\\);console.log\\('module:',p.module\\);console.log\\('exports:',JSON.stringify\\(p.exports,null,2\\).slice\\(0,400\\)\\)\")"
+    ]
+  }
+}

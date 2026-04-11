@@ -1,0 +1,290 @@
+{
+  "_comment": "Content engine skeleton. All copy strings are placeholders — fill in Step 10 copy pass.",
+
+  "weekly_concepts": [
+    {
+      "week": 1,
+      "seed": {
+        "title": "Money is a swap",
+        "penny_says": "Money is just a clever swap — like when I trade acorns from my bag for something I can't find in the forest.",
+        "body": "Coins and notes help people swap what they make for what they need.",
+        "question": ""
+      },
+      "sprout": {
+        "title": "What is money, really?",
+        "penny_says": "Where do you think ₹100 in your pocket actually came from — who decided it was worth something?",
+        "body": "Money is a shared agreement. A ₹100 note is printed paper, but everyone agrees it can be swapped for real things. That agreement is the only thing making it valuable — and your parents' portfolio is built on top of it.",
+        "question": "If everyone in India suddenly stopped trusting that agreement, what do you think would happen to your parents' investments?"
+      },
+      "growth": {
+        "title": "Money is a shared agreement",
+        "penny_says": "Here's something most people find out way too late — money itself has no value. The only reason a ₹500 note buys dinner is because everyone involved agrees it does.",
+        "body": "Historically, people have used gold, shells, salt, and cloth as money. What made each one 'money' was collective trust, not the thing itself. The Indian rupee works the same way — it's backed by the government's credibility, not gold. That's why inflation matters: it's the agreement slowly shifting.",
+        "question": "So if trust is what backs money, what do you think happens to a currency when a government loses credibility?"
+      },
+      "investor": {
+        "title": "A claim on future purchasing power",
+        "penny_says": "Most people treat money as a fixed measure of value. It's not — it's a claim on future purchasing power, and that claim degrades over time.",
+        "body": "Fiat currency is backed by government decree and enforced through legal tender laws and tax obligations. The 'value' of ₹1 is its real purchasing power — which inflation continuously erodes. This is why cash is a depreciating asset over long horizons, and why equity investments exist: to compound faster than that erosion. Your parents' mutual fund is an attempt to stay ahead of it.",
+        "question": "At 6% inflation, ₹1L today has the purchasing power of ₹59,000 in 10 years. If their fund compounds at 12% annually over the same period, how much real purchasing power do they gain — and what would 3% annual returns look like by comparison?"
+      }
+    },
+    {
+      "week": 2,
+      "seed": {
+        "title": "Your money joins a team",
+        "penny_says": "A mutual fund is when lots of families put their money together — like all the squirrels in the forest sharing one giant acorn pile — and an expert decides what to buy.",
+        "body": "When money joins together, it can buy small pieces of many different companies at once.",
+        "question": ""
+      },
+      "sprout": {
+        "title": "What is a mutual fund?",
+        "penny_says": "How many other families do you think are sharing your parents' mutual fund right now, pooling their money together?",
+        "body": "A mutual fund collects money from thousands of families into one big pool. A fund manager uses that pool to buy tiny pieces of many companies. When those companies grow in value, everyone in the pool benefits — including your parents.",
+        "question": "Why do you think spreading money across many companies might turn out differently than putting it all into just one?"
+      },
+      "growth": {
+        "title": "Why pooling changes the maths",
+        "penny_says": "Here's something most people only figure out after they've already started investing — ₹1,000 on its own gets you almost nothing in the markets, but pooled with thousands of others, it buys into the same companies that billionaires access.",
+        "body": "A mutual fund is a legal trust structure. It pools capital, then a professional manager deploys it across companies or bonds. The price per unit — called NAV, or Net Asset Value — rises as the underlying investments grow. Every time your parents' portfolio shows a gain, that's the NAV of their fund units moving up.",
+        "question": "If a fund's NAV goes from ₹100 to ₹120 and your parents hold 500 units, what's the gain in rupees — and where did that extra money actually come from?"
+      },
+      "investor": {
+        "title": "NAV, units, and the expense ratio nobody talks about",
+        "penny_says": "Before we get into returns — do you know the difference between a direct plan and a regular plan, and how much that difference compounds to over 20 years?",
+        "body": "A mutual fund is an open-ended trust regulated by SEBI. Investors buy units at NAV; the fund manager deploys pooled capital per the fund's stated mandate. Returns come from two sources: capital appreciation (NAV increase) and dividend payouts. The expense ratio — deducted daily from NAV before it's published — typically runs 0.5–1.5% for direct plans versus 1–2.5% for regular plans. That 1% gap, compounded over 20 years on ₹10L at 12% gross, is the difference between ₹96.5L and ₹80.6L. Your parents' fund is one or the other.",
+        "question": "If your parents are in a regular plan, a distributor earns a trail commission on their balance every year — paid invisibly from their returns. Do you think they know this is happening?"
+      }
+    },
+    {
+      "week": 3,
+      "seed": {
+        "title": "One drop at a time",
+        "penny_says": "Imagine dropping one acorn into a jar every single month without fail — by the end of the year, your jar is packed even though each drop felt tiny.",
+        "body": "Your parents do exactly this with their money — a fixed amount goes in every month, automatically.",
+        "question": ""
+      },
+      "sprout": {
+        "title": "The trick that beats the experts",
+        "penny_says": "How much do you think your parents automatically invest every single month, without even checking what the market is doing?",
+        "body": "A SIP — Systematic Investment Plan — means investing a fixed amount every month, no matter what. When prices drop, the same amount buys more units. When prices rise, it buys fewer. Over time, this averages out the cost — often better than trying to pick the perfect moment to invest.",
+        "question": "If someone put ₹5,000 a month into a fund for 5 years, that's ₹3L invested. If their portfolio is now worth ₹4.2L, where did that extra ₹1.2L come from?"
+      },
+      "growth": {
+        "title": "Why consistency beats timing",
+        "penny_says": "Here's something that trips up most adults — trying to find the perfect moment to invest almost always loses to just putting in the same amount every month without overthinking it.",
+        "body": "A SIP automates something called rupee cost averaging. When NAV falls, your fixed amount buys more units. When it rises, fewer. The result: your average cost per unit ends up lower than the average NAV over the same period. It's not magic — it's arithmetic. And because it's automatic, it removes the temptation to stop during market crashes, which is exactly when most people make their worst decisions.",
+        "question": "If markets crash 30% halfway through a 10-year SIP, is that investor better or worse off compared to someone who put the full amount in as a lump sum at the start? Work through the logic."
+      },
+      "investor": {
+        "title": "Rupee cost averaging: the actual maths",
+        "penny_says": "Rupee cost averaging sounds mechanical — until you model what consistent buying through a drawdown actually does to your average acquisition cost.",
+        "body": "A SIP executes periodic fixed-amount purchases regardless of NAV. Average unit cost = total invested ÷ total units acquired. Because more units are purchased at depressed prices, this average falls below the arithmetic mean of NAV over the period. SIPs outperform lump-sum in volatile regimes and underperform in consistently rising markets. The behavioural value is equally significant: automation removes the decision to stop during drawdowns, which is where most retail investors destroy their own returns.",
+        "question": "NAV moves 100 → 80 → 60 → 80 → 100 over 5 months. You invest ₹10,000 each month. What's your average cost per unit? Now compare to ₹50,000 lump sum at month 1. Work out the rupee difference in portfolio value when NAV returns to 100."
+      }
+    },
+    {
+      "week": 4,
+      "seed": {
+        "title": "Money that makes more money",
+        "penny_says": "Each acorn in my pile grew a tiny baby acorn last year — and now those baby acorns are growing their own babies too.",
+        "body": "Your parents' money does the same thing — the more it grows, the faster it keeps growing.",
+        "question": ""
+      },
+      "sprout": {
+        "title": "Growth that grows itself",
+        "penny_says": "Which do you think ends up bigger after 30 years — ₹1L that earns 10% only on the original amount, or ₹1L where the earnings also start earning?",
+        "body": "Compounding means your returns earn their own returns. In year 1, ₹1L at 10% becomes ₹1.1L. In year 2, the 10% is on ₹1.1L — so you earn slightly more than the year before, without doing anything extra. At 10%, ₹1L grows to about ₹17.4L in 30 years — from compounding alone, with no new money added.",
+        "question": "If your parents had started investing 10 years earlier than they did, what do you think their portfolio might look like today — bigger by a little, or a lot?"
+      },
+      "growth": {
+        "title": "Why time matters more than amount",
+        "penny_says": "Here's the thing most people only figure out when it's already too late — starting 10 years earlier does more for your final number than doubling the amount you invest.",
+        "body": "Compounding means returns generate their own returns. At 12% annually, money doubles roughly every 6 years — that's the Rule of 72 (divide 72 by the return rate). ₹1L invested at 20 becomes ₹93L by 60. The same ₹1L at 30 becomes ₹30L by 60. Same amount, same return — a 10-year head start created ₹63L of difference. The money did that, not the investor.",
+        "question": "At 12%, use the Rule of 72 to count how many doublings your parents' portfolio gets between now and age 60. Then imagine what one extra doubling — 6 more years — would add to the final number."
+      },
+      "investor": {
+        "title": "The Rule of 72 and the cost of late starts",
+        "penny_says": "The compounding curve is exponential, not linear — the steepest growth happens at the end, which means time isn't just helpful, it's structurally decisive.",
+        "body": "Compound growth: A = P(1+r)^n. The exponent n — time — dominates. At 12% CAGR, money doubles every ~6 years. ₹1L at 20 = ~₹64L at 62 (7 doublings). The same ₹1L at 32 = ~₹16L at 62 (5 doublings). Two fewer doublings cuts the outcome to roughly one-quarter. The implication: the amount invested matters far less than when the clock starts. Every decade of delay roughly quarters terminal value at typical equity returns.",
+        "question": "Two people invest ₹1,000 a month for exactly 10 years then stop. One starts at 20, one at 30. Both leave the money compounding at 12% until 60. Total invested is identical. Work out the terminal value for each at 60, and explain in one sentence why the gap exists."
+      }
+    },
+    {
+      "week": 5,
+      "seed": {
+        "title": "The daily price tag",
+        "penny_says": "The number on your parents' investment changes every single day — check it with them tonight and see if it went up or down!",
+        "body": "That changing number is called NAV — it shows how much each piece of their investment is worth right now.",
+        "question": ""
+      },
+      "sprout": {
+        "title": "Why does the number change every day?",
+        "penny_says": "Have you ever looked at your parents' portfolio on two different days and noticed the number was different — even though they didn't add or take out any money?",
+        "body": "That number is called NAV — Net Asset Value. It's the price of one unit in the mutual fund, calculated every day after the stock market closes. It goes up when the companies in the fund do well, and down when they don't. Your parents' portfolio value is simply: units they own × today's NAV.",
+        "question": "If your parents hold 1,000 units and the NAV moves from ₹120 to ₹125 this week, how much did their portfolio grow — and what do you think caused that ₹5 move?"
+      },
+      "growth": {
+        "title": "What actually moves NAV",
+        "penny_says": "Here's something interesting — the number your parents see in their portfolio isn't updated in real time. It's calculated exactly once a day, after the market closes.",
+        "body": "NAV = (total market value of the fund's holdings − liabilities) ÷ units outstanding. Every stock and bond in the fund is marked to its closing price. Add them up, subtract any fees owed, divide by units — that's today's NAV. A fund holding Infosys will see its NAV tick in line with Infosys's share price. The fund manager decides which securities to hold; the market decides what they're worth.",
+        "question": "If a fund holds 50% of its money in one stock that drops 10%, what happens to NAV? Now imagine the same fund spread equally across 20 stocks, and only one drops 10% — how is the impact different?"
+      },
+      "investor": {
+        "title": "NAV as a lagging signal — and why it doesn't matter",
+        "penny_says": "NAV is calculated from yesterday's closing prices, published after hours — it's a deliberately lagging indicator. For long-term investors, that's actually fine.",
+        "body": "NAV = (AUM marked to market at close − accrued liabilities) ÷ outstanding units. The expense ratio is deducted daily (annual rate ÷ 365) before publication. This makes NAV a smoothed, end-of-day signal rather than a real-time price. For equity funds, daily swings of ±1–2% are structurally uninformative noise. The meaningful performance metric is rolling CAGR over 3–5 years, which filters out market volatility and isolates the fund manager's actual contribution to returns.",
+        "question": "A fund's NAV drops 8% in one week due to a broad market correction. A SIP investor has 10 years remaining in their horizon. Based on what you now know about compounding and rupee cost averaging, is this week net positive, negative, or neutral for their terminal outcome — and why?"
+      }
+    },
+    {
+      "week": 6,
+      "seed": {
+        "title": "Up, down, and still growing",
+        "penny_says": "My acorn pile goes up and down with the seasons — but every year it ends up bigger than the year before.",
+        "body": "Your parents' money works the same way — sometimes it dips, but over time it keeps growing.",
+        "question": ""
+      },
+      "sprout": {
+        "title": "Risk isn't the enemy",
+        "penny_says": "Has your parents' portfolio ever dipped down — and did they leave it in anyway, or did they pull it out?",
+        "body": "Risk in investing means the value can drop before it comes back up. The funds your parents chose go up and down more than a bank deposit — but they also grow more over time. Funds that never drop (like fixed deposits) don't grow much either. The movement is the price of better growth.",
+        "question": "If your parents' portfolio dropped ₹10,000 next month but had grown ₹60,000 over the last 5 years, would you call that investment a success or a failure — and what would you tell a friend who only saw the dip?"
+      },
+      "growth": {
+        "title": "The risk nobody warns you about",
+        "penny_says": "Here's something most people get backwards — avoiding risk completely isn't playing it safe. It's choosing a different, quieter kind of risk.",
+        "body": "Risk in investing means variability — the chance that returns differ from what you expected. Equity funds carry high variability (the price swings a lot), but historically deliver higher long-term returns. Keeping money in a savings account has almost no price variability — but at 3.5% interest against 6% inflation, it loses real purchasing power every year. That's the quiet risk: not losing on paper, but slowly losing what the money can actually buy.",
+        "question": "At 6% inflation and 3.5% savings interest, what is the real return on ₹1L kept in the bank for 10 years? How does that compare to an equity fund averaging 12% over the same period?"
+      },
+      "investor": {
+        "title": "Volatility is not risk",
+        "penny_says": "Most retail investors conflate volatility with risk. They're not the same concept — and confusing them is an expensive mistake.",
+        "body": "Volatility is price variability — measured by standard deviation of returns. Risk, more precisely, is the probability of permanent capital loss. An equity fund dropping 30% in a bear market hasn't permanently destroyed capital if the underlying businesses remain solvent — that's volatility. A company going bankrupt is capital risk. The third category most people miss: sequence risk — the order of returns matters enormously near withdrawal. A 30% crash in year 1 of retirement is catastrophic; the same crash in year 1 of a 30-year accumulation phase is a buying opportunity.",
+        "question": "Two portfolios both deliver 8% CAGR over 30 years. Portfolio A has low volatility (±5% annually). Portfolio B has high volatility (±30% annually). Are they equally valuable to all investors? What changes if both begin withdrawing 5% annually from day 1 of retirement?"
+      }
+    },
+    {
+      "week": 7,
+      "seed": {
+        "title": "Know what you're growing toward",
+        "penny_says": "I know exactly how many acorns I need for winter — so every one I find means I'm one step closer, and I never stop until the jar is full.",
+        "body": "Your parents picked a real goal for their investment — something specific they're growing toward.",
+        "question": ""
+      },
+      "sprout": {
+        "title": "Why your goal is on the bar",
+        "penny_says": "Do you know the name of what your family's portfolio is growing toward — and roughly how full the goal bar is right now?",
+        "body": "A goal turns a portfolio from a number into a plan. Your parents set a target amount and a target date. The goal bar tracks how far the investment has come. Every time the portfolio grows, the bar moves. Every SIP narrows the gap a little more.",
+        "question": "If your goal bar is 40% full right now and the portfolio keeps growing at the same pace, when do you think it might hit 100%?"
+      },
+      "growth": {
+        "title": "A goal makes the numbers mean something",
+        "penny_says": "Here's what makes a goal different from just watching a number go up — a real goal has a target, a date, and a reason, which means you can actually tell whether you're on track.",
+        "body": "A goal converts an abstract portfolio value into a concrete plan. With a target amount and target date, you can back-calculate whether your current growth rate is enough. If you're behind, you can adjust — invest more, extend the timeline, or revise the target. Without a goal, a portfolio can grow for 20 years and you still don't know if it's sufficient.",
+        "question": "Goal: ₹5L in 5 years. Portfolio today: ₹2L, no new additions. Does it reach the target at 12% annual growth? At 8%? What does the gap tell you about why ongoing SIP contributions matter?"
+      },
+      "investor": {
+        "title": "Goal-based investing works backwards",
+        "penny_says": "A goal isn't a wish — it's a constraint that makes every allocation decision deliberate.",
+        "body": "Goal-based investing runs backwards from target: required terminal value → implied CAGR given current portfolio and time horizon → asset allocation that delivers that CAGR → implied risk budget. If the required CAGR is 8%, a conservative allocation works. If it's 15%, you're forced into high-equity concentration with commensurate volatility. The goal defines the return needed, which defines the risk taken. Most retail investors do this in reverse: they pick an asset class and hope the goal gets funded.",
+        "question": "Goal: ₹10L in 7 years. Current portfolio: ₹3L, no further additions. First, calculate the CAGR required to reach the target. Then: what monthly SIP added to the existing ₹3L would get you to ₹10L at a more conservative 10% CAGR?"
+      }
+    }
+  ],
+
+  "triggers": {
+    "sip": {
+      "_comment": "Fired when a new PURCHASE_SIP transaction appears vs the previous snapshot.",
+      "seed": {
+        "title": "One more drop in the jar",
+        "penny_says": "Your parents just added more money to the investment — one more acorn in the pile.",
+        "body": ""
+      },
+      "sprout": {
+        "title": "A new investment just came in",
+        "penny_says": "Do you know what happens to the number of units your parents own every time a new SIP goes in?",
+        "body": "Every SIP investment buys new units at today's NAV price. The total units your family owns just ticked up. Each additional unit is a tiny piece of more companies — and over time, all those units are what make the portfolio grow."
+      },
+      "growth": {
+        "title": "SIP executed — rupee cost averaging at work",
+        "penny_says": "Something interesting just happened — your parents' monthly investment went in automatically, buying whatever today's price offered, without any decision being made.",
+        "body": "That's rupee cost averaging in action. The amount is fixed; the units bought depend on today's NAV. If NAV is lower than last month, more units were purchased for the same money. If higher, fewer. The consistency is what makes it work — not the timing."
+      },
+      "investor": {
+        "title": "SIP executed — average cost updated",
+        "penny_says": "Another SIP cleared. The unit count is up; the weighted average acquisition cost has adjusted. The number worth tracking is whether this month's NAV is above or below your running average.",
+        "body": "Each SIP purchase adjusts the weighted average cost (WAC) of all units held. If today's NAV is above WAC, this purchase pulled the average up slightly. If below, it pulled it down — a mechanical advantage of buying during a dip. The fund only needs to exceed WAC, not the highest price ever paid, for the overall position to be profitable."
+      }
+    },
+    "nav_change": {
+      "_comment": "Fired when any tagged scheme moves >1% vs the previous snapshot.",
+      "seed": {
+        "title": "The number just moved",
+        "penny_says": "Your parents' investment number changed today — their garden is always doing something, even when nobody's watching.",
+        "body": ""
+      },
+      "sprout": {
+        "title": "Your portfolio just moved",
+        "penny_says": "Did you notice your parents' portfolio changed by more than 1% today — can you guess what might have caused it?",
+        "body": "When NAV moves more than 1% in a single day, something significant happened in the market. It could be news about a company the fund owns, a big economic announcement, or lots of people buying or selling at once. Your parents didn't do anything — the market just priced things differently."
+      },
+      "growth": {
+        "title": "Portfolio moved more than 1% today",
+        "penny_says": "Something moved your parents' portfolio by more than 1% today — and it almost certainly wasn't anything they did.",
+        "body": "A NAV swing of more than 1% in a day means the fund's underlying securities repriced significantly. For a diversified equity fund, this usually reflects a market-wide event — an RBI rate decision, a global cue, or an earnings surprise from a large holding. This is normal volatility, not a signal to act on."
+      },
+      "investor": {
+        "title": "NAV moved >1% — signal or noise?",
+        "penny_says": "Your portfolio just crossed the 1% daily move threshold — above-average volatility for a diversified equity fund, but probably not meaningful.",
+        "body": "A single-day NAV move of >1% in a diversified fund typically signals a broad market event or a concentrated holding repricing sharply. For a long-term SIP investor, daily NAV movement has near-zero predictive value for 5-year CAGR. The question worth asking: is this move correlated with a change in the underlying businesses' fundamentals, or just market sentiment repricing? One matters; the other doesn't."
+      }
+    },
+    "milestone": {
+      "_comment": "Fired when goal progress crosses 25 / 50 / 75 / 100%. milestone_pct in metadata.",
+      "seed": {
+        "title": "Your plant just grew!",
+        "penny_says": "Your goal bar just moved up — the garden is getting closer to being full!",
+        "body": ""
+      },
+      "sprout": {
+        "title": "You crossed a milestone!",
+        "penny_says": "How far along the goal bar do you think you are right now — and can you work out how much further is left?",
+        "body": "Every milestone means the real thing you're growing toward is closer. At 25%, a quarter of the way. At 50%, halfway. At 75%, the final stretch. At 100%, the jar is full. The SIPs and the portfolio growth together moved the bar to where it is now."
+      },
+      "growth": {
+        "title": "Milestone crossed — goal progress updated",
+        "penny_says": "Something just happened that most investors never stop to notice — your portfolio crossed a real milestone toward an actual goal.",
+        "body": "Tracking progress against a goal changes how market movements feel. A 5% NAV dip when you're at 70% toward a target has a completely different weight than the same dip at 10%. You're not just watching a number — you're watching the distance to something real close. The milestone you just crossed means the end is genuinely nearer than it's ever been."
+      },
+      "investor": {
+        "title": "Milestone logged — recalculate from here",
+        "penny_says": "Portfolio just crossed a goal milestone. The interesting number isn't the percentage — it's the gap remaining and the return rate needed to close it by the target date.",
+        "body": "At each milestone, the plan deserves a recalculation: what CAGR does the remaining gap require given the time left? A 50% milestone with 5 years remaining is a very different position from 50% with 1 year remaining. The milestone is a checkpoint for whether the original investment thesis still holds — not just a marker, but a prompt to verify the plan is still on track."
+      }
+    },
+    "task_approved": {
+      "_comment": "Fired when a parent approves a task completion — coins_awarded in metadata.",
+      "seed": {
+        "title": "You earned coins!",
+        "penny_says": "You did something real and your parent said yes — now your coin jar is heavier.",
+        "body": ""
+      },
+      "sprout": {
+        "title": "Your effort just paid off",
+        "penny_says": "Do you know how many coins just appeared in your Gullak — and what exactly you did to earn them?",
+        "body": "The coins you earn from tasks are a record that real effort leads to real reward. That's the same idea behind your parents' monthly SIPs — consistent effort, month after month, building toward something real."
+      },
+      "growth": {
+        "title": "Effort → approval → reward",
+        "penny_says": "Here's something worth noticing — your task just completed a full loop: you did the work, a parent verified it, and coins arrived. That chain is exactly how value moves in the real world.",
+        "body": "Money is a reward for value created and verified by someone else. You produced something your family valued, they confirmed it, and you received a token for it. Scale that loop — consistent work, verified quality, reliable reward — and you have the model behind every salary, every business, and every investment return."
+      },
+      "investor": {
+        "title": "Value loop closed",
+        "penny_says": "Task approved, coins credited. That closed a value loop — and it's worth thinking about the mechanics of what just happened.",
+        "body": "You performed a task; a counterparty verified the output and assigned a value. This is the atomic unit of economic exchange: produce → verify → compensate. The coins are a numeraire — a unit of account tracking value within this system. What makes it real is that the exchange was consensual, the output was verified, and the reward was proportional to the agreed terms. Every market transaction is just this loop, scaled."
+      }
+    }
+  }
+}

@@ -1,0 +1,166 @@
+/* ══════════════════════════════════════════════════════════════
+   Taru Design Tokens — extracted from Taru_Design_System v1.0
+   Single source of truth. Never hardcode values outside this file.
+   ══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;600;700;800;900&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:wght@600&family=DM+Sans:wght@400;500;600&display=swap');
+
+:root {
+  /* ── BRAND GREENS ── */
+  --forest:    #1C4A3A;
+  --moss:      #2D6A4F;
+  --leaf:      #40916C;
+  --sage:      #74C69D;
+  --mint:      #B7E4C7;
+  --frost:     #D8F3DC;
+  --ds-white:  #F9FDFB;
+
+  /* ── AMBER ACCENT ── */
+  --amber:     #E8920A;
+  --amber-lt:  #FDF0DC;
+  --amber-md:  #F9C84A;
+  --amber-dk:  #7A4800;
+
+  /* ── SUPPORTING PALETTES ── */
+  --sky:       #2166B2;
+  --sky-lt:    #EAF2FC;
+  --sky-md:    #90BFEE;
+
+  --coral:     #E05B3A;
+  --coral-lt:  #FFF0EB;
+
+  --purple:    #7B5EDD;
+  --purple-lt: #F2EDFC;
+
+  /* ── INK (TEXT) ── */
+  --ink:       #1A2B22;
+  --ink-60:    rgba(26, 43, 34, 0.6);
+  --ink-30:    rgba(26, 43, 34, 0.3);
+  --ink-10:    rgba(26, 43, 34, 0.08);
+
+  /* ── SURFACE / BACKGROUND ── */
+  --surface:   #FFFFFF;
+  --bg:        #F4FAF6;
+  --border:    rgba(26, 43, 34, 0.1);
+
+  /* ── SHADOWS ── */
+  --shadow-sm: 0 1px 3px rgba(26, 43, 34, 0.08);
+  --shadow-md: 0 4px 16px rgba(26, 43, 34, 0.1);
+  --shadow-lg: 0 8px 32px rgba(26, 43, 34, 0.12);
+
+  /* ── TYPOGRAPHY ── */
+  --font-parent:  'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-kid:     'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  /* ── SPACING ── */
+  --sp1:  4px;
+  --sp2:  8px;
+  --sp3:  12px;
+  --sp4:  16px;
+  --sp6:  24px;
+  --sp8:  32px;
+  --sp12: 48px;
+
+  /* ── BORDER RADIUS ── */
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-xl:   24px;
+  --r-pill: 100px;
+
+  /* ── EASING ── */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ══════════════════════════════════════════════════════════════
+     BACKWARD-COMPAT ALIASES
+     Parent-app CSS still references these. Do not remove.
+     New code in child app must use design-system tokens above.
+     ══════════════════════════════════════════════════════════════ */
+
+  /* Colors */
+  --color-navy:            #0B1628;
+  --color-gold:            var(--amber-md);
+  --color-gold-dark:       var(--amber);
+  --color-bg:              var(--bg);
+  --color-surface:         var(--frost);
+  --color-text-primary:    var(--ink);
+  --color-text-secondary:  var(--ink-60);
+  --color-border:          var(--border);
+  --color-success:         var(--leaf);
+  --color-warning:         var(--amber);
+  --color-error:           #DC2626;
+  --color-info:            var(--sky);
+  --color-info-light:      var(--sky-lt);
+  --color-info-border:     var(--sky-md);
+
+  /* Amber aliases (Gullak) */
+  --color-amber:           var(--amber);
+  --color-amber-bright:    var(--amber-md);
+  --color-amber-light:     var(--amber-lt);
+  --color-amber-border:    #FDDBA8;
+  --color-amber-dark:      var(--amber-dk);
+
+  /* Font aliases */
+  --font-heading: 'DM Serif Display', Georgia, serif;
+  --font-body:    'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-kids:    'Nunito', system-ui, sans-serif;
+
+  /* Spacing aliases */
+  --space-1:  var(--sp1);
+  --space-2:  var(--sp2);
+  --space-3:  var(--sp3);
+  --space-4:  var(--sp4);
+  --space-5:  20px;
+  --space-6:  var(--sp6);
+  --space-8:  var(--sp8);
+  --space-10: 40px;
+  --space-12: var(--sp12);
+
+  /* Radius aliases */
+  --radius-sm:   var(--r-sm);
+  --radius-md:   var(--r-md);
+  --radius-lg:   20px;
+  --radius-full: var(--r-pill);
+
+  /* Accessibility */
+  --tap-target: 44px;
+}
+
+/* ── BASE RESET ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-parent);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+  background-color: var(--bg);
+  min-width: 375px;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

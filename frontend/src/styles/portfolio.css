@@ -1,0 +1,318 @@
+/* ── Portfolio page styles ───────────────────────────────────── */
+
+/* Fallback notice — shown when Portfolio Connect SDK fails */
+.import-fallback-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  background: var(--color-amber-light);
+  border: 1px solid var(--color-amber-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  font-size: 14px;
+  color: var(--color-amber-dark);
+  line-height: 1.5;
+}
+
+.import-fallback-notice__dismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-target);
+  height: var(--tap-target);
+  min-width: var(--tap-target);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-amber-dark);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.import-fallback-notice__dismiss:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Import method tabs */
+.import-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.import-tab {
+  flex: 1;
+  height: var(--tap-target);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.import-tab.active {
+  border-color: var(--color-navy);
+  color: var(--color-navy);
+  background: var(--color-surface);
+}
+
+/* Drop zone */
+.drop-zone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-8) var(--space-5);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: var(--color-bg);
+}
+
+.drop-zone:hover,
+.drop-zone.dragging {
+  border-color: var(--color-gold);
+  background: #FFFBF0;
+}
+
+.drop-zone__icon {
+  font-size: 32px;
+  margin-bottom: var(--space-3);
+}
+
+.drop-zone__title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.drop-zone__sub {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.drop-zone__file-name {
+  margin-top: var(--space-3);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-navy);
+  word-break: break-all;
+}
+
+.drop-zone input[type="file"] {
+  display: none;
+}
+
+/* Password field inside import form */
+.import-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.import-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.import-field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.import-field input {
+  height: var(--tap-target);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  outline: none;
+}
+
+.import-field input:focus {
+  border-color: var(--color-navy);
+}
+
+/* Progress / status */
+.import-status {
+  text-align: center;
+  padding: var(--space-6);
+}
+
+.import-status__spinner {
+  font-size: 28px;
+  margin-bottom: var(--space-3);
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .import-status__spinner { animation: none; }
+}
+
+.import-status__text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+/* ── Fund tag list ───────────────────────────────────────────── */
+
+.fund-type-group {
+  margin-bottom: var(--space-5);
+}
+
+.fund-type-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.fund-type-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fund-type-badge.equity  { background: #DCFCE7; color: #15803D; }
+.fund-type-badge.debt    { background: #DBEAFE; color: #1D4ED8; }
+.fund-type-badge.hybrid  { background: #FEF9C3; color: #854D0E; }
+.fund-type-badge.other   { background: var(--color-surface); color: var(--color-text-secondary); }
+
+.fund-type-count {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+/* Individual fund row */
+.fund-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-2);
+  gap: var(--space-3);
+}
+
+.fund-row__name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.fund-row__isin {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-family: monospace;
+}
+
+/* Toggle switch */
+.toggle-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.toggle-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle__track {
+  position: absolute;
+  inset: 0;
+  border-radius: 99px;
+  background: var(--color-border);
+  transition: background 0.2s;
+}
+
+.toggle input:checked + .toggle__track {
+  background: var(--color-success);
+}
+
+.toggle__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: left 0.2s;
+}
+
+.toggle input:checked ~ .toggle__thumb {
+  left: 19px;
+}
+
+/* Child preview card */
+.child-preview {
+  background: var(--color-navy);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.child-preview__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-gold);
+  margin-bottom: var(--space-1);
+}
+
+.child-preview__title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: var(--space-1);
+}
+
+.child-preview__sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.6);
+}
