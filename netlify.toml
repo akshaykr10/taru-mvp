@@ -1,0 +1,28 @@
+# ── Netlify configuration for Taru frontend ──────────────────────
+# Vite app lives in /frontend; output goes to /frontend/dist.
+
+[build]
+  base    = "frontend"          # Netlify runs all commands from here
+  command = "npm run build"     # vite build → outputs to frontend/dist
+  publish = "dist"              # relative to base, so resolves to frontend/dist
+
+[build.environment]
+  NODE_VERSION = "20"           # pin to LTS; Vite 8 requires Node ≥ 18
+
+# ── SPA redirect rule ─────────────────────────────────────────────
+# All routes (including /child/:token, /parent/*, /login, etc.) must
+# fall through to index.html so React Router handles them client-side.
+# Without this, a hard refresh on any sub-route returns a Netlify 404.
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# ── Security headers ─────────────────────────────────────────────
+# Minimal hardening for Phase 0. Tighten before public launch.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy        = "strict-origin-when-cross-origin"

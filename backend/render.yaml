@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: taru-api
+    runtime: node
+    region: singapore          # closest to India for Phase 0 pilot families
+    plan: free
+
+    # ── Build & start ──────────────────────────────────────────
+    buildCommand: npm install
+    startCommand: node src/index.js   # uses npm start script (no nodemon in prod)
+
+    # ── Health check ───────────────────────────────────────────
+    # Render pings this path to decide if the deploy succeeded.
+    # Add GET /health → res.json({ ok: true }) to src/index.js if not already present.
+    healthCheckPath: /health
+
+    # ── Environment variables ──────────────────────────────────
+    # Set real values in the Render dashboard (Settings → Environment).
+    # Never commit secret values here.
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: PORT
+        value: 3001
+
+      # Supabase — get from Supabase dashboard → Project Settings → API
+      - key: SUPABASE_URL
+        sync: false             # fill in Render dashboard
+
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false             # SERVER ONLY — never expose to frontend
+
+      # CASParser — get from api.casparser.in dashboard
+      - key: CASPARSER_API_KEY
+        sync: false             # SERVER ONLY — never expose to frontend
+
+      # Child token JWT signing secret — generate a long random string
+      # e.g.  openssl rand -base64 48
+      - key: CHILD_TOKEN_SECRET
+        sync: false             # SERVER ONLY
+
+      # CORS — set to your Netlify URL once deployed (e.g. https://taru-money.netlify.app)
+      - key: FRONTEND_URL
+        sync: false
