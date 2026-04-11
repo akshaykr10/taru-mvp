@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase.js'
 import { useAuth } from '../../context/AuthContext.jsx'
+import { BACKEND_URL } from '../../lib/api.js'
 import '../../styles/parent.css'
 
 const STAGE_LABELS = {
@@ -24,8 +25,6 @@ async function getAuthHeaders() {
   }
 }
 
-const API = import.meta.env.VITE_API_BASE_URL
-
 // ── Task rule form ────────────────────────────────────────────
 function TaskRuleForm({ childId, onSave, onCancel }) {
   const [name,      setName]      = useState('')
@@ -44,7 +43,7 @@ function TaskRuleForm({ childId, onSave, onCancel }) {
     setSaving(true)
     setError('')
     try {
-      const res  = await fetch(`${API}/api/tasks`, {
+      const res  = await fetch(`${BACKEND_URL}/api/tasks`, {
         method:  'POST',
         headers: await getAuthHeaders(),
         body:    JSON.stringify({ task_name: n, reward_coins: c, frequency: freq, child_id: childId }),
@@ -127,7 +126,7 @@ function TaskRuleRow({ rule, onToggle, onDelete }) {
     setToggling(true)
     const newStatus = rule.status === 'active' ? 'paused' : 'active'
     try {
-      const res  = await fetch(`${API}/api/tasks/${rule.id}`, {
+      const res  = await fetch(`${BACKEND_URL}/api/tasks/${rule.id}`, {
         method:  'PATCH',
         headers: await getAuthHeaders(),
         body:    JSON.stringify({ status: newStatus }),
@@ -142,7 +141,7 @@ function TaskRuleRow({ rule, onToggle, onDelete }) {
   async function deleteRule() {
     setDeleting(true)
     try {
-      const res = await fetch(`${API}/api/tasks/${rule.id}`, {
+      const res = await fetch(`${BACKEND_URL}/api/tasks/${rule.id}`, {
         method:  'DELETE',
         headers: await getAuthHeaders(),
       })
@@ -226,7 +225,7 @@ export default function ParentSettings() {
   useEffect(() => {
     async function loadRules() {
       const headers = await getAuthHeaders()
-      const res     = await fetch(`${API}/api/tasks`, { headers })
+      const res     = await fetch(`${BACKEND_URL}/api/tasks`, { headers })
       if (res.ok) {
         const data = await res.json()
         setRules(data.rules || [])
@@ -242,8 +241,8 @@ export default function ParentSettings() {
     setGeneratingLink(true)
     setLinkError('')
     const endpoint = isRegen
-      ? `${API}/api/children/${child.id}/token/regenerate`
-      : `${API}/api/children/${child.id}/token`
+      ? `${BACKEND_URL}/api/children/${child.id}/token/regenerate`
+      : `${BACKEND_URL}/api/children/${child.id}/token`
     try {
       const res  = await fetch(endpoint, { method: 'POST', headers: await getAuthHeaders() })
       const data = await res.json()

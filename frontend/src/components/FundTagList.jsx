@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase.js'
+import { BACKEND_URL } from '../lib/api.js'
 import '../styles/portfolio.css'
 
 const TYPE_ORDER = ['Equity', 'Hybrid', 'Debt', 'Other']
@@ -19,7 +20,7 @@ export default function FundTagList({ funds, onUpdate }) {
 
     // Persist via backend (auth header added automatically via supabase session)
     const { data: { session } } = await supabase.auth.getSession()
-    await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/casparser/fund-tags/${encodeURIComponent(isin)}`, {
+    await fetch(`${BACKEND_URL}/api/casparser/fund-tags/${encodeURIComponent(isin)}`, {
       method:  'PATCH',
       headers: {
         'Content-Type':  'application/json',

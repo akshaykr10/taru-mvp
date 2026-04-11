@@ -4,9 +4,8 @@ import { supabase } from '../../lib/supabase.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { logActivity } from '../../lib/activity.js'
 import { useActivityOnView } from '../../hooks/useActivityOnView.js'
+import { BACKEND_URL } from '../../lib/api.js'
 import '../../styles/parent.css'
-
-const API = import.meta.env.VITE_API_BASE_URL
 
 async function getAuthHeaders() {
   const { data: { session } } = await supabase.auth.getSession()
@@ -51,7 +50,7 @@ export default function ParentDashboard() {
   // Load pending task approvals
   const loadPending = useCallback(async () => {
     const headers = await getAuthHeaders()
-    const res = await fetch(`${API}/api/tasks/pending`, { headers })
+    const res = await fetch(`${BACKEND_URL}/api/tasks/pending`, { headers })
     if (res.ok) {
       const data = await res.json()
       setPendingApprovals(data.completions || [])
@@ -63,7 +62,7 @@ export default function ParentDashboard() {
   async function handleApproval(completionId, action) {
     setActioning(a => ({ ...a, [completionId]: action }))
     try {
-      const res = await fetch(`${API}/api/tasks/completions/${completionId}/${action}`, {
+      const res = await fetch(`${BACKEND_URL}/api/tasks/completions/${completionId}/${action}`, {
         method:  'POST',
         headers: await getAuthHeaders(),
       })

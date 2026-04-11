@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { PortfolioConnect } from '@cas-parser/connect'
 import { supabase } from '../../lib/supabase.js'
+import { BACKEND_URL } from '../../lib/api.js'
 import FundTagList from '../../components/FundTagList.jsx'
 import '../../styles/parent.css'
 import '../../styles/portfolio.css'
-
-const API = import.meta.env.VITE_API_BASE_URL
 
 const TABS = [
   { id: 'widget', label: '🔗 Portfolio Connect' },
@@ -58,7 +57,7 @@ export default function ParentPortfolio() {
     setLoadingFunds(true)
     try {
       const headers = await getAuthHeaders()
-      const res  = await fetch(`${API}/api/casparser/fund-tags`, { headers })
+      const res  = await fetch(`${BACKEND_URL}/api/casparser/fund-tags`, { headers })
       const data = await res.json()
       if (res.ok) setFunds(data.fund_tags || [])
     } catch {
@@ -84,7 +83,7 @@ export default function ParentPortfolio() {
       setWidgetTokenError('')
       try {
         const headers = await getAuthHeaders()
-        const res  = await fetch(`${API}/api/casparser/token`, {
+        const res  = await fetch(`${BACKEND_URL}/api/casparser/token`, {
           method: 'POST',
           headers,
         })
@@ -127,7 +126,7 @@ export default function ParentPortfolio() {
         ...(await getAuthHeaders()),
         'Content-Type': 'application/json',
       }
-      const res = await fetch(`${API}/api/casparser/process-widget`, {
+      const res = await fetch(`${BACKEND_URL}/api/casparser/process-widget`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ data }),
@@ -202,7 +201,7 @@ export default function ParentPortfolio() {
     try {
       const headers = await getAuthHeaders()
       console.log('1. Sending PDF to backend...')
-      const res  = await fetch(`${API}/api/casparser/parse-pdf`, {
+      const res  = await fetch(`${BACKEND_URL}/api/casparser/parse-pdf`, {
         method: 'POST',
         headers,
         body:   form,

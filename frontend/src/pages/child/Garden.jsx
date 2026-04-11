@@ -4,9 +4,8 @@ import { logActivity } from '../../lib/activity.js'
 import { useActivityOnView } from '../../hooks/useActivityOnView.js'
 import Learn   from './Learn.jsx'
 import Gullak  from './Gullak.jsx'
+import { BACKEND_URL } from '../../lib/api.js'
 import '../../styles/child.css'
-
-const API = import.meta.env.VITE_API_BASE_URL
 
 // Plant emoji by goal-progress stage (matches CLAUDE.md spec)
 function getPlantStage(progressPct) {
@@ -82,7 +81,7 @@ export default function ChildGarden() {
 
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/child/garden`,
+          `${BACKEND_URL}/api/child/garden`,
           { headers: { 'X-Child-Token': token } }
         )
 
@@ -117,7 +116,7 @@ export default function ChildGarden() {
 
   const loadTasks = useCallback(async (tkn) => {
     try {
-      const res = await fetch(`${API}/api/tasks/child`, {
+      const res = await fetch(`${BACKEND_URL}/api/tasks/child`, {
         headers: { 'X-Child-Token': tkn || token },
       })
       if (res.ok) {
@@ -133,7 +132,7 @@ export default function ChildGarden() {
     setSubmitting(s => ({ ...s, [ruleId]: true }))
     setSubmitMsg(m => ({ ...m, [ruleId]: null }))
     try {
-      const res = await fetch(`${API}/api/tasks/${ruleId}/complete`, {
+      const res = await fetch(`${BACKEND_URL}/api/tasks/${ruleId}/complete`, {
         method:  'POST',
         headers: { 'X-Child-Token': token, 'Content-Type': 'application/json' },
       })
