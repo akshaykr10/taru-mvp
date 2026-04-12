@@ -462,6 +462,104 @@
   margin-top: var(--space-1);
 }
 
+/* ── Form inputs & labels ────────────────────────────────────── */
+.taru-input,
+.form-input {
+  width: 100%;
+  height: var(--tap-target);
+  padding: 0 var(--sp4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: var(--font-parent);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.taru-input:focus,
+.form-input:focus {
+  border-color: var(--forest);
+  box-shadow: 0 0 0 3px rgba(28, 74, 58, 0.1);
+}
+
+.input-label,
+.form-label {
+  font-family: var(--font-parent);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  display: block;
+  margin-bottom: var(--sp2);
+}
+
+/* ── Primary button (forest green) ──────────────────────────── */
+.btn-primary {
+  background: var(--forest);
+  color: var(--ds-white);
+  font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--moss);
+}
+
+/* ── Ghost micro-button (Pause / Resume) ─────────────────────── */
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ink-60);
+  height: 32px;
+  padding: 0 var(--sp3);
+  font-size: 12px;
+  font-family: var(--font-parent);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.btn-ghost:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Danger micro-button (Delete) ────────────────────────────── */
+.btn-danger {
+  background: transparent;
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+  height: 32px;
+  padding: 0 var(--sp3);
+  font-size: 12px;
+  font-family: var(--font-parent);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--color-error);
+  color: #fff;
+}
+
+.btn-danger--filled {
+  background: var(--color-error);
+  color: #fff;
+}
+
+.btn-danger:disabled { opacity: 0.45; cursor: not-allowed; }
+
 /* ── Task rule rows ──────────────────────────────────────────── */
 .task-rule-row {
   display: flex;

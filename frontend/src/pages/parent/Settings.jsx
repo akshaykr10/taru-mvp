@@ -69,7 +69,7 @@ function TaskRuleForm({ childId, onSave, onCancel }) {
   }
 
   return (
-    <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+    <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp4)' }}>
       {error && <div className="auth-error">{error}</div>}
 
       {/* Quick assign chip rail */}
@@ -103,7 +103,7 @@ function TaskRuleForm({ childId, onSave, onCancel }) {
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp4)' }}>
         <div>
           <label className="form-label" htmlFor="task-coins">Coins reward</label>
           <input
@@ -135,7 +135,7 @@ function TaskRuleForm({ childId, onSave, onCancel }) {
         <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={onCancel} disabled={saving}>
           Cancel
         </button>
-        <button type="submit" className="btn btn-navy" style={{ flex: 1 }} disabled={saving}>
+        <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={saving}>
           {saving ? 'Saving…' : 'Add task'}
         </button>
       </div>
@@ -193,8 +193,7 @@ function TaskRuleRow({ rule, onToggle, onDelete }) {
       </div>
       <div className="task-rule-row__actions">
         <button
-          className="btn btn-outline"
-          style={{ fontSize: '12px', height: '32px', padding: '0 10px' }}
+          className="btn-ghost"
           onClick={toggle}
           disabled={toggling}
         >
@@ -203,16 +202,14 @@ function TaskRuleRow({ rule, onToggle, onDelete }) {
 
         {!confirmDel ? (
           <button
-            className="btn btn-outline"
-            style={{ fontSize: '12px', height: '32px', padding: '0 10px', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+            className="btn-danger"
             onClick={() => setConfirmDel(true)}
           >
             Delete
           </button>
         ) : (
           <button
-            className="btn"
-            style={{ fontSize: '12px', height: '32px', padding: '0 10px', background: 'var(--color-error)', color: '#fff' }}
+            className="btn-danger btn-danger--filled"
             onClick={deleteRule}
             disabled={deleting}
           >
