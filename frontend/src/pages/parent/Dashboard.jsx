@@ -15,6 +15,45 @@ async function getAuthHeaders() {
   }
 }
 
+// ── Portfolio empty state — shown when no CAS has been imported yet ──
+function PortfolioEmptyState() {
+  const MOCK_FUNDS = [
+    ['Axis Bluechip Fund',       '██,██,███'],
+    ['Mirae Asset ELSS',         '█,██,███'],
+    ['Parag Parikh Flexi Cap',   '███,██,███'],
+  ]
+
+  return (
+    <div className="portfolio-empty">
+      {/* Blurred mock in the background — purely decorative */}
+      <div className="portfolio-empty__mock" aria-hidden="true">
+        <div className="portfolio-empty__mock-label">Tagged portfolio</div>
+        <div className="portfolio-empty__mock-total">₹ ██,██,███</div>
+        {MOCK_FUNDS.map(([name, val]) => (
+          <div key={name} className="portfolio-empty__mock-row">
+            <span>{name}</span>
+            <span className="portfolio-empty__mock-val">{val}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Focused overlay with the CTA */}
+      <div className="portfolio-empty__overlay">
+        <div className="portfolio-empty__icon" aria-hidden="true">🌱</div>
+        <p className="portfolio-empty__headline">
+          Your child's financial forest starts with a single seed.
+        </p>
+        <p className="portfolio-empty__sub">
+          Connect your portfolio in one click.
+        </p>
+        <Link to="/parent/portfolio" className="btn btn-gold">
+          Connect portfolio →
+        </Link>
+      </div>
+    </div>
+  )
+}
+
 // Seed prompt shown before CASParser is connected (Step 4 will replace with real prompts)
 const SEED_PROMPT = {
   week: 1,
@@ -153,31 +192,28 @@ export default function ParentDashboard() {
         {getGreeting()},<br />{displayName}.
       </h1>
 
-      {/* Portfolio card */}
-      <div className="card card--gold">
-        <div className="card__label">Tagged portfolio</div>
-        <div className="card__value">
-          {portfolioTotal === null
-            ? '—'
-            : portfolioTotal.rupees > 0
+      {/* Portfolio card — premium empty state until a CAS is imported */}
+      {portfolioTotal === null ? (
+        <div className="card card--gold">
+          <div className="card__label">Tagged portfolio</div>
+          <div className="card__value">—</div>
+          <div className="card__sub">Loading…</div>
+        </div>
+      ) : portfolioTotal.count === 0 ? (
+        <PortfolioEmptyState />
+      ) : (
+        <div className="card card--gold">
+          <div className="card__label">Tagged portfolio</div>
+          <div className="card__value">
+            {portfolioTotal.rupees > 0
               ? `₹\u00A0${portfolioTotal.rupees.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
               : '₹ —'}
+          </div>
+          <div className="card__sub">
+            {`${portfolioTotal.count} fund${portfolioTotal.count !== 1 ? 's' : ''} shared with ${child?.name || 'your child'}`}
+          </div>
         </div>
-        <div className="card__sub">
-          {!portfolioTotal || portfolioTotal.count === 0
-            ? 'Connect your portfolio to see the value here.'
-            : `${portfolioTotal.count} fund${portfolioTotal.count !== 1 ? 's' : ''} shared with ${child?.name || 'your child'}`}
-        </div>
-        {(!portfolioTotal || portfolioTotal.count === 0) && (
-          <Link
-            to="/parent/portfolio"
-            className="btn btn-gold"
-            style={{ marginTop: 'var(--space-4)', display: 'inline-flex' }}
-          >
-            Connect portfolio →
-          </Link>
-        )}
-      </div>
+      )}
 
       {/* Child card */}
       {!loadingChild && (child ? (

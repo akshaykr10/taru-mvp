@@ -25,6 +25,16 @@ async function getAuthHeaders() {
   }
 }
 
+// ── Quick-assign presets ─────────────────────────────────────
+const QUICK_TASKS = [
+  { label: '🧹 Tidy Room',    coins: 20, freq: 'weekly'   },
+  { label: '📚 Homework',     coins: 30, freq: 'weekly'   },
+  { label: '🐕 Dog Walking',  coins: 25, freq: 'weekly'   },
+  { label: '🍽️ Clear Table',  coins: 15, freq: 'weekly'   },
+  { label: '🛏️ Make Bed',     coins: 10, freq: 'weekly'   },
+  { label: '🌱 Water Plants', coins: 20, freq: 'one-time' },
+]
+
 // ── Task rule form ────────────────────────────────────────────
 function TaskRuleForm({ childId, onSave, onCancel }) {
   const [name,      setName]      = useState('')
@@ -61,6 +71,23 @@ function TaskRuleForm({ childId, onSave, onCancel }) {
   return (
     <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
       {error && <div className="auth-error">{error}</div>}
+
+      {/* Quick assign chip rail */}
+      <div className="quick-assign-section">
+        <div className="quick-assign-label">Quick assign</div>
+        <div className="quick-assign-rail">
+          {QUICK_TASKS.map(t => (
+            <button
+              key={t.label}
+              type="button"
+              className={`quick-assign-chip${name === t.label ? ' quick-assign-chip--active' : ''}`}
+              onClick={() => { setName(t.label); setCoins(String(t.coins)); setFreq(t.freq) }}
+            >
+              {t.label} · {t.coins}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div>
         <label className="form-label" htmlFor="task-name">Task name</label>
