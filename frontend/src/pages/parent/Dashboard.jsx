@@ -60,6 +60,65 @@ const SEED_PROMPT = {
   text: `Ask your child: "If you had ₹1,000 right now, what's the first thing you'd do with it?" — don't correct, just listen.`,
 }
 
+function ChildOverview({ child, portfolioTotal, pendingCount }) {
+  if (!child) return null
+
+  const goalAmount = child.goal_amount ? Number(child.goal_amount) : null
+  const saved      = portfolioTotal?.rupees ?? null
+  const pct        = (goalAmount && saved !== null)
+    ? Math.min(Math.round((saved / goalAmount) * 100), 100)
+    : 0
+
+  const fmtInr = n => `₹${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
+
+  return (
+    <div className="child-overview">
+      <div className="child-overview__header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp2)' }}>
+          <span className="child-overview__name">{child.name}</span>
+          <span className="age-badge">{child.age_stage}</span>
+        </div>
+        {pendingCount > 0 ? (
+          <span className="child-overview__tasks-pill child-overview__tasks-pill--pending">
+            {pendingCount} pending
+          </span>
+        ) : (
+          <span className="child-overview__tasks-pill child-overview__tasks-pill--clear">
+            All clear ✓
+          </span>
+        )}
+      </div>
+
+      {child.goal_name ? (
+        <>
+          <div className="child-overview__goal-label">{child.goal_name}</div>
+          <div className="child-overview__progress-track">
+            <div
+              className="child-overview__progress-fill"
+              style={{ width: `${pct}%` }}
+              role="progressbar"
+              aria-valuenow={pct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            />
+          </div>
+          <div className="child-overview__progress-labels">
+            <span>{saved !== null ? fmtInr(saved) : '—'} saved</span>
+            <span>{goalAmount ? `of ${fmtInr(goalAmount)}` : 'No target set'} · {pct}%</span>
+          </div>
+        </>
+      ) : (
+        <p className="child-overview__no-goal">
+          No savings goal set.{' '}
+          <Link to="/parent/settings" style={{ color: 'var(--forest)', fontWeight: 500 }}>
+            Add one →
+          </Link>
+        </p>
+      )}
+    </div>
+  )
+}
+
 export default function ParentDashboard() {
   const { user, session } = useAuth()
   const [child, setChild]                   = useState(null)
@@ -215,50 +274,31 @@ export default function ParentDashboard() {
         </div>
       )}
 
-      {/* Child card */}
-      {!loadingChild && (child ? (
-          <div className="card">
-            <div className="section-header" style={{ marginBottom: 'var(--space-2)' }}>
-              <span className="card__label" style={{ marginBottom: 0 }}>
-                {child.name}'s garden
-              </span>
-              <span className="age-badge">{child.age_stage}</span>
-            </div>
-            {child.goal_name ? (
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-                Saving for <strong style={{ color: 'var(--color-text-primary)' }}>{child.goal_name}</strong>
-                {child.goal_amount
-                  ? ` — target ₹${Number(child.goal_amount).toLocaleString('en-IN')}`
-                  : ''}
-              </p>
-            ) : (
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>
-                No goal set yet.{' '}
-                <Link to="/parent/settings" style={{ color: 'var(--color-navy)', fontWeight: 500 }}>
-                  Add one →
-                </Link>
-              </p>
-            )}
-          </div>
-        ) : (
-          <div className="card">
-            <div className="empty-state" style={{ padding: 'var(--space-5) 0' }}>
-              <div className="empty-state__icon">🌱</div>
-              <div className="empty-state__title">No child added yet</div>
-              <div className="empty-state__body">
-                Something went wrong during setup.{' '}
-                <Link to="/parent/onboarding" style={{ color: 'var(--color-navy)', fontWeight: 500 }}>
-                  Run onboarding again →
-                </Link>
-              </div>
+      {/* Child overview */}
+      {!loadingChild && !child && (
+        <div className="card">
+          <div className="empty-state" style={{ padding: 'var(--space-5) 0' }}>
+            <div className="empty-state__icon">🌱</div>
+            <div className="empty-state__title">No child added yet</div>
+            <div className="empty-state__body">
+              <Link to="/parent/settings" style={{ color: 'var(--color-navy)', fontWeight: 500 }}>
+                Add a child in Settings →
+              </Link>
             </div>
           </div>
-        )
+        </div>
+      )}
+      {!loadingChild && child && (
+        <ChildOverview
+          child={child}
+          portfolioTotal={portfolioTotal}
+          pendingCount={pendingApprovals.length}
+        />
       )}
 
       {/* Weekly conversation prompt */}
       <div className="section-header">
-        <span className="section-title">Weekly prompt</span>
+        <span className="section-title">Weekly Learning</span>
       </div>
 
       <div
@@ -292,58 +332,52 @@ export default function ParentDashboard() {
         )}
       </div>
 
-      <div className="card">
-        {pendingApprovals.length === 0 ? (
-          <div className="empty-state" style={{ padding: 'var(--space-4) 0' }}>
-            <div className="empty-state__icon">✅</div>
-            <div className="empty-state__title">All clear</div>
-            <div className="empty-state__body">
-              No pending task approvals.
-              <br />
-              <Link to="/parent/settings" style={{ color: 'var(--color-navy)', fontWeight: 500 }}>
-                Set up task rules →
-              </Link>
-            </div>
-          </div>
-        ) : (
-          pendingApprovals.map(comp => {
-            const rule     = comp.task_rules
-            const childName = rule?.children?.name || 'your child'
-            const taskName  = rule?.task_name || 'Unknown task'
-            const coins     = rule?.reward_coins || 0
-            const isActioning = !!actioning[comp.id]
-            return (
-              <div key={comp.id} className="approval-row">
-                <div className="approval-row__info">
-                  <div className="approval-row__name">{taskName}</div>
-                  <div className="approval-row__meta">
-                    {childName} · 🪙 {coins} coins ·{' '}
-                    {new Date(comp.completed_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                  </div>
-                </div>
-                <div className="approval-row__actions">
-                  <button
-                    className="btn btn-outline"
-                    style={{ fontSize: '12px', height: '32px', padding: '0 10px', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
-                    disabled={isActioning}
-                    onClick={() => handleApproval(comp.id, 'reject')}
-                  >
-                    {actioning[comp.id] === 'reject' ? '…' : 'Reject'}
-                  </button>
-                  <button
-                    className="btn btn-navy"
-                    style={{ fontSize: '12px', height: '32px', padding: '0 10px' }}
-                    disabled={isActioning}
-                    onClick={() => handleApproval(comp.id, 'approve')}
-                  >
-                    {actioning[comp.id] === 'approve' ? '…' : 'Approve'}
-                  </button>
+      {pendingApprovals.length === 0 ? (
+        <p className="approval-empty">
+          No pending approvals.{' '}
+          <Link to="/parent/settings" style={{ color: 'var(--forest)', fontWeight: 500 }}>
+            Set up assigned tasks →
+          </Link>
+        </p>
+      ) : (
+        pendingApprovals.map(comp => {
+          const rule        = comp.task_rules
+          const childName   = rule?.children?.name || 'your child'
+          const taskName    = rule?.task_name || 'Unknown task'
+          const coins       = rule?.reward_coins || 0
+          const isActioning = !!actioning[comp.id]
+          return (
+            <div key={comp.id} className="approval-card">
+              <div className="approval-card__body">
+                <div className="approval-card__task">{taskName}</div>
+                <div className="approval-card__meta">
+                  {childName} · 🪙 {coins} ·{' '}
+                  {new Date(comp.completed_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                 </div>
               </div>
-            )
-          })
-        )}
-      </div>
+              <div className="approval-card__actions">
+                <button
+                  className="ac-btn-reject"
+                  disabled={isActioning}
+                  onClick={() => {
+                    if (!window.confirm('Are you sure you want to un-mark this task?')) return
+                    handleApproval(comp.id, 'reject')
+                  }}
+                >
+                  {actioning[comp.id] === 'reject' ? '…' : 'Reject'}
+                </button>
+                <button
+                  className="ac-btn-approve"
+                  disabled={isActioning}
+                  onClick={() => handleApproval(comp.id, 'approve')}
+                >
+                  {actioning[comp.id] === 'approve' ? '…' : 'Approve'}
+                </button>
+              </div>
+            </div>
+          )
+        })
+      )}
     </div>
   )
 }

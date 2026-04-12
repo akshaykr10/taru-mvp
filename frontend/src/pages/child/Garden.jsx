@@ -56,8 +56,8 @@ function MilestoneBadge({ pct, label, icon, lockedIcon, achieved }) {
 }
 
 const NAV_TABS = [
-  { id: 'garden', label: 'Garden', icon: '🌱' },
   { id: 'learn',  label: 'Learn',  icon: '💡' },
+  { id: 'garden', label: 'Garden', icon: '🌱' },
   { id: 'tasks',  label: 'Tasks',  icon: '✅' },
   { id: 'gullak', label: 'Gullak', icon: '🪙' },
 ]
@@ -68,7 +68,7 @@ export default function ChildGarden() {
   const [status,     setStatus]     = useState('loading') // 'loading' | 'error' | 'ready'
   const [errorMsg,   setErrorMsg]   = useState('')
   const [gardenData, setGardenData] = useState(null)
-  const [activeTab,  setActiveTab]  = useState('garden')
+  const [activeTab,  setActiveTab]  = useState('learn')
 
   // Tasks tab state
   const [tasks,      setTasks]      = useState([])
@@ -289,13 +289,11 @@ export default function ChildGarden() {
             </div>
 
             {tasks.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: 'var(--sp8) var(--sp4)' }}>
-                <div style={{ fontSize: '40px', marginBottom: 'var(--sp3)' }}>📋</div>
-                <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--ink)', marginBottom: 'var(--sp2)' }}>
-                  No tasks yet
-                </div>
-                <div style={{ fontSize: '13px', color: 'var(--ink-60)' }}>
-                  Ask a parent to set up task rules.
+              <div className="child-tasks-empty">
+                <div className="child-tasks-empty__icon">📋</div>
+                <div className="child-tasks-empty__title">No tasks yet</div>
+                <div className="child-tasks-empty__body">
+                  Ask a parent to set up assigned tasks.
                 </div>
               </div>
             ) : (

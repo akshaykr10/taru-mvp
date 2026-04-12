@@ -4,6 +4,14 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { BACKEND_URL } from '../../lib/api.js'
 import '../../styles/parent.css'
 
+function deriveAgeStage(dob) {
+  const age = Math.floor((Date.now() - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000))
+  if (age <= 8)  return 'seed'
+  if (age <= 11) return 'sprout'
+  if (age <= 14) return 'growth'
+  return 'investor'
+}
+
 const STAGE_LABELS = {
   seed:     'Seed (ages 5–8)',
   sprout:   'Sprout (ages 9–11)',
@@ -103,7 +111,7 @@ function TaskRuleForm({ childId, onSave, onCancel }) {
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--sp4)' }}>
+      <div className="task-form-grid">
         <div>
           <label className="form-label" htmlFor="task-coins">Coins reward</label>
           <input
@@ -192,13 +200,15 @@ function TaskRuleRow({ rule, onToggle, onDelete }) {
         </div>
       </div>
       <div className="task-rule-row__actions">
-        <button
-          className="btn-ghost"
-          onClick={toggle}
-          disabled={toggling}
-        >
-          {toggling ? '…' : rule.status === 'active' ? 'Pause' : 'Resume'}
-        </button>
+        {rule.frequency !== 'one-time' && (
+          <button
+            className="btn-ghost"
+            onClick={toggle}
+            disabled={toggling}
+          >
+            {toggling ? '…' : rule.status === 'active' ? 'Pause' : 'Resume'}
+          </button>
+        )}
 
         {!confirmDel ? (
           <button
@@ -229,6 +239,13 @@ export default function ParentSettings() {
   const [rules,      setRules]      = useState([])
   const [rulesLoading, setRulesLoading] = useState(true)
   const [showForm,   setShowForm]   = useState(false)
+
+  // Add Child modal state
+  const [showAddChild,    setShowAddChild]    = useState(false)
+  const [addChildName,    setAddChildName]    = useState('')
+  const [addChildDob,     setAddChildDob]     = useState('')
+  const [addChildError,   setAddChildError]   = useState('')
+  const [addChildSaving,  setAddChildSaving]  = useState(false)
 
   // Garden link state
   const [generatingLink, setGeneratingLink] = useState(false)
@@ -300,6 +317,39 @@ export default function ParentSettings() {
     setRules(prev => prev.filter(r => r.id !== id))
   }
 
+  const today  = new Date()
+  const maxDob = new Date(today.getFullYear() - 5,  today.getMonth(), today.getDate()).toISOString().split('T')[0]
+  const minDob = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate()).toISOString().split('T')[0]
+
+  async function handleAddChild(e) {
+    e.preventDefault()
+    const name = addChildName.trim()
+    if (!name)        { setAddChildError('Please enter your child\'s name.'); return }
+    if (!addChildDob) { setAddChildError('Please enter your child\'s date of birth.'); return }
+
+    setAddChildSaving(true)
+    setAddChildError('')
+    const stage = deriveAgeStage(addChildDob)
+
+    const { data: newChild, error } = await supabase
+      .from('children')
+      .insert({ parent_id: user.id, name, dob: addChildDob, age_stage: stage })
+      .select()
+      .single()
+
+    setAddChildSaving(false)
+
+    if (error) {
+      setAddChildError('Failed to add child. Please try again.')
+      return
+    }
+
+    setChild(newChild)
+    setShowAddChild(false)
+    setAddChildName('')
+    setAddChildDob('')
+  }
+
   if (loading) return null
 
   const gardenUrl = child?.child_token
@@ -336,9 +386,20 @@ export default function ParentSettings() {
         </div>
       ) : (
         <div className="card">
-          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>
-            No child profile found. Something may have gone wrong during setup.
-          </p>
+          <div className="empty-state" style={{ padding: 'var(--sp4) 0' }}>
+            <div className="empty-state__icon">🌱</div>
+            <div className="empty-state__title">No child added yet</div>
+            <div className="empty-state__body" style={{ marginBottom: 'var(--sp6)' }}>
+              Add your child to set up their Money Garden.
+            </div>
+            <button
+              className="btn btn-primary"
+              style={{ width: '100%' }}
+              onClick={() => setShowAddChild(true)}
+            >
+              + Add Child
+            </button>
+          </div>
         </div>
       )}
 
@@ -382,7 +443,7 @@ export default function ParentSettings() {
 
       {/* ── Task rules ─────────────────────────────────────── */}
       <div className="section-header" style={{ marginTop: 'var(--space-2)' }}>
-        <span className="section-title">Task rules</span>
+        <span className="section-title">Assigned Tasks</span>
         <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
           {rules.length}/3 used
         </span>
@@ -396,7 +457,7 @@ export default function ParentSettings() {
             {rules.length === 0 && !showForm && (
               <div className="empty-state" style={{ padding: 'var(--space-3) 0' }}>
                 <div className="empty-state__icon">📋</div>
-                <div className="empty-state__title">No task rules yet</div>
+                <div className="empty-state__title">No assigned tasks yet</div>
                 <div className="empty-state__body">
                   Create tasks that {child?.name || 'your child'} can complete to earn coins.
                 </div>
@@ -426,7 +487,7 @@ export default function ParentSettings() {
                 style={{ width: '100%', marginTop: rules.length > 0 ? 'var(--space-3)' : 0 }}
                 onClick={() => setShowForm(true)}
               >
-                + Add task rule
+                + Add assigned task
               </button>
             )}
           </>
@@ -511,6 +572,83 @@ export default function ParentSettings() {
           </div>
         )}
       </div>
+
+      {/* ── Add Child modal ────────────────────────────────── */}
+      {showAddChild && (
+        <div
+          className="add-child-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Add child"
+          onClick={e => { if (e.target === e.currentTarget) setShowAddChild(false) }}
+        >
+          <div className="add-child-sheet">
+            <div className="add-child-sheet__handle" aria-hidden="true" />
+            <h2 className="add-child-sheet__title">Add your child</h2>
+            <p className="add-child-sheet__sub">
+              Their learning stage is set automatically from their date of birth.
+            </p>
+
+            <form onSubmit={handleAddChild} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp4)' }}>
+              {addChildError && (
+                <div className="auth-error">{addChildError}</div>
+              )}
+
+              <div>
+                <label className="form-label" htmlFor="add-child-name">Child's name</label>
+                <input
+                  id="add-child-name"
+                  className="form-input"
+                  type="text"
+                  placeholder="e.g. Arya"
+                  maxLength={60}
+                  value={addChildName}
+                  onChange={e => setAddChildName(e.target.value)}
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="form-label" htmlFor="add-child-dob">Date of birth</label>
+                <input
+                  id="add-child-dob"
+                  className="form-input"
+                  type="date"
+                  min={minDob}
+                  max={maxDob}
+                  value={addChildDob}
+                  onChange={e => setAddChildDob(e.target.value)}
+                />
+                {addChildDob && (
+                  <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: 'var(--sp1)' }}>
+                    Stage: {STAGE_LABELS[deriveAgeStage(addChildDob)]}
+                  </p>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', gap: 'var(--sp3)', marginTop: 'var(--sp2)' }}>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  style={{ flex: 1 }}
+                  onClick={() => { setShowAddChild(false); setAddChildError('') }}
+                  disabled={addChildSaving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ flex: 1 }}
+                  disabled={addChildSaving}
+                >
+                  {addChildSaving ? 'Saving…' : 'Add child'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

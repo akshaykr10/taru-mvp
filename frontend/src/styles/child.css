@@ -795,3 +795,164 @@
 }
 
 .gullak-milestones__empty span { font-size: 36px; }
+
+/* ══════════════════════════════════════════════════════════════
+   Tasks tab — empty state (replaces inline styles in Garden.jsx)
+   ══════════════════════════════════════════════════════════════ */
+
+.child-tasks-empty {
+  text-align: center;
+  padding: var(--sp8) var(--sp4);
+}
+
+.child-tasks-empty__icon {
+  font-size: 40px;
+  margin-bottom: var(--sp3);
+}
+
+.child-tasks-empty__title {
+  font-family: var(--font-kid);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: var(--sp2);
+}
+
+.child-tasks-empty__body {
+  font-size: 13px;
+  color: var(--ink-60);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Weekly Learning Card — sky-lt themed, Wise Gilli
+   ══════════════════════════════════════════════════════════════ */
+
+.learn-week-card {
+  background: var(--sky-lt);
+  border: 1.5px solid var(--sky-md);
+  border-radius: var(--r-xl);
+  padding: var(--sp6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp4);
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+.learn-week-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp3);
+}
+
+.learn-week-card__gilli {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.learn-week-card__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--sky);
+  line-height: 1.25;
+}
+
+.learn-week-card__speech {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--sky-md);
+  border-radius: var(--r-md);
+  padding: var(--sp3) var(--sp4);
+  font-family: var(--font-kid);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--sky);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.learn-week-card__body {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-60);
+}
+
+/* ── Mark as Done button — tactile kid style ─────────────────── */
+
+.btn-kid-done {
+  width: 100%;
+  height: 44px;
+  background: var(--forest);
+  color: var(--ds-white);
+  border: none;
+  border-radius: var(--r-pill);
+  font-family: var(--font-kid);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  box-shadow: 0 3px 0 var(--moss);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp2);
+  margin-top: var(--sp2);
+}
+
+.btn-kid-done:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--moss);
+}
+
+.btn-kid-done:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Done confirmation banner ────────────────────────────────── */
+
+.learn-done-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp2);
+  background: var(--frost);
+  border: 1.5px solid var(--mint);
+  border-radius: var(--r-pill);
+  padding: var(--sp3) var(--sp4);
+  font-family: var(--font-kid);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--leaf);
+  margin-top: var(--sp2);
+}
+
+/* ── Reward burst animation — floating +XP! ─────────────────── */
+
+.learn-reward-burst {
+  position: absolute;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-kid);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--amber);
+  pointer-events: none;
+  white-space: nowrap;
+  animation: rewardFloat 1.4s ease-out forwards;
+  z-index: 10;
+}
+
+@keyframes rewardFloat {
+  0%   { opacity: 1;   transform: translateX(-50%) translateY(0);     }
+  100% { opacity: 0;   transform: translateX(-50%) translateY(-56px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .learn-reward-burst { animation: none; opacity: 0; }
+  .btn-kid-done       { transition: none; }
+}

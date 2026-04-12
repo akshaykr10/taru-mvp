@@ -800,3 +800,260 @@
   color: var(--sky);
   font-weight: 600;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Mobile-first 2-col grid — used in TaskRuleForm (coins + freq)
+   Single column on mobile, 2-col at 440px+
+   ══════════════════════════════════════════════════════════════ */
+
+.task-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp4);
+}
+
+@media (min-width: 440px) {
+  .task-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Child Overview card — replaces plain child card on Dashboard
+   ══════════════════════════════════════════════════════════════ */
+
+.child-overview {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp6);
+  margin-bottom: var(--sp4);
+}
+
+.child-overview__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp6);
+}
+
+.child-overview__name {
+  font-family: var(--font-parent);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.child-overview__tasks-pill {
+  font-family: var(--font-parent);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.child-overview__tasks-pill--pending {
+  background: var(--amber-lt);
+  color: var(--amber-dk);
+}
+
+.child-overview__tasks-pill--clear {
+  background: var(--frost);
+  color: var(--moss);
+}
+
+.child-overview__goal-label {
+  font-family: var(--font-parent);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-60);
+  margin-bottom: var(--sp3);
+}
+
+.child-overview__progress-track {
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--ink-10);
+  overflow: hidden;
+}
+
+.child-overview__progress-fill {
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--leaf);
+  transition: width 0.6s ease;
+  min-width: 0;
+}
+
+.child-overview__progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--sp2);
+  font-family: var(--font-parent);
+  font-size: 12px;
+  color: var(--ink-60);
+}
+
+.child-overview__no-goal {
+  font-family: var(--font-parent);
+  font-size: 13px;
+  color: var(--ink-60);
+  margin-top: var(--sp2);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Compact Inline Approval cards
+   ══════════════════════════════════════════════════════════════ */
+
+.approval-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--sp3) var(--sp4);
+  margin-bottom: var(--sp3);
+}
+
+.approval-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.approval-card__task {
+  font-family: var(--font-parent);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.approval-card__meta {
+  font-family: var(--font-parent);
+  font-size: 12px;
+  color: var(--ink-60);
+  margin-top: 3px;
+}
+
+.approval-card__actions {
+  display: flex;
+  gap: var(--sp2);
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* Approve micro-button */
+.ac-btn-approve {
+  background: var(--forest);
+  color: var(--ds-white);
+  border: none;
+  border-radius: var(--r-pill);
+  height: 32px;
+  padding: 0 var(--sp4);
+  font-family: var(--font-parent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.15s;
+}
+
+.ac-btn-approve:hover:not(:disabled) { background: var(--moss); }
+.ac-btn-approve:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Reject micro-button */
+.ac-btn-reject {
+  background: transparent;
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+  border-radius: var(--r-pill);
+  height: 32px;
+  padding: 0 var(--sp3);
+  font-family: var(--font-parent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ac-btn-reject:hover:not(:disabled) {
+  background: var(--color-error);
+  color: #fff;
+}
+.ac-btn-reject:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Empty approvals line */
+.approval-empty {
+  font-family: var(--font-parent);
+  font-size: 13px;
+  color: var(--ink-60);
+  padding: var(--sp2) 0 var(--sp4);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Add Child modal — slide-up sheet, mobile-first
+   ══════════════════════════════════════════════════════════════ */
+
+.add-child-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(26, 43, 34, 0.48);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.add-child-sheet {
+  background: var(--color-bg);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: var(--sp4) var(--sp6) calc(var(--sp8) + env(safe-area-inset-bottom));
+  width: 100%;
+  max-width: 480px;
+  animation: sheet-slide-up 0.25s var(--ease-bounce) both;
+}
+
+@keyframes sheet-slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .add-child-sheet {
+    animation: none;
+  }
+}
+
+.add-child-sheet__handle {
+  width: 36px;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--border);
+  margin: 0 auto var(--sp6);
+}
+
+.add-child-sheet__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--ink);
+  margin-bottom: var(--sp2);
+}
+
+.add-child-sheet__sub {
+  font-family: var(--font-parent);
+  font-size: 14px;
+  color: var(--ink-60);
+  line-height: 1.5;
+  margin-bottom: var(--sp6);
+}
