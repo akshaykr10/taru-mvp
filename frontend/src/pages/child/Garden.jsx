@@ -45,8 +45,8 @@ function getNextMilestone(progressPct) {
 }
 
 const NAV_TABS = [
-  { id: 'learn',  label: 'Learn',  icon: '💡' },
   { id: 'garden', label: 'Garden', icon: '🌱' },
+  { id: 'learn',  label: 'Learn',  icon: '💡' },
   { id: 'tasks',  label: 'Tasks',  icon: '✅' },
   { id: 'gullak', label: 'Gullak', icon: '🪙' },
 ]
@@ -305,7 +305,7 @@ export default function ChildGarden() {
             ) : (
               tasks.map(task => {
                 const isApproved = task.has_approved
-                const isPending  = task.has_pending || submitMsg[task.id] === 'sent'
+                const isPending  = task.has_pending || submitMsg[task.id] === 'sent' || submitMsg[task.id] === 'pending'
                 const isSending  = submitting[task.id]
 
                 return (
@@ -319,7 +319,9 @@ export default function ChildGarden() {
                     </div>
 
                     {isApproved ? (
-                      <div className="child-task-card__approved-badge" aria-label="Completed">✓</div>
+                      <div className="child-task-card__cooldown-badge">
+                        {task.frequency === 'weekly' ? '✓ Done for this week' : '✓ Done for today'}
+                      </div>
                     ) : (
                       <button
                         className={`child-task-card__btn${isPending ? ' child-task-card__btn--pending' : ''}`}

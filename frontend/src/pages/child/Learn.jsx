@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import content from '../../data/content.json'
 import { useActivityOnView } from '../../hooks/useActivityOnView.js'
 

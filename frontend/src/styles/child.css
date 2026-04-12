@@ -418,19 +418,18 @@
 }
 
 /* Checkmark badge for approved tasks */
-.child-task-card__approved-badge {
+/* Pill badge shown when parent has approved the task — read-only, no button */
+.child-task-card__cooldown-badge {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  background: var(--mint);
+  background: var(--frost);
+  color: var(--forest);
+  border: 1px solid var(--mint);
   border-radius: var(--r-pill);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: var(--sp2) var(--sp4);
   font-family: var(--font-kid);
-  font-size: 16px;
-  font-weight: 900;
-  color: var(--leaf);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .child-task-card__info { flex: 1; min-width: 0; }
