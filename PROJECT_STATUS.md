@@ -1,331 +1,634 @@
 # Taru MVP — Project Status
-
-> **Phase 0 is complete and live.**
-> This file is the primary context anchor for all future development sessions.
-> Read it before writing any code. For full product decisions see `CLAUDE.md`.
+> **Baseline as of Phase 0 Sprint Close.** This document is the single source of truth for current architecture, UX state, and code health. Update it whenever a structural decision changes.
 
 ---
 
-## 1. Core Architecture
+## Table of Contents
+1. [What We've Built](#1-what-weve-built)
+2. [Tech Stack](#2-tech-stack)
+3. [Route Map](#3-route-map)
+4. [Brand & Mascot Identity](#4-brand--mascot-identity)
+5. [Mobile-First Architecture](#5-mobile-first-architecture)
+6. [Parent App — Taru](#6-parent-app--taru)
+7. [Child App — Taru Jr.](#7-child-app--taru-jr)
+8. [Backend API](#8-backend-api)
+9. [Database Schema](#9-database-schema)
+10. [Design System](#10-design-system)
+11. [Activity Tracking](#11-activity-tracking)
+12. [Code Health & Edge Cases](#12-code-health--edge-cases)
+13. [Dev Environment](#13-dev-environment)
+14. [Out of Scope — Phase 0](#14-out-of-scope--phase-0)
 
-### Frontend — `frontend/`
-| Concern | Choice |
-|---|---|
-| Framework | React 18 + Vite 8 |
-| Routing | React Router v6 |
-| Auth client | `@supabase/supabase-js` (anon key only) |
-| Portfolio SDK | `@cas-parser/connect` (Lite plan) |
-| Styling | Plain CSS with CSS custom properties — zero CSS-in-JS |
-| Entry point | `src/main.jsx` → imports `src/styles/tokens.css` globally |
+---
 
-### Backend — `backend/`
-| Concern | Choice |
-|---|---|
-| Runtime | Node.js (CommonJS) |
-| Framework | Express 4 |
-| Auth validation | Supabase service-role key — validates JWTs server-side |
-| File handling | `multer` (memory storage, 20 MB cap) |
-| PDF proxy | `node-fetch` + `form-data` — forwards to CASParser |
-| JWT signing | `jsonwebtoken` — for child tokens only |
+## 1. What We've Built
 
-### Database — Supabase (PostgreSQL)
-All tables use Row Level Security. The backend connects via service-role key (`SUPABASE_SERVICE_ROLE_KEY`). The frontend connects via anon key (`VITE_SUPABASE_ANON_KEY`) for auth only — never for direct data writes.
+Two distinct products sharing one codebase, deployed at `taru.money`.
 
-**Tables:**
-```
-parents              — email, name
-children             — parent_id, name, dob, age_stage, goal_*, child_token
-portfolio_snapshots  — parent_id, cas_type, raw_json (full CASParser response)
-fund_tags            — parent_id, isin, fund_name, fund_type, is_visible_to_child
-task_rules           — parent_id, child_id, task_name, reward_coins, frequency, status
-task_completions     — task_rule_id, completed_at, approved_at, rejected_at
-learning_state       — child_id (UNIQUE), current_week, coins_total, xp_total, last_trigger_type
-conversation_log     — parent_id, week_number, prompt_text, marked_done_at
-activity_events      — actor_type, parent_id, child_id, event_type, section, occurred_at (server-set), metadata
-```
+| Product | Audience | Access | Purpose |
+|---|---|---|---|
+| **Taru** (Parent App) | Parent | Email + password (Supabase Auth) | Manage portfolio visibility, set tasks, approve completions, read weekly prompts |
+| **Taru Jr.** (Child App) | Child | Signed JWT in URL, no login | Money Garden, weekly lessons, task submission, coin jar |
 
-### External APIs
-| Service | Usage | Key location |
+**Phase 0 scope:** 10 pilot families. Not built for scale. One child per family.
+
+---
+
+## 2. Tech Stack
+
+| Layer | Technology | Notes |
 |---|---|---|
-| CASParser (`api.casparser.in`) | Portfolio import via SDK widget and PDF upload | `CASPARSER_API_KEY` — backend env only, never bundled |
-| Supabase Auth | Parent email/password auth | Service role key — backend only; anon key — frontend |
+| Frontend | React 18 + Vite | Both apps live in `/frontend/src` |
+| Routing | React Router DOM v6 | Single SPA, nested routes |
+| Backend | Node.js + Express | `/backend/src`, nodemon in dev |
+| Database | Supabase (PostgreSQL) | RLS enabled on every table |
+| Auth | Supabase Auth | Parents only — email + password |
+| Child Auth | Signed JWT in URL | 90-day expiry, DB-validated for revocation |
+| Portfolio import | CASParser API | SDK widget (primary) + PDF fallback |
+| Hosting (frontend) | Netlify / Vercel (free tier) | |
+| Hosting (backend) | Render (free tier) | `render.yaml` configured |
+| Domain | taru.money | Purchased separately |
 
 ---
 
-## 2. Deployment Infrastructure
+## 3. Route Map
 
-### Frontend → Netlify
-- **Build config:** `netlify.toml` in repo root
-  - `base = "frontend"` — Netlify runs `npm run build` from the `frontend/` directory
-  - `publish = "dist"` (relative to base)
-  - `NODE_VERSION = "20"` pinned
-- **SPA redirect:** `/* → /index.html (200)` — required for React Router to handle `/child/:token` and all parent routes on hard refresh
-- **Security headers:** `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`
-- **Critical env var:** `VITE_BACKEND_URL` must be set in Netlify → Site settings → Environment variables
-
-### Backend → Render
-- **Config:** `backend/render.yaml`
-  - `runtime: node`, `region: singapore` (lowest latency for Indian users on free tier)
-  - `buildCommand: npm install` / `startCommand: node src/index.js`
-  - Health check path: `GET /health` → `{ status: 'ok', timestamp: '...' }`
-- **CORS:** `process.env.FRONTEND_URL` — set to the Netlify URL in Render dashboard
-- **Required env vars (all set in Render dashboard — never in YAML):**
-  ```
-  SUPABASE_URL
-  SUPABASE_SERVICE_ROLE_KEY   ← server only, never expose
-  CASPARSER_API_KEY           ← server only, never expose
-  CHILD_TOKEN_SECRET          ← JWT signing secret, generate with: openssl rand -base64 48
-  FRONTEND_URL                ← Netlify deployment URL (for CORS + garden link generation)
-  PORT=3001
-  NODE_ENV=production
-  ```
-
-### Backend URL — how the frontend resolves it
-`frontend/src/lib/api.js` exports a single `BACKEND_URL` constant:
-```js
-export const BACKEND_URL =
-  import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001'
 ```
-**Every** `fetch()` call in the frontend imports from this file. There are zero inline `import.meta.env` calls for the backend URL anywhere else. This prevents the `undefined/api/...` relative-path bug that occurs when the env var is missing.
+/signup                  Public — parent signup
+/login                   Public — parent login
+/verify-email            Public — post-signup holding page
+
+/parent/onboarding       Auth-required — 3-step wizard (full screen, no nav)
+/parent/dashboard        Auth-required — main parent hub
+/parent/portfolio        Auth-required — CAS import + fund tagging
+/parent/settings         Auth-required — child profile, tasks, garden link
+
+/child/:token            Token-gated — child Money Garden (Taru Jr.)
+
+/                        → redirects to /login
+/*                       → redirects to /login
+```
+
+**Auth guard:** `RequireParentAuth` wraps all `/parent/*` routes. Redirects to `/login` with `from` state preserved.
+
+**Child token guard:** Backend validates the JWT signature AND that it matches the value stored in `children.child_token` (supports revocation). A mismatch returns `401` — the child app renders a friendly error, never raw JSON or a 500.
 
 ---
 
-## 3. Completed Features
+## 4. Brand & Mascot Identity
 
-### Auth & Onboarding (Parent)
-- **Signup** (`/signup`) — email + password via Supabase Auth; inserts row into `parents` table
-- **Email verification** (`/verify-email`) — holding page; Supabase sends the link
-- **Login** (`/login`) — Supabase session; redirects to `/parent/dashboard`
-- **3-step onboarding wizard** (`/parent/onboarding`)
-  - Step 1: Child name + DOB → `age_stage` derived automatically from DOB (parent cannot override)
-  - Step 2: Savings goal (name, amount, date — all optional)
-  - Step 3: Confirmation + creates `children` row + seeds `learning_state` row
-- **Auth guard** (`RequireParentAuth`) — validates Supabase session; redirects to `/login` if missing
-- **Session context** (`AuthContext`) — exposes `user`, `session`, `signOut` app-wide
+### Official Mascot: Penny the Squirrel 🐿️
 
-### CASParser Integration (`/parent/portfolio`)
-- **SDK widget tab** — fetches a short-lived `at_...` token from `POST /api/casparser/token` (master API key never leaves backend); renders `<PortfolioConnect>` SDK; on success calls `POST /api/casparser/process-widget`
-- **PDF upload tab** — drag-and-drop + file picker; forwards to `POST /api/casparser/parse-pdf` which proxies to `POST https://api.casparser.in/v4/smart/parse`; SDK errors auto-switch user to PDF tab
-- **Portfolio processing pipeline** (runs after every successful import):
-  1. Stores full CASParser JSON in `portfolio_snapshots`
-  2. Flattens schemes — handles both production (`folios[].schemes[]`) and sandbox (`mutual_funds[]`) response shapes
-  3. Upserts `fund_tags` — preserves existing `is_visible_to_child`; defaults: `Equity → true`, all others `→ false`
-  4. Computes tagged portfolio total (tries all known value field names across API shapes)
-  5. Checks goal milestone crossing (25/50/75/100%) → updates `learning_state.last_trigger_type`
-  6. Checks NAV change trigger (>1% vs previous snapshot) → updates trigger type
-  7. Checks SIP transaction trigger (new `PURCHASE_SIP` since last snapshot) → updates trigger type
+- **Name:** Penny the Squirrel
+- **Emoji:** 🐿️ — used in speech bubbles, card headers, error states
+- **Voice:** Curious, sharp. Speaks like a smart 16-year-old talking to a 10-year-old. Asks questions before giving answers. Never says "lesson", "should", "must", or "Great job learning!"
+- **Voice varies by age stage** — see § 7.2 for stage-by-stage rules
 
-### Fund Tagging (`/parent/portfolio` — fund list section)
-- Displays all imported funds grouped by type: Equity / Hybrid / Debt / Other
-- Toggle per fund — `PATCH /api/casparser/fund-tags/:isin` — optimistic UI update
-- Live "What your child sees" count strip
-- Equity funds visible by default; all others hidden
+### Mascot Purge — Completed
+All references to the former mascot "Gilli" (an owl) have been fully removed from the codebase:
 
-### Child Token & Garden Link (`/parent/settings`)
-- `POST /api/children/:childId/token` — signs a 90-day JWT (`{ child_id, parent_id }`) with `CHILD_TOKEN_SECRET`, stores in `children.child_token`
-- `POST /api/children/:childId/token/regenerate` — overwrites `child_token`; old token instantly invalid because backend validates JWT signature **and** DB-stored value on every request
-- Garden URL format: `https://taru.money/child/{token}`
-- One-click copy to clipboard in Settings
-
-### Child Money Garden (`/child/:token`)
-Full token-gated experience — no login. Token validated on every API call against DB (not just JWT signature). On invalid/expired token: friendly error screen, never a 500 or raw JSON.
-
-**4-tab navigation (bottom nav):**
-
-| Tab | Key behaviour |
+| Was | Now |
 |---|---|
-| **Garden** | Plant emoji (5 growth stages) with smooth CSS animation; Goal Card with progress bar + inline milestone badges (25/50/75/100%); Penny the Squirrel speech bubble |
-| **Learn** | Vertical timeline — "This Week" section header (DM Serif Display), current week concept card (left green accent), "Recent Updates" divider, past trigger cards (muted bg) |
-| **Tasks** | Lists active task rules; child taps "Done!" → `POST /api/tasks/:id/complete`; frequency locking enforced server-side; pending state shown while awaiting parent approval |
-| **Gullak** | Coin counter (Nunito 900, 80px); coin-rain SVG animation on mount and on coin increase; "How to earn more" info card |
+| `WiseGilliSVG` component (36-line SVG owl) | `PennyIcon` — 3-line `🐿️` emoji span |
+| `.learn-week-card__gilli` CSS class | `.learn-week-card__penny` |
+| All comments referencing "Gilli" or "Wise Gilli" | Updated to "Penny" |
+| Separate `learn-done-state` confirmation banner | Removed — button morphs in-place |
 
-**Plant growth stages:**
-| Portfolio progress | Emoji | Animation |
+`grep -r "Gilli\|🦉\|owl" src/` returns **zero results** across all `.jsx` and `.css` files.
+
+---
+
+## 5. Mobile-First Architecture
+
+Both Taru and Taru Jr. are strictly mobile-first, single-column applications. There is no desktop breakpoint — the max-width container centres on larger screens.
+
+### Constraints enforced in CSS
+- **Max width:** `480px` with `margin: 0 auto` on `.child-shell` and `.parent-shell`
+- **Min tap target:** `44px` (via `--tap-target` token) on all interactive elements
+- **Min font size:** `14px` across all body text
+- **Viewport unit:** `min-height: 100dvh` (accounts for mobile browser chrome)
+- **Safe area:** Bottom nav uses `env(safe-area-inset-bottom)` for notched devices
+- **Browser targets:** Chrome 80+, Safari 13+, Samsung Internet 12+
+
+### Layout model
+Both apps use a three-layer flex column:
+```
+.app-shell
+  ├── top bar         (fixed height)
+  ├── main content    (flex: 1, overflow-y: auto)
+  └── bottom nav      (fixed height + safe-area inset)
+```
+
+---
+
+## 6. Parent App — Taru
+
+### 6.1 Navigation
+Bottom nav with 3 tabs rendered by `ParentLayout.jsx`. Active route highlighted with `color: var(--forest)`. Fires `parent_section_visit` activity event on every route change.
+
+| Tab | Icon | Route |
 |---|---|---|
-| 0–24% (seed) | 🌰 | `seedPulse` — gentle scale 1→1.10 |
-| 25–49% | 🪴 | `plantFloat` — translateY + scale breath |
-| 50–74% | 🌱 | `plantFloat` |
-| 75–99% | 🌿 | `plantFloat` |
-| 100% | 🌳 | `plantFloat` |
+| Home | 🏡 | `/parent/dashboard` |
+| Portfolio | 📊 | `/parent/portfolio` |
+| Settings | ⚙️ | `/parent/settings` |
 
-**Penny the Squirrel voice rules (never deviate):**
-- Never say: "lesson", "should", "must", "important", "understand", "learn", "Great job!"
-- One sentence max at Seed stage (ages 5–8)
-- Discovery framing at Growth stage (12–14)
-- Peer-level data-first at Investor stage (15–17)
-- Never display daily NAV change — total growth since inception only
+### 6.2 Onboarding (`/parent/onboarding`)
+3-step wizard. Full-screen — no nav shell. Redirects to dashboard on completion.
 
-### Task Rules & Approval Flow
-- **Parent creates rules** (`/parent/settings`) — max 3 per parent; `task_name`, `reward_coins` (1–100), `frequency` (`one-time` | `weekly` | `custom`)
-- **Parent can pause/resume/delete** — `PATCH` / `DELETE /api/tasks/:id`
-- **Child submits completion** — `POST /api/tasks/:id/complete`; server blocks if pending or frequency-locked
-- **Frequency locking logic** (enforced server-side, mirrored in child UI):
-  - `one-time` — locked forever after first approval
-  - `weekly` — locked until 7 days since last approval have passed
-  - `custom` — never auto-locked
-- **Parent approves/rejects** (`/parent/dashboard` approval queue)
-  - Approve: stamps `approved_at`, increments `learning_state.coins_total` via upsert
-  - Reject: stamps `rejected_at`
+| Step | Fields | Notes |
+|---|---|---|
+| 1 — Child basics | First name, Date of birth | Age stage (`seed`/`sprout`/`growth`/`investor`) auto-derived from DOB. Parent cannot override. |
+| 2 — Savings goal | Goal name, Target ₹, Target date | All optional. Can be set later in Settings. |
+| 3 — Review | Summary card | Inserts `children` + `learning_state` rows on confirm. |
 
-### Activity Logging
-Fire-and-forget (`fetch(...).catch(() => {})` — UI never blocked). All 7 event types implemented:
-| Event | Actor | Trigger |
+### 6.3 Dashboard (`/parent/dashboard`)
+
+**Child Overview Widget**
+Rendered prominently at the top of the feed. Shows:
+- Child name + age stage badge
+- Goal name and progress bar (0–100%)
+- ₹ saved vs. ₹ target
+- Task status pill: "X tasks pending" or "All clear ✓"
+
+**Portfolio Summary Card**
+- Total tagged portfolio value (₹) and number of funds shared with child
+- **Empty state (PortfolioEmptyState):** A blurred mock portfolio background is rendered behind a "Connect your portfolio →" CTA overlay. New parents see a realistic preview of what the screen will look like, not an empty void.
+
+**Inline Task Approvals**
+- Lists all `task_completions` where `approved_at IS NULL AND rejected_at IS NULL`
+- Per-completion row: task name, child name, coins at stake
+- **Approve** and **Reject** action buttons — no separate approvals page needed
+- Approval immediately awards coins (`learning_state.coins_total += reward_coins`)
+
+**Weekly Learning Prompt**
+- Prompt card for the current week surfaced on the dashboard
+- Fires `parent_prompt_viewed` activity event when scrolled into viewport (IntersectionObserver, 0 ms dwell)
+
+### 6.4 Portfolio (`/parent/portfolio`)
+
+**Two import modes (tabbed):**
+
+| Mode | Flow |
+|---|---|
+| Portfolio Connect | Backend generates short-lived `at_...` token → CASParser SDK widget handles CAMS/KFintech auth → `onSuccess` POSTs data to `/api/casparser/process-widget` |
+| PDF Upload | Drag-drop / file picker → optional password → `POST /api/casparser/parse-pdf` (multipart, max 5 MB) |
+
+**Post-import pipeline (backend):**
+1. Full CAS response stored in `portfolio_snapshots`
+2. `fund_tags` upserted — new **Equity** funds default to `is_visible_to_child: true`, others `false`. Existing visibility preserved.
+3. Goal milestone trigger checked (25 / 50 / 75 / 100%)
+4. NAV change trigger checked (>1% on any tagged scheme vs. prior snapshot)
+5. SIP transaction trigger checked (new `PURCHASE_SIP` since last snapshot)
+
+**Fund Tagging UI (`FundTagList` component):**
+- Funds grouped: Equity → Hybrid → Debt → Other
+- Per-fund toggle: "Shared" / "Hidden" — optimistic update + `PATCH /api/casparser/fund-tags/:isin`
+- "What your child sees" summary strip
+
+### 6.5 Settings (`/parent/settings`)
+
+**Assigned Tasks — Quick Assign Chips**
+Pre-built chips (Tidy Room, Homework, Dog Walking, etc.) populate the task form in one tap, reducing friction for the most common tasks.
+
+Full task form fields: task name + coins (1–100) + frequency (`one-time` | `weekly` | `custom`).
+Max **3 active task rules** per family enforced at the API level.
+
+Per-rule controls: Pause / Resume (non-one-time rules) · Delete with confirmation.
+
+**Child's Garden Link**
+- Generates a 90-day signed JWT and displays the full `taru.money/child/{token}` URL
+- Copy button + Regenerate button (invalidates old token immediately via DB overwrite)
+
+---
+
+## 7. Child App — Taru Jr.
+
+### 7.1 Routing & Default Tab
+
+The child app is a **single-component SPA** (`ChildGarden.jsx`). Tabs are managed by local React state — not URL sub-routes.
+
+**Default tab on load: Garden** — set by `useState('garden')` in `ChildGarden.jsx`.
+
+**Bottom nav order (left → right):**
+
+| Position | Tab | Icon | Default? |
+|---|---|---|---|
+| 1 | Garden | 🌱 | ✅ Yes |
+| 2 | Learn | 💡 | |
+| 3 | Tasks | ✅ | |
+| 4 | Gullak | 🪙 | |
+
+Active tab styling: `color: var(--forest)`, `background: var(--frost)`, icon scales `1.15×` with bounce easing. All nav buttons maintain `min-height: 44px`.
+
+### 7.2 Garden Tab
+
+**Plant emoji reflects goal progress:**
+
+| Progress | Emoji | Animation |
+|---|---|---|
+| 0–24% | 🌰 Seed | `seedPulse` — gentle scale breathe |
+| 25–49% | 🪴 Sprout | `plantFloat` — vertical drift |
+| 50–74% | 🌱 Small plant | `plantFloat` |
+| 75–99% | 🌿 Full plant | `plantFloat` |
+| 100% | 🌳 Bloom | `plantFloat` |
+
+**Goal Card:** goal name + age stage badge + progress bar + **single Next Milestone badge**.
+
+**Next Milestone logic (`getNextMilestone`):**
+- `Array.find()` — returns the **first** unachieved threshold only (25 / 50 / 75 / 100%)
+- Never renders all four milestones simultaneously
+- At 100%: renders "🌸 Goal complete!" badge with `--complete` variant styling
+
+**Penny speech bubble:**
+- 🐿️ emoji floats above the bubble (`.penny-bubble-wrap__squirrel`)
+- Bubble: `background: var(--frost)`, `padding: var(--sp4)`, `border-radius: var(--r-xl)`
+- `::before` pseudo-element creates an upward-pointing tail connecting to the emoji above
+- Text varies by `age_stage` via `getPennyGreeting()`
+
+**Penny's voice by age stage:**
+
+| Stage | Age | Character |
+|---|---|---|
+| `seed` | 5–8 | One sentence max. No quizzes. "Your money is growing! 🌱" |
+| `sprout` | 9–11 | Leads with a question. Ties to real portfolio number. |
+| `growth` | 12–14 | Discovery framing. Never "you should". |
+| `investor` | 15–17 | Peer-level, data-first. Never simplifies. |
+
+### 7.3 Learn Tab
+
+**Layout (vertical timeline):**
+1. "This Week" heading + week number + age stage
+2. `CurrentWeekCard` — sky-lt themed card with Penny icon (🐿️)
+3. "Recent updates" — `TriggerCard` for `last_trigger_type` (if set)
+
+**CurrentWeekCard:**
+- Content from `data/content.json` → `weekly_concepts[week][ageStage]`
+- Fields rendered: `title` · `penny_says` · `body` · `question` (optional)
+- Title styled: `font-family: var(--font-kid)`, `font-weight: 800`, `color: var(--forest)`
+- Card header: week badge (left) + 🐿️ Penny icon (right)
+
+**Mark as Done — XP Reward Logic:**
+```
+Child taps "Mark as done ✓"
+  → onXpEarned(50) fires
+  → Garden.jsx: gardenData.learning_state.xp_total += 50 (local state)
+  → "+50 XP! 🌟" burst floats up and fades (1.4s, amber, font-kid)
+  → Button morphs in-place (no separate banner):
+        text:        "✓ 50 XP Earned!"
+        background:  var(--mint)
+        color:       var(--leaf)
+        box-shadow:  none       ← physically "pressed down"
+        transform:   translateY(2px)
+        disabled:    true       ← cannot be tapped again
+        aria-pressed: true      ← accessible state
+```
+
+**Activity:** `child_learn_card_viewed` fires after 3-second dwell in viewport (`useActivityOnView` hook).
+
+**Trigger types (Recent Updates section):**
+
+| Type | Icon | Fires when |
+|---|---|---|
+| `sip` | 💰 | New SIP purchase in latest CAS import |
+| `nav_change` | 📈 | Tagged fund moved >1% vs. prior snapshot |
+| `milestone` | 🎉 | Goal progress newly crossed 25/50/75/100% |
+| `task_approved` | 🪙 | Parent approved a task completion |
+
+### 7.4 Tasks Tab
+
+**Three card states per task:**
+
+| State | Trigger | Visual |
+|---|---|---|
+| **Active** | Default | Amber "Done!" button. `box-shadow: 0 3px 0 var(--amber-dk)` gives physical depth. `:active` → `translateY(2px)` + shadow collapses — tactile press feel. |
+| **Pending** | After submit OR 409 response | Button morphs: `⏳ Pending Parent`, `background: var(--amber-lt)`, `box-shadow: none`, `translateY(2px)`. `disabled={true}`. Cannot be tapped again. |
+| **Approved (Cooldown)** | `task.has_approved === true` | Button removed entirely. Read-only pill badge replaces it. |
+
+**Cooldown badge (approved state):**
+- `background: var(--frost)` · `color: var(--forest)` · `border: 1px solid var(--mint)`
+- `border-radius: var(--r-pill)` · `padding: var(--sp2) var(--sp4)` · `font-family: var(--font-kid)`
+- Dynamic text:
+  - `task.frequency === 'weekly'` → **"✓ Done for this week"**
+  - All other frequencies → **"✓ Done for today"**
+
+**Approved card:** `.child-task-card--approved` — `background: var(--frost)`, `border-color: var(--mint)`, `box-shadow: none` on the full card.
+
+**Task frequency lock (backend-enforced):**
+
+| Frequency | Lock |
+|---|---|
+| `one-time` | Permanently locked after first approval |
+| `weekly` | Locked for 7 days after approval |
+| `custom` | No automatic lock |
+
+### 7.5 Gullak Tab
+
+- Large 🪙 + XL `coins_total` counter (`--font-kid`, `font-weight: 900`)
+- **Coin rain:** 12 coins fall with staggered delays when coins increase or on first mount if `coins > 0`. Total duration: 1800 ms.
+- Info: "Complete tasks and ask a parent to approve them."
+
+### 7.6 Error & Loading States
+
+**Loading:** Full-screen centred `🌱` + "Getting your garden ready…"
+
+**Error:**
+```
+       🐿️
+Penny can't find your garden
+{descriptive error message}
+```
+Never a raw 500 or JSON. `401` → "This link has expired or is no longer valid. Ask a parent to send a new one."
+
+---
+
+## 8. Backend API
+
+`/parent/*` endpoints: `Authorization: Bearer <supabase_jwt>` validated server-side via `requireParentAuth` middleware.
+Child endpoints: `X-Child-Token: <child_jwt>` validated against JWT signature + DB-stored value.
+
+### CASParser — `/api/casparser/*`
+| Method | Path | Auth | Action |
+|---|---|---|---|
+| POST | `/token` | Parent | Generate short-lived CASParser SDK access token |
+| POST | `/parse-pdf` | Parent | Upload CAS PDF → parse → store snapshot + upsert tags |
+| POST | `/process-widget` | Parent | Store Portfolio Connect SDK result |
+| GET | `/fund-tags` | Parent | List all fund_tags grouped by type |
+| PATCH | `/fund-tags/:isin` | Parent | Toggle `is_visible_to_child` |
+
+### Children — `/api/children/*`
+| Method | Path | Auth | Action |
+|---|---|---|---|
+| POST | `/:childId/token` | Parent | Generate 90-day child JWT, store in DB |
+| POST | `/:childId/token/regenerate` | Parent | Rotate child JWT (old token immediately invalid) |
+
+### Tasks — `/api/tasks/*`
+| Method | Path | Auth | Action |
+|---|---|---|---|
+| GET | `/` | Parent | List all task rules |
+| POST | `/` | Parent | Create task rule (max 3 per family) |
+| PATCH | `/:id` | Parent | Update name / coins / frequency / status |
+| DELETE | `/:id` | Parent | Delete rule |
+| GET | `/pending` | Parent | List completions awaiting approval |
+| POST | `/completions/:id/approve` | Parent | Approve + award coins to child |
+| POST | `/completions/:id/reject` | Parent | Reject completion |
+| GET | `/child` | Child token | List tasks with `has_pending` + `has_approved` state |
+| POST | `/:id/complete` | Child token | Submit completion (409 if duplicate or frequency-locked) |
+
+### Child Garden — `/api/child/*`
+| Method | Path | Auth | Action |
+|---|---|---|---|
+| GET | `/garden` | Child token | Fetch child record, tagged portfolio total, learning state |
+
+### Activity — `/api/activity`
+| Method | Path | Auth | Action |
+|---|---|---|---|
+| POST | `/` | Parent or Child token | Log activity event (safe to fire-and-forget) |
+
+### Health
+| Method | Path | Auth | Action |
+|---|---|---|---|
+| GET | `/health` | None | `{ status: 'ok' }` |
+
+---
+
+## 9. Database Schema
+
+All tables have Row Level Security enabled. `SUPABASE_SERVICE_ROLE_KEY` is backend-only and never sent to the frontend.
+
+```sql
+parents (
+  id uuid PK, email text UNIQUE, name text, created_at timestamptz
+)
+
+children (
+  id uuid PK, parent_id uuid FK,
+  name text, dob date, age_stage text,       -- seed|sprout|growth|investor
+  goal_name text, goal_amount numeric, goal_date date,
+  child_token text UNIQUE,                   -- 90-day JWT; DB-validated for revocation
+  created_at timestamptz
+)
+
+portfolio_snapshots (
+  id uuid PK, parent_id uuid FK,
+  fetched_at timestamptz, cas_type text,     -- casparser_widget|pdf_upload
+  raw_json jsonb, statement_period text
+)
+
+fund_tags (
+  id uuid PK, parent_id uuid FK,
+  isin text, fund_name text, fund_type text, -- Equity|Debt|Hybrid|Other
+  is_visible_to_child boolean DEFAULT false,
+  UNIQUE(parent_id, isin)
+)
+
+task_rules (
+  id uuid PK, parent_id uuid FK, child_id uuid FK,
+  task_name text, reward_coins integer,
+  frequency text,                            -- one-time|weekly|custom
+  status text DEFAULT 'active'               -- active|paused
+)
+
+task_completions (
+  id uuid PK, task_rule_id uuid FK,
+  completed_at timestamptz,
+  approved_at timestamptz,                   -- null = pending
+  rejected_at timestamptz                    -- null = not rejected
+  -- status is derived: both null = pending
+)
+
+learning_state (
+  id uuid PK, child_id uuid FK UNIQUE,
+  current_week integer DEFAULT 1,
+  last_trigger_type text,                    -- sip|nav_change|milestone|task_approved
+  coins_total integer DEFAULT 0,
+  xp_total integer DEFAULT 0
+)
+
+conversation_log (
+  id uuid PK, parent_id uuid FK,
+  week_number integer, prompt_text text, marked_done_at timestamptz
+)
+
+activity_events (
+  id uuid PK, actor_type text,              -- parent|child
+  parent_id uuid FK, child_id uuid FK,
+  event_type text, section text,
+  occurred_at timestamptz,                  -- ALWAYS server-set
+  metadata jsonb                            -- no PII
+)
+```
+
+---
+
+## 10. Design System
+
+All values sourced from `src/styles/tokens.css`. **No hardcoded hex values, no hardcoded font-family strings** anywhere in component JSX or CSS files.
+
+### Colour Tokens
+
+| Group | Key Tokens | Notes |
+|---|---|---|
+| Brand greens | `--forest`, `--moss`, `--leaf`, `--mint`, `--frost` | Main brand palette |
+| Amber accent | `--amber`, `--amber-lt`, `--amber-md`, `--amber-dk` | Buttons, pending states, coins |
+| Learn card | `--sky`, `--sky-lt`, `--sky-md` | Used exclusively in Learn tab cards |
+| Status | `--coral` (error), `--purple` | Supporting colours |
+| Neutral | `--ink`, `--ink-60`, `--ink-30`, `--ink-10` | Text opacity scale |
+| Surface | `--surface`, `--bg`, `--border` | Card and page backgrounds |
+| Shadows | `--shadow-sm`, `--shadow-md`, `--shadow-lg` | Elevation |
+
+### Typography Tokens
+
+| Token | Font | Used in |
+|---|---|---|
+| `--font-display` | DM Serif Display | Section headings, hero numbers |
+| `--font-kid` | Nunito | All child app UI, task badges, XP button |
+| `--font-parent` | Plus Jakarta Sans | Parent app body text |
+| `--font-mono` | JetBrains Mono | Token URLs, code display |
+
+### Spacing Scale
+`--sp1` (4px) · `--sp2` (8px) · `--sp3` (12px) · `--sp4` (16px) · `--sp6` (24px) · `--sp8` (32px) · `--sp12` (48px)
+
+### Border Radius Scale
+
+| Token | Value | Usage |
+|---|---|---|
+| `--r-sm` | 8px | Small UI chips |
+| `--r-md` | 12px | Inner elements, speech bubbles |
+| `--r-lg` | 16px | Standard cards |
+| `--r-xl` | 24px | Kid-friendly cards — bouncy, rounded |
+| `--r-pill` | 100px | Badges, buttons, nav pills |
+
+### Button Physics (Child App)
+- **Active (resting):** `box-shadow: 0 3px 0 <shadow-colour>` — physical depth
+- **`:active` (press):** `translateY(2px)` + shadow collapses to `0 1px 0` — mimics physical button
+- **`disabled` / done:** `box-shadow: none` + `translateY(2px)` — permanently pressed flat; no opacity reduction so the colour stays vivid
+
+### Reduced Motion
+All animations (plant float, coin rain, XP burst, badge glow) have `@media (prefers-reduced-motion: reduce)` fallbacks disabling animation while preserving layout.
+
+---
+
+## 11. Activity Tracking
+
+All writes go through `POST /api/activity` only. The frontend never writes to Supabase directly for this table.
+
+**Event taxonomy:**
+
+| Event | Actor | When fired |
 |---|---|---|
 | `parent_app_open` | parent | Authenticated load of `/parent/dashboard` |
 | `parent_section_visit` | parent | Every route change within `/parent/*` |
-| `parent_prompt_viewed` | parent | Weekly prompt card enters viewport (IntersectionObserver, fires immediately) |
-| `child_app_open` | child | Successful `/child/:token` load |
-| `child_tab_visit` | child | Bottom-nav tab tap |
-| `child_learn_card_viewed` | child | Learn card visible for ≥3 seconds (IntersectionObserver dwell timer) |
+| `parent_prompt_viewed` | parent | Weekly prompt card enters viewport (0 ms dwell) |
+| `child_app_open` | child | Successful load of `/child/:token` |
+| `child_tab_visit` | child | Each bottom nav tab tap |
+| `child_learn_card_viewed` | child | Card visible for ≥ 3 seconds |
 
-Server always sets `occurred_at` — never trusted from client. PII fields stripped from metadata in `activity.js` route before insert.
+**Client pattern (fire-and-forget, never awaited):**
+```js
+fetch('/api/activity', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', ...authHeaders },
+  body: JSON.stringify({ event_type, section, metadata })
+}).catch(() => {}) // silent failure is intentional
+```
 
-### Content System
-`frontend/src/data/content.json` — weekly concept cards and trigger cards keyed by `week` number and `age_stage`. The `Learn` component resolves the right copy for the child's current week and stage. No content is hardcoded in JSX.
+**Metadata rules:** IDs, slugs, week numbers only. No names, emails, PAN numbers, fund names, or portfolio values.
+
+**Weekly founder query:** Runs in Supabase SQL editor every Sunday — aggregates `parent_open_days`, `child_open_days`, and derives `same_day_open_occurred` per family per week.
 
 ---
 
-## 4. Design System
+## 12. Code Health & Edge Cases
 
-**Single source of truth:** `frontend/src/styles/tokens.css`
-Extracted from `Taru_Design_System (1).html` (repo root). Imported globally in `main.jsx`.
+### ✅ 409 Conflict — Pending Task Button (patched)
+**Problem:** When `POST /api/tasks/:id/complete` returns `409` (a completion already exists in DB), `submitMsg[ruleId]` was set to `'pending'`. The `isPending` derivation only checked for `=== 'sent'`, leaving the "Done!" button re-clickable.
 
-**Strict guardrail: no hardcoded hex codes or `font-family` strings anywhere in JSX or component CSS. All values must use `var(--token-name)`.**
+**Fix (`Garden.jsx`):**
+```js
+// Before — buggy
+const isPending = task.has_pending || submitMsg[task.id] === 'sent'
 
-### Key tokens
-```css
-/* Brand greens */
---forest:    #1C4A3A   /* primary dark — topbars, headings */
---leaf:      #40916C   /* success, progress fills */
---sage:      #74C69D   /* muted accents */
---frost:     #D8F3DC   /* light green tint surfaces */
---bg:        #F4FAF6   /* page background */
---surface:   #FFFFFF   /* card backgrounds */
-
-/* Amber accent — Gullak, badges, CTA */
---amber:     #E8920A
---amber-md:  #F9C84A   /* gold highlight */
---amber-lt:  #FDF0DC   /* light amber surfaces */
---amber-dk:  #7A4800   /* dark amber text */
-
-/* Ink (text) */
---ink:       #1A2B22   /* primary text */
---ink-60:    rgba(26,43,34,.6)   /* secondary text */
---ink-30:    rgba(26,43,34,.3)   /* muted / labels */
---ink-10:    rgba(26,43,34,.08)  /* hairline backgrounds */
-
-/* Shadows */
---shadow-sm: 0 1px 3px rgba(26,43,34,.08)
---shadow-md: 0 4px 16px rgba(26,43,34,.1)   /* cards */
---shadow-lg: 0 8px 32px rgba(26,43,34,.12)
-
-/* Typography */
---font-parent:  'Plus Jakarta Sans'   /* parent app body + UI */
---font-kid:     'Nunito'              /* child app — coin counter, badges */
---font-display: 'DM Serif Display'   /* all headings + hero numbers */
---font-mono:    'JetBrains Mono'     /* code/URL display */
-
-/* Radii */
---r-sm: 8px  --r-md: 12px  --r-lg: 16px  --r-xl: 24px  --r-pill: 100px
-
-/* Spacing */
---sp1: 4px  --sp2: 8px  --sp3: 12px  --sp4: 16px  --sp6: 24px  --sp8: 32px
+// After — patched
+const isPending = task.has_pending
+               || submitMsg[task.id] === 'sent'
+               || submitMsg[task.id] === 'pending'
 ```
+Button now correctly enters disabled `⏳ Pending Parent` state on both 200 and 409 responses.
 
-**Legacy aliases** (`--color-navy`, `--color-gold`, `--color-border`, `--radius-md`, `--space-*`, etc.) are defined in `tokens.css` as pointers to the new tokens. They exist only so that parent-app CSS written before the design system migration continues to work. New code must use the design-system token names directly.
+### ✅ Dead Import Removed (`Learn.jsx`)
+`useRef` was imported but never called (ref is returned by `useActivityOnView` hook). Removed. Zero lint warnings.
 
-### SVG fill exception
-SVG `fill` attributes cannot use CSS variables. In these cases, use the literal hex value from the matching token with a comment:
-```jsx
-<circle fill="#E8920A" />  {/* --amber */}
-```
+### ✅ Inline Styles Eliminated
+Task error message previously used `style={{ color: 'var(--coral)' }}` inline. Replaced with `.child-task-card__error` class. All styling now flows through `tokens.css` variables.
+
+### ✅ Mascot Fully Replaced
+`WiseGilliSVG` (36-line inline SVG owl) removed. `PennyIcon` (3-line emoji span) replaces all usages. CSS class `__gilli` renamed to `__penny`. Zero Gilli/owl references remain anywhere in the source tree.
+
+### ✅ Token Security Enforced
+- `SUPABASE_SERVICE_ROLE_KEY` and `CASPARSER_API_KEY` — backend env only, never bundled by Vite
+- `CHILD_TOKEN_SECRET` — backend env only
+- Frontend receives only short-lived `at_...` CASParser tokens (60-min expiry) generated on-demand from backend
+
+### ✅ Child Token Revocation
+Backend validates `X-Child-Token` against both JWT signature and `children.child_token` DB column. Regenerating a token in Settings immediately voids the old one — no grace period.
+
+### ✅ tokens.css Strictly Enforced
+All new components added during the Phase 0 sprint (cooldown badge, next milestone badge, Penny bubble wrapper, XP button done state) use only CSS variable references. Confirmed: no hardcoded hex, rgba, or font-family literals in any new rule.
+
+### ⚠️ Known Limitations (Phase 0, by design)
+- One child per family — multiple children out of scope
+- `learning_state.current_week` does not auto-advance — increment is manual / future sprint
+- `last_trigger_type` stores only the most recent trigger; history is not surfaced in the UI
+- XP total is updated in local React state on "Mark as done" — not persisted to DB until next session load (acceptable for Phase 0 pilot)
 
 ---
 
-## 5. Current State
+## 13. Dev Environment
 
-**Phase 0 MVP is complete and live for the 10-family pilot.**
+Config stored at `.claude/launch.json`.
 
-### What is live
-- Full parent auth flow (signup → verify → login → onboarding)
-- CASParser portfolio import (SDK widget + PDF fallback)
-- Fund visibility tagging
-- Child token generation and garden link sharing
-- Child Money Garden at `taru.money/child/:token`
-- Task rules + parent approval queue + coin awarding
-- Activity event logging (all 7 events)
-- Weekly Penny content cards (Learn tab)
-- Milestone badges in Goal Card (Garden tab)
-- Coin counter + coin-rain animation (Gullak tab)
+| Server | Command | URL |
+|---|---|---|
+| Frontend (Vite) | `npm run dev` in `/frontend` | http://localhost:5173 |
+| Backend (Express / nodemon) | `npm run dev` in `/backend` | http://localhost:3001 |
 
-### What is explicitly out of scope for Phase 0
-Per `CLAUDE.md` — do not build any of these until Phase 1 is scoped:
-- Multiple children per family
-- In-app payments (Razorpay)
-- Hero tools (Compounding Visualiser, SIP Calculator, etc.)
-- Real MF folio creation (AMC API / NACH)
+Vite proxies `/api/*` → `http://localhost:3001` (configured in `vite.config.js`). Both servers must be running simultaneously in development.
+
+**Environment variables:**
+```bash
+# backend/.env
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=    # server only — never in frontend
+CASPARSER_API_KEY=             # server only — use sandbox key in dev
+CHILD_TOKEN_SECRET=            # JWT signing secret for child tokens
+PORT=3001
+
+# frontend/.env
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=        # anon key only — never service role
+VITE_API_BASE_URL=http://localhost:3001
+```
+
+**CASParser sandbox key:** `sandbox-with-json-responses` — always use in dev to avoid consuming production API credits.
+
+---
+
+## 14. Out of Scope — Phase 0
+
+Do not build any of the following. If a session starts drifting toward one, stop immediately.
+
+- Hero tools: Compounding Visualiser, Goal Reverse Planner, SIP Step-Up Calculator, RCA Visualiser, Opportunity Cost Engine, Savings Rate Simulator
+- Real MF folio creation (AMC API / NACH mandate)
+- In-app payments / Razorpay
 - Automated push notifications
 - Shareable milestone cards (image generation)
-- Gmail inbox / CDSL OTP / CAS Generator (requires CASParser Pro plan)
-- Full 28-lesson Independence curriculum
-- Analytics SDKs (Mixpanel / Amplitude)
-- Android or iOS native apps
-
-### Key file index
-```
-taru-mvp/
-├── CLAUDE.md                          ← authoritative product/arch decisions
-├── PROJECT_STATUS.md                  ← this file — session context anchor
-├── Taru_Design_System (1).html        ← design system source (tokens extracted from here)
-├── netlify.toml                       ← frontend build + SPA redirect
-├── frontend/
-│   ├── src/
-│   │   ├── main.jsx                   ← entry — imports tokens.css
-│   │   ├── App.jsx                    ← route map (all 8 routes)
-│   │   ├── lib/
-│   │   │   ├── api.js                 ← BACKEND_URL — import here, nowhere else
-│   │   │   ├── supabase.js            ← Supabase browser client
-│   │   │   └── activity.js            ← logActivity() fire-and-forget helper
-│   │   ├── hooks/
-│   │   │   └── useActivityOnView.js   ← IntersectionObserver + dwell timer hook
-│   │   ├── context/AuthContext.jsx    ← Supabase session, exposed app-wide
-│   │   ├── components/
-│   │   │   ├── RequireParentAuth.jsx  ← auth guard for /parent/* routes
-│   │   │   ├── ParentLayout.jsx       ← shared header + bottom nav
-│   │   │   └── FundTagList.jsx        ← fund visibility toggle list
-│   │   ├── pages/
-│   │   │   ├── Signup / Login / VerifyEmail
-│   │   │   ├── parent/
-│   │   │   │   ├── Onboarding.jsx     ← 3-step wizard, writes to Supabase directly
-│   │   │   │   ├── Dashboard.jsx      ← portfolio total, weekly prompt, task approvals
-│   │   │   │   ├── Portfolio.jsx      ← CASParser widget + PDF upload tabs
-│   │   │   │   └── Settings.jsx       ← child profile, goal, task rules, garden link
-│   │   │   └── child/
-│   │   │       ├── Garden.jsx         ← main child shell: 4 tabs, plant, goal card, milestones
-│   │   │       ├── Learn.jsx          ← weekly concept cards + trigger cards (timeline layout)
-│   │   │       └── Gullak.jsx         ← coin counter + SVG coin rain animation
-│   │   ├── data/content.json          ← Penny copy: weekly_concepts[], triggers{}
-│   │   └── styles/
-│   │       ├── tokens.css             ← ALL design tokens live here — never hardcode elsewhere
-│   │       ├── auth.css
-│   │       ├── parent.css
-│   │       ├── portfolio.css
-│   │       └── child.css
-└── backend/
-    ├── render.yaml                    ← Render service config
-    └── src/
-        ├── index.js                   ← Express app, middleware, GET /health, GET /api/child/garden
-        ├── middleware/auth.js         ← requireParentAuth + Supabase admin client
-        └── routes/
-            ├── casparser.js           ← /api/casparser/* (token, parse-pdf, process-widget, fund-tags)
-            ├── tasks.js               ← /api/tasks/* (CRUD + approval flow + child endpoints)
-            ├── children.js            ← /api/children/:id/token (generate + regenerate)
-            └── activity.js            ← POST /api/activity (resolves actor from JWT or child token)
-```
-
-### Weekly founder tracking query
-Run every Sunday in the Supabase SQL editor — see `CLAUDE.md` for the full SQL. It produces per-parent, per-week counts of `parent_open_days`, `child_open_days`, and `same_day_open_occurred`.
+- Multiple children per family
+- Gmail inbox integration / CDSL OTP fetch / CAS Generator (requires CASParser Pro plan)
+- Full Independence curriculum (28 lessons)
+- Daily lesson cadence (current model: weekly)
+- Analytics SDK (Mixpanel / Amplitude)
+- Android or iOS native app
 
 ---
 
-*Last updated: Phase 0 deployment complete. 10-family pilot live.*
+*Version: Phase 0 Sprint Close. Next update trigger: any new route, schema change, or UX pattern introduced.*
