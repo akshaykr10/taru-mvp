@@ -277,11 +277,11 @@
 
 /* ── Penny bubble ────────────────────────────────────────────── */
 .penny-bubble {
-  background: var(--surface);
+  background: var(--frost);
   border: 1px solid var(--border);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-xl);
   box-shadow: var(--shadow-sm);
-  padding: var(--sp4) var(--space-5);
+  padding: var(--sp6) var(--space-5);
   margin: var(--sp4) var(--sp4) 0;
   position: relative;
   text-align: left;
@@ -294,7 +294,7 @@
   left: 28px;
   width: 16px;
   height: 16px;
-  background: var(--surface);
+  background: var(--frost);
   border-top: 1px solid var(--border);
   border-left: 1px solid var(--border);
   transform: rotate(45deg);
@@ -303,7 +303,9 @@
 .penny-bubble__penny { font-size: 22px; margin-bottom: var(--sp2); }
 
 .penny-bubble__text {
+  font-family: var(--font-kid);
   font-size: 14px;
+  font-weight: 600;
   line-height: 1.6;
   color: var(--ink);
 }
@@ -314,7 +316,8 @@
   border-top: 1px solid var(--border);
   display: flex;
   height: calc(64px + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
+  padding: var(--sp1) var(--sp2) env(safe-area-inset-bottom);
+  gap: var(--sp1);
 }
 
 .garden-nav__item {
@@ -326,17 +329,29 @@
   gap: 3px;
   background: none;
   border: none;
-  font-family: var(--font-parent);
+  border-radius: var(--r-md);
+  font-family: var(--font-kid);
   cursor: pointer;
   color: var(--ink-30);
-  transition: color 0.15s;
+  transition: color 0.15s, background 0.2s;
   min-height: var(--tap-target);
 }
 
-.garden-nav__item.active { color: var(--forest); }
+.garden-nav__item.active {
+  color: var(--forest);
+  background: var(--frost);
+}
 
-.garden-nav__icon  { font-size: 20px; line-height: 1; }
-.garden-nav__label { font-size: 11px; font-weight: 600; }
+.garden-nav__icon {
+  font-size: 20px;
+  line-height: 1;
+  display: inline-block;
+  transition: transform 0.2s var(--ease-bounce);
+}
+
+.garden-nav__item.active .garden-nav__icon { transform: scale(1.15); }
+
+.garden-nav__label { font-size: 11px; font-weight: 700; }
 
 /* ── Tasks tab ───────────────────────────────────────────────── */
 .garden-tasks {
@@ -363,10 +378,10 @@
 .child-task-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-xl);
   box-shadow: var(--shadow-sm);
-  padding: var(--sp4);
-  margin-bottom: var(--sp3);
+  padding: var(--sp6) var(--sp4);
+  margin-bottom: var(--sp4);
   display: flex;
   align-items: center;
   gap: var(--sp3);
@@ -375,34 +390,48 @@
 .child-task-card__info { flex: 1; min-width: 0; }
 
 .child-task-card__name {
+  font-family: var(--font-kid);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink);
   margin-bottom: 4px;
 }
 
 .child-task-card__coins {
+  font-family: var(--font-kid);
   font-size: 13px;
-  color: var(--ink-60);
+  font-weight: 800;
+  color: var(--amber);
 }
 
 .child-task-card__btn {
   flex-shrink: 0;
-  background: var(--forest);
-  color: var(--ds-white);
+  background: var(--amber);
+  color: var(--surface);
   border: none;
-  border-radius: var(--r-sm);
-  font-family: var(--font-parent);
-  font-size: 13px;
-  font-weight: 700;
-  padding: 0 var(--sp4);
-  height: 38px;
-  min-width: 64px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-kid);
+  font-size: 14px;
+  font-weight: 800;
+  padding: 0 var(--sp6);
+  height: 44px;
+  min-width: 72px;
   cursor: pointer;
-  transition: opacity 0.15s;
+  box-shadow: 0 3px 0 var(--amber-dk);
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
-.child-task-card__btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.child-task-card__btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--amber-dk);
+}
+
+.child-task-card__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 3px 0 var(--amber-dk);
+}
 
 .child-task-card__pending {
   flex-shrink: 0;
@@ -666,18 +695,17 @@
 }
 
 .gullak-info__header {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-30);
+  font-family: var(--font-kid);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--amber-dk);
 }
 
 .gullak-info__body {
-  background: var(--surface);
+  background: var(--amber-lt);
   border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: var(--sp4);
+  border-radius: var(--r-xl);
+  padding: var(--sp6);
   font-size: 14px;
   color: var(--ink-60);
   line-height: 1.6;
@@ -686,6 +714,11 @@
   flex-direction: column;
   align-items: center;
   gap: var(--sp3);
+}
+
+.gullak-info__body p {
+  font-family: var(--font-kid);
+  font-weight: 600;
 }
 
 .gullak-info__body span { font-size: 36px; }
