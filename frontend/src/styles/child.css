@@ -203,12 +203,13 @@
   margin-top: var(--sp1);
 }
 
-/* ── Milestones inside Goal Card ─────────────────────────────── */
-.garden-milestones {
+/* ── Next Milestone inside Goal Card ─────────────────────────── */
+.garden-next-milestone {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--sp3);
-  padding-top: var(--sp2);
+  padding-top: var(--sp3);
   border-top: 1px solid var(--border);
 }
 
@@ -218,33 +219,22 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-30);
+  flex-shrink: 0;
 }
 
-.garden-milestone-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--sp2);
-}
-
-.garden-milestone-badge {
+.garden-next-milestone__badge {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: var(--sp2) var(--sp1);
-  border-radius: var(--r-md);
-  text-align: center;
-  transition: transform 0.2s var(--ease-bounce);
-}
-
-.garden-milestone-badge--locked {
+  gap: var(--sp2);
   background: var(--bg);
   border: 1.5px dashed var(--border);
+  border-radius: var(--r-xl);
+  padding: var(--sp2) var(--sp3);
 }
 
-.garden-milestone-badge--unlocked {
+.garden-next-milestone__badge--complete {
   background: var(--amber-lt);
-  border: 1.5px solid #FDDBA8;
+  border: 1.5px solid var(--amber-md);
   animation: badgeGlow 3s ease-in-out infinite;
 }
 
@@ -254,53 +244,79 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .garden-milestone-badge--unlocked { animation: none; }
+  .garden-next-milestone__badge--complete { animation: none; }
 }
 
-.garden-milestone-badge__icon {
-  font-size: 22px;
+.garden-next-milestone__icon {
+  font-size: 18px;
   line-height: 1;
+  opacity: 0.5;
 }
 
-.garden-milestone-badge--locked .garden-milestone-badge__icon { opacity: 0.35; }
+.garden-next-milestone__badge--complete .garden-next-milestone__icon { opacity: 1; }
 
-.garden-milestone-badge__pct {
+.garden-next-milestone__label {
   font-family: var(--font-kid);
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1;
-  color: var(--forest);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-60);
 }
 
-.garden-milestone-badge--locked .garden-milestone-badge__pct { color: var(--ink-30); }
-.garden-milestone-badge--unlocked .garden-milestone-badge__pct { color: var(--amber-dk); }
+.garden-next-milestone__pct {
+  font-family: var(--font-kid);
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--ink-30);
+}
 
 /* ── Penny bubble ────────────────────────────────────────────── */
+
+/*
+  Wrapper stacks the squirrel emoji above the bubble.
+  Emoji aligns left so it sits directly over the tail.
+*/
+.penny-bubble-wrap {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: var(--sp4);
+}
+
+.penny-bubble-wrap__squirrel {
+  font-size: 28px;
+  line-height: 1;
+  padding-left: var(--sp4);
+  margin-bottom: -5px; /* close the visual gap before the tail */
+  position: relative;
+  z-index: 1;
+}
+
 .penny-bubble {
   background: var(--frost);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
   box-shadow: var(--shadow-sm);
-  padding: var(--sp6) var(--space-5);
-  margin: var(--sp4) var(--sp4) 0;
+  padding: var(--sp4);
+  width: 100%;
   position: relative;
   text-align: left;
 }
 
+/* Upward-pointing tail aligns under the squirrel emoji */
 .penny-bubble::before {
   content: '';
   position: absolute;
-  top: -9px;
-  left: 28px;
-  width: 16px;
-  height: 16px;
+  top: -8px;
+  left: 26px;
+  width: 14px;
+  height: 14px;
   background: var(--frost);
   border-top: 1px solid var(--border);
   border-left: 1px solid var(--border);
   transform: rotate(45deg);
 }
-
-.penny-bubble__penny { font-size: 22px; margin-bottom: var(--sp2); }
 
 .penny-bubble__text {
   font-family: var(--font-kid);
@@ -308,6 +324,7 @@
   font-weight: 600;
   line-height: 1.6;
   color: var(--ink);
+  margin: 0;
 }
 
 /* ── Bottom nav ──────────────────────────────────────────────── */
@@ -384,7 +401,36 @@
   margin-bottom: var(--sp4);
   display: flex;
   align-items: center;
+  flex-wrap: wrap; /* allows .child-task-card__error to occupy its own row */
   gap: var(--sp3);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+/* ── Approved state — full card turns frost/mint ─────────────── */
+.child-task-card--approved {
+  background: var(--frost);
+  border-color: var(--mint);
+  box-shadow: none;
+}
+
+.child-task-card--approved .child-task-card__name {
+  color: var(--ink-60);
+}
+
+/* Checkmark badge for approved tasks */
+.child-task-card__approved-badge {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: var(--mint);
+  border-radius: var(--r-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-kid);
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--leaf);
 }
 
 .child-task-card__info { flex: 1; min-width: 0; }
@@ -404,6 +450,7 @@
   color: var(--amber);
 }
 
+/* ── Active 'Done!' button ───────────────────────────────────── */
 .child-task-card__btn {
   flex-shrink: 0;
   background: var(--amber);
@@ -415,10 +462,10 @@
   font-weight: 800;
   padding: 0 var(--sp6);
   height: 44px;
-  min-width: 72px;
+  min-width: 80px;
   cursor: pointer;
   box-shadow: 0 3px 0 var(--amber-dk);
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s, color 0.15s;
 }
 
 .child-task-card__btn:active {
@@ -426,21 +473,38 @@
   box-shadow: 0 1px 0 var(--amber-dk);
 }
 
+/* Generic sending state — brief dim while awaiting API response */
 .child-task-card__btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-  box-shadow: 0 3px 0 var(--amber-dk);
 }
 
-.child-task-card__pending {
-  flex-shrink: 0;
+/* ── Pending state — tapped and confirmed, waiting for parent ── */
+/*
+  Compound selector beats the plain :disabled rule above.
+  Pressed-down (translateY + no shadow) signals the tap landed.
+  amber-lt bg communicates "waiting" without alarming the child.
+*/
+.child-task-card__btn.child-task-card__btn--pending,
+.child-task-card__btn.child-task-card__btn--pending:disabled {
+  background: var(--amber-lt);
+  color: var(--amber-dk);
+  box-shadow: none;
+  transform: translateY(2px);
+  cursor: default;
+  opacity: 1;
+  min-width: 140px; /* wider to fit '⏳ Pending Parent' without wrapping */
+}
+
+/* ── Error row — wraps below the info+button row ────────────── */
+.child-task-card__error {
+  flex: 0 0 100%;
+  font-family: var(--font-kid);
   font-size: 12px;
-  color: var(--amber);
   font-weight: 600;
-  text-align: right;
-  max-width: 100px;
-  line-height: 1.4;
+  color: var(--coral);
+  margin-top: calc(var(--sp1) * -1); /* tighten gap above */
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -725,7 +789,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .gullak-counter__number { animation: none; }
-  .garden-milestone-badge--unlocked { animation: none; }
+  .garden-next-milestone__badge--complete { animation: none; }
 }
 
 /* Milestone section in Gullak (legacy — kept for Gullak's progress bar) */
@@ -824,7 +888,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   Weekly Learning Card — sky-lt themed, Wise Gilli
+   Weekly Learning Card — sky-lt themed, Penny the Squirrel
    ══════════════════════════════════════════════════════════════ */
 
 .learn-week-card {
@@ -846,16 +910,17 @@
   gap: var(--sp3);
 }
 
-.learn-week-card__gilli {
-  width: 56px;
-  height: 56px;
+.learn-week-card__penny {
+  font-size: 40px;
+  line-height: 1;
   flex-shrink: 0;
 }
 
 .learn-week-card__title {
-  font-family: var(--font-display);
-  font-size: 24px;
-  color: var(--sky);
+  font-family: var(--font-kid);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--forest);
   line-height: 1.25;
 }
 
@@ -906,28 +971,18 @@
   box-shadow: 0 1px 0 var(--moss);
 }
 
+/*
+  Disabled = "pressed down and confirmed" state.
+  Mint background, no drop-shadow (physically flat), shifted down 2px.
+  No opacity reduction — the button stays vivid; the shadow loss signals completion.
+*/
 .btn-kid-done:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* ── Done confirmation banner ────────────────────────────────── */
-
-.learn-done-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp2);
-  background: var(--frost);
-  border: 1.5px solid var(--mint);
-  border-radius: var(--r-pill);
-  padding: var(--sp3) var(--sp4);
-  font-family: var(--font-kid);
-  font-size: 14px;
-  font-weight: 800;
+  background: var(--mint);
   color: var(--leaf);
-  margin-top: var(--sp2);
+  box-shadow: none;
+  transform: translateY(2px);
+  cursor: default;
+  opacity: 1;
 }
 
 /* ── Reward burst animation — floating +XP! ─────────────────── */

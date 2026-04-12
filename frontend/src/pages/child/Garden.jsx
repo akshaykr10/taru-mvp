@@ -33,26 +33,15 @@ function getPennyGreeting(ageStage, goalName) {
   }
 }
 
-// Milestone definitions (moved here from Gullak — belongs with portfolio progress)
-const MILESTONES = [
-  { pct: 25,  label: 'Sprout',  icon: '🌱', lockedIcon: '🔒' },
-  { pct: 50,  label: 'Growing', icon: '🌿', lockedIcon: '🔒' },
-  { pct: 75,  label: 'Almost',  icon: '🌳', lockedIcon: '🔒' },
-  { pct: 100, label: 'Bloom!',  icon: '🌸', lockedIcon: '🔒' },
-]
-
-function MilestoneBadge({ pct, label, icon, lockedIcon, achieved }) {
-  return (
-    <div
-      className={`garden-milestone-badge${achieved ? ' garden-milestone-badge--unlocked' : ' garden-milestone-badge--locked'}`}
-      aria-label={achieved ? `${label} — achieved` : `${label} — locked`}
-    >
-      <span className="garden-milestone-badge__icon" aria-hidden="true">
-        {achieved ? icon : lockedIcon}
-      </span>
-      <span className="garden-milestone-badge__pct">{pct}%</span>
-    </div>
-  )
+// Returns the single next unachieved milestone, or null if goal is complete
+function getNextMilestone(progressPct) {
+  const milestones = [
+    { pct: 25,  label: 'Sprout',  icon: '🌱' },
+    { pct: 50,  label: 'Growing', icon: '🌿' },
+    { pct: 75,  label: 'Almost',  icon: '🌳' },
+    { pct: 100, label: 'Bloom!',  icon: '🌸' },
+  ]
+  return milestones.find(m => progressPct < m.pct) || null
 }
 
 const NAV_TABS = [
@@ -68,7 +57,7 @@ export default function ChildGarden() {
   const [status,     setStatus]     = useState('loading') // 'loading' | 'error' | 'ready'
   const [errorMsg,   setErrorMsg]   = useState('')
   const [gardenData, setGardenData] = useState(null)
-  const [activeTab,  setActiveTab]  = useState('learn')
+  const [activeTab,  setActiveTab]  = useState('garden')
 
   // Tasks tab state
   const [tasks,      setTasks]      = useState([])
@@ -151,6 +140,16 @@ export default function ChildGarden() {
     }
   }
 
+  function handleXpEarned(amount) {
+    setGardenData(prev => ({
+      ...prev,
+      learning_state: {
+        ...prev.learning_state,
+        xp_total: (prev.learning_state?.xp_total ?? 0) + amount,
+      }
+    }))
+  }
+
   function handleTabClick(tabId) {
     setActiveTab(tabId)
     logActivity('child', 'child_tab_visit', {
@@ -190,6 +189,7 @@ export default function ChildGarden() {
   const progressPct   = goalAmount > 0 ? Math.min((tagged_total / goalAmount) * 100, 100) : 0
   const plant         = getPlantStage(progressPct)
   const pennyGreeting = getPennyGreeting(child.age_stage, child.goal_name)
+  const nextMilestone = getNextMilestone(progressPct)
 
   return (
     <div className="child-shell">
@@ -237,19 +237,22 @@ export default function ChildGarden() {
                   </div>
                 )}
 
-                {/* Milestones — moved from Gullak, belongs here with portfolio progress */}
+                {/* Next milestone — single focused target */}
                 {goalAmount > 0 && (
-                  <div className="garden-milestones">
-                    <div className="garden-milestones__label">Milestones</div>
-                    <div className="garden-milestone-grid">
-                      {MILESTONES.map(m => (
-                        <MilestoneBadge
-                          key={m.pct}
-                          {...m}
-                          achieved={progressPct >= m.pct}
-                        />
-                      ))}
-                    </div>
+                  <div className="garden-next-milestone">
+                    <span className="garden-milestones__label">Next milestone</span>
+                    {nextMilestone ? (
+                      <div className="garden-next-milestone__badge">
+                        <span className="garden-next-milestone__icon" aria-hidden="true">🔒</span>
+                        <span className="garden-next-milestone__label">{nextMilestone.label}</span>
+                        <span className="garden-next-milestone__pct">{nextMilestone.pct}%</span>
+                      </div>
+                    ) : (
+                      <div className="garden-next-milestone__badge garden-next-milestone__badge--complete">
+                        <span className="garden-next-milestone__icon" aria-hidden="true">🌸</span>
+                        <span className="garden-next-milestone__label">Goal complete!</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -260,10 +263,12 @@ export default function ChildGarden() {
               <div className="garden-stage-badge">{child.age_stage}</div>
             )}
 
-            {/* Penny speech bubble */}
-            <div className="penny-bubble">
-              <div className="penny-bubble__penny">🐿️</div>
-              <p className="penny-bubble__text">{pennyGreeting}</p>
+            {/* Penny speech bubble — emoji sits above, tail connects to it */}
+            <div className="penny-bubble-wrap">
+              <div className="penny-bubble-wrap__squirrel" aria-hidden="true">🐿️</div>
+              <div className="penny-bubble">
+                <p className="penny-bubble__text">{pennyGreeting}</p>
+              </div>
             </div>
           </div>
         )}
@@ -275,6 +280,7 @@ export default function ChildGarden() {
             currentWeek={learning_state?.current_week ?? 1}
             lastTriggerType={learning_state?.last_trigger_type ?? null}
             token={token}
+            onXpEarned={handleXpEarned}
           />
         )}
 
@@ -298,31 +304,34 @@ export default function ChildGarden() {
               </div>
             ) : (
               tasks.map(task => {
-                const isPending = task.has_pending
-                const isSending = submitting[task.id]
-                const msg       = submitMsg[task.id]
+                const isApproved = task.has_approved
+                const isPending  = task.has_pending || submitMsg[task.id] === 'sent'
+                const isSending  = submitting[task.id]
 
                 return (
-                  <div key={task.id} className="child-task-card">
+                  <div
+                    key={task.id}
+                    className={`child-task-card${isApproved ? ' child-task-card--approved' : ''}`}
+                  >
                     <div className="child-task-card__info">
                       <div className="child-task-card__name">{task.task_name}</div>
                       <div className="child-task-card__coins">🪙 {task.reward_coins} coins · {task.frequency}</div>
                     </div>
 
-                    {msg === 'sent' || isPending ? (
-                      <div className="child-task-card__pending">Waiting for approval ⏳</div>
+                    {isApproved ? (
+                      <div className="child-task-card__approved-badge" aria-label="Completed">✓</div>
                     ) : (
                       <button
-                        className="child-task-card__btn"
-                        disabled={isSending}
+                        className={`child-task-card__btn${isPending ? ' child-task-card__btn--pending' : ''}`}
+                        disabled={isPending || isSending}
                         onClick={() => submitTask(task.id)}
                       >
-                        {isSending ? '…' : 'Done!'}
+                        {isPending ? '⏳ Pending Parent' : isSending ? '…' : 'Done!'}
                       </button>
                     )}
 
-                    {msg === 'error' && (
-                      <div style={{ fontSize: '12px', color: 'var(--coral)', marginTop: 'var(--sp1)' }}>
+                    {submitMsg[task.id] === 'error' && (
+                      <div className="child-task-card__error">
                         Something went wrong. Try again.
                       </div>
                     )}

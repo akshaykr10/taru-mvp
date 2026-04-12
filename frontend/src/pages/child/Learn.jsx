@@ -26,53 +26,22 @@ function getTriggerCard(triggerType, ageStage) {
   return { ...card, type: triggerType }
 }
 
-// ── Wise Gilli SVG mascot — learning-context owl ──────────────
-// Distinct from Penny (garden squirrel). Purely decorative.
-function WiseGilliSVG() {
+// ── Penny mascot — squirrel emoji for card header ─────────────
+function PennyIcon() {
   return (
-    <svg
-      className="learn-week-card__gilli"
-      viewBox="0 0 56 56"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      {/* Body */}
-      <ellipse cx="28" cy="36" rx="14" ry="13" style={{ fill: 'var(--sky)' }} />
-      {/* Head */}
-      <circle cx="28" cy="22" r="14" style={{ fill: 'var(--sky)' }} />
-      {/* Wing left */}
-      <ellipse cx="14" cy="37" rx="5" ry="9" style={{ fill: 'var(--sky-md)' }} transform="rotate(-15 14 37)" />
-      {/* Wing right */}
-      <ellipse cx="42" cy="37" rx="5" ry="9" style={{ fill: 'var(--sky-md)' }} transform="rotate(15 42 37)" />
-      {/* Ear tufts */}
-      <polygon points="20,11 17,4 23,9" style={{ fill: 'var(--sky)' }} />
-      <polygon points="36,11 33,9 39,4" style={{ fill: 'var(--sky)' }} />
-      {/* Eye whites */}
-      <circle cx="22" cy="22" r="5.5" fill="white" />
-      <circle cx="34" cy="22" r="5.5" fill="white" />
-      {/* Pupils */}
-      <circle cx="22" cy="22" r="3" style={{ fill: 'var(--forest)' }} />
-      <circle cx="34" cy="22" r="3" style={{ fill: 'var(--forest)' }} />
-      {/* Eye shine */}
-      <circle cx="23.5" cy="20.5" r="1" fill="white" opacity="0.9" />
-      <circle cx="35.5" cy="20.5" r="1" fill="white" opacity="0.9" />
-      {/* Beak */}
-      <polygon points="28,26 25,30 31,30" style={{ fill: 'var(--amber)' }} />
-      {/* Chest highlight */}
-      <ellipse cx="28" cy="38" rx="7" ry="6" style={{ fill: 'var(--sky-md)' }} opacity="0.45" />
-    </svg>
+    <span className="learn-week-card__penny" aria-hidden="true">🐿️</span>
   )
 }
 
-// ── CurrentWeekCard — sky-lt themed, Wise Gilli, Mark as Done ──
-function CurrentWeekCard({ card, cardRef }) {
+// ── CurrentWeekCard — sky-lt themed, Penny, Mark as Done ────────
+function CurrentWeekCard({ card, cardRef, onXpEarned }) {
   const [markedDone,  setMarkedDone]  = useState(false)
   const [showReward,  setShowReward]  = useState(false)
 
   function handleMarkDone() {
     setMarkedDone(true)
     setShowReward(true)
+    onXpEarned(50)
     setTimeout(() => setShowReward(false), 1400)
   }
 
@@ -82,20 +51,20 @@ function CurrentWeekCard({ card, cardRef }) {
       {/* Floating reward burst */}
       {showReward && (
         <div className="learn-reward-burst" aria-hidden="true">
-          +XP! 🌟
+          +50 XP! 🌟
         </div>
       )}
 
-      {/* Header: week badge + Wise Gilli */}
+      {/* Header: week badge + Penny */}
       <div className="learn-week-card__header">
         <div className="learn-card__week-badge">Week {card.week}</div>
-        <WiseGilliSVG />
+        <PennyIcon />
       </div>
 
-      {/* Concept title */}
+      {/* Lesson heading — bold, kid font, high contrast */}
       <h2 className="learn-week-card__title">{card.title}</h2>
 
-      {/* Gilli's speech */}
+      {/* Penny's speech */}
       <div className="learn-week-card__speech">
         {card.penny_says}
       </div>
@@ -112,14 +81,15 @@ function CurrentWeekCard({ card, cardRef }) {
         </div>
       )}
 
-      {/* Mark as Done / Done state */}
-      {markedDone ? (
-        <div className="learn-done-state">✓ Done this week!</div>
-      ) : (
-        <button className="btn-kid-done" onClick={handleMarkDone}>
-          Mark as done ✓
-        </button>
-      )}
+      {/* Mark as Done — morphs to confirmed state in-place; disabled = physically pressed */}
+      <button
+        className="btn-kid-done"
+        onClick={handleMarkDone}
+        disabled={markedDone}
+        aria-pressed={markedDone}
+      >
+        {markedDone ? '✓ 50 XP Earned!' : 'Mark as done ✓'}
+      </button>
     </div>
   )
 }
@@ -149,7 +119,7 @@ function TriggerCard({ card }) {
 /**
  * Vertical timeline layout:
  *   1. "This Week" section heading  ← clear hierarchy via --font-display
- *   2. CurrentWeekCard              ← sky-lt card, Wise Gilli, Mark as Done
+ *   2. CurrentWeekCard              ← sky-lt card, Penny, Mark as Done
  *   3. "Recent Updates" divider     ← only rendered if trigger cards exist
  *   4. TriggerCard(s)               ← subtly muted bg to de-emphasise past
  *
@@ -159,7 +129,7 @@ function TriggerCard({ card }) {
  * @param {string|null} props.lastTriggerType - from learning_state.last_trigger_type
  * @param {string}      props.token           - child JWT, forwarded to activity hook
  */
-export default function Learn({ ageStage, currentWeek, lastTriggerType, token }) {
+export default function Learn({ ageStage, currentWeek, lastTriggerType, token, onXpEarned }) {
   const week     = currentWeek || 1
   const weekCard = getWeekCard(week, ageStage)
 
@@ -189,12 +159,12 @@ export default function Learn({ ageStage, currentWeek, lastTriggerType, token })
 
       {/* ── Current week card ─────────────────────────── */}
       {weekCard ? (
-        <CurrentWeekCard card={weekCard} cardRef={weekCardRef} />
+        <CurrentWeekCard card={weekCard} cardRef={weekCardRef} onXpEarned={onXpEarned} />
       ) : (
         <div ref={weekCardRef} className="learn-week-card learn-card--empty">
           <div className="learn-week-card__header">
             <div className="learn-card__week-badge">Week {week}</div>
-            <WiseGilliSVG />
+            <PennyIcon />
           </div>
           <div className="learn-week-card__speech">
             Something interesting is happening with your portfolio.
