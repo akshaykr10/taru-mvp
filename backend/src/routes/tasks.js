@@ -23,6 +23,17 @@ const router = express.Router()
 
 // ── Helpers ───────────────────────────────────────────────────
 
+/** Returns the ISO timestamp for the start of the current calendar week (Monday 00:00:00 UTC). */
+function currentWeekStart() {
+  const now = new Date()
+  const dayOfWeek = now.getUTCDay()                     // 0=Sunday … 6=Saturday
+  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+  const monday = new Date(now)
+  monday.setUTCDate(now.getUTCDate() - daysToMonday)
+  monday.setUTCHours(0, 0, 0, 0)
+  return monday.toISOString()
+}
+
 /** Resolve child identity from X-Child-Token header. Returns null if invalid. */
 async function resolveChildToken(req) {
   const token = req.headers['x-child-token']
@@ -104,7 +115,7 @@ router.get('/child', async (req, res) => {
       .in('task_rule_id', ruleIds)
       .not('approved_at', 'is', null)
 
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    const weekStart = currentWeekStart()
     const ruleMap = Object.fromEntries((rules || []).map(r => [r.id, r]))
 
     for (const c of (approved || [])) {
@@ -113,8 +124,8 @@ router.get('/child', async (req, res) => {
       if (rule.frequency === 'one-time') {
         lockedSet.add(rule.id)                                   // locked forever once approved
       } else if (rule.frequency === 'weekly') {
-        if (new Date(c.approved_at) >= weekAgo) {
-          lockedSet.add(rule.id)                                 // locked until 7-day window passes
+        if (c.approved_at >= weekStart) {
+          lockedSet.add(rule.id)                                 // locked until next Monday
         }
       }
       // 'custom' frequency: no automatic lock
@@ -180,13 +191,12 @@ router.post('/:id/complete', async (req, res) => {
   }
 
   if (rule.frequency === 'weekly') {
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
     const { data: recentApproved } = await sb
       .from('task_completions')
       .select('id')
       .eq('task_rule_id', rule.id)
       .not('approved_at', 'is', null)
-      .gte('approved_at', weekAgo)
+      .gte('approved_at', currentWeekStart())
       .limit(1)
       .maybeSingle()
 

@@ -304,23 +304,23 @@ export default function ChildGarden() {
               </div>
             ) : (
               tasks.map(task => {
-                const isApproved = task.has_approved
+                const isLocked   = task.locked
                 const isPending  = task.has_pending || submitMsg[task.id] === 'sent' || submitMsg[task.id] === 'pending'
                 const isSending  = submitting[task.id]
 
                 return (
                   <div
                     key={task.id}
-                    className={`child-task-card${isApproved ? ' child-task-card--approved' : ''}`}
+                    className={`child-task-card${isLocked ? ' child-task-card--approved' : ''}`}
                   >
                     <div className="child-task-card__info">
                       <div className="child-task-card__name">{task.task_name}</div>
                       <div className="child-task-card__coins">🪙 {task.reward_coins} coins · {task.frequency}</div>
                     </div>
 
-                    {isApproved ? (
+                    {isLocked ? (
                       <div className="child-task-card__cooldown-badge">
-                        {task.frequency === 'weekly' ? '✓ Done for this week' : '✓ Done for today'}
+                        {task.frequency === 'one-time' ? '✓ Completed' : '✓ Done for this week'}
                       </div>
                     ) : (
                       <button
