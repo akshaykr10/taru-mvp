@@ -91,6 +91,11 @@ function CurrentWeekCard({ weekContent, ageStage, weekNum, token, cardRef, onXpE
         <PennyIcon />
       </div>
 
+      {/* Topic — what this week is about */}
+      {weekContent.topic && (
+        <h3 className="learn-week-card__title">{weekContent.topic}</h3>
+      )}
+
       {/* a. Penny Moment — italic, tinted blue box */}
       <div className="learn-week-card__speech">
         {weekContent.penny_moment}

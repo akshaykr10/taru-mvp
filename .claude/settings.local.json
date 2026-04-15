@@ -34,7 +34,8 @@
       "Bash(node \"C:/Users/aksha/taru-mvp/gen_curriculum.js\")",
       "Bash(node --input-type=module)",
       "Bash(2>&1)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(curl -s 'https://wuokcezdgefykxctxdlu.supabase.co/rest/v1/children?select=id,name,child_token&limit=1' -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1b2tjZXpkZ2VmeWt4Y3R4ZGx1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTgxNjM2OCwiZXhwIjoyMDkxMzkyMzY4fQ.NrVsPHVu6Z0AjEPViZiwVLKpCyjmdbtCZOFp9xg78uA' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1b2tjZXpkZ2VmeWt4Y3R4ZGx1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTgxNjM2OCwiZXhwIjoyMDkxMzkyMzY4fQ.NrVsPHVu6Z0AjEPViZiwVLKpCyjmdbtCZOFp9xg78uA')"
     ]
   }
 }
