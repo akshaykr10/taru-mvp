@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { logActivity } from '../../lib/activity.js'
 import { useActivityOnView } from '../../hooks/useActivityOnView.js'
 import { BACKEND_URL } from '../../lib/api.js'
+import { getWeekContent } from '../../data/weeklyContent.js'
 import '../../styles/parent.css'
 
 async function getAuthHeaders() {
@@ -119,6 +120,29 @@ function ChildOverview({ child, portfolioTotal, pendingCount }) {
   )
 }
 
+// ── DinnerPromptCard — appears when child has completed the current week ──
+function DinnerPromptCard({ row, childName, onDismiss, dismissing }) {
+  const weekContent = getWeekContent(row.week_number)
+  const topic = weekContent?.topic || `Week ${row.week_number}`
+
+  return (
+    <div className="dinner-prompt-card">
+      <div className="dinner-prompt-card__label">Tonight at dinner</div>
+      <div className="dinner-prompt-card__meta">
+        {childName} completed Week {row.week_number} — {topic}
+      </div>
+      <p className="dinner-prompt-card__text">{row.prompt_text}</p>
+      <button
+        className="dinner-prompt-card__btn"
+        onClick={onDismiss}
+        disabled={dismissing}
+      >
+        {dismissing ? '…' : 'We talked about this ✓'}
+      </button>
+    </div>
+  )
+}
+
 export default function ParentDashboard() {
   const { user, session } = useAuth()
   const [child, setChild]                   = useState(null)
@@ -127,6 +151,8 @@ export default function ParentDashboard() {
   const [promptDone, setPromptDone]         = useState(false)
   const [pendingApprovals, setPendingApprovals] = useState([])
   const [actioning, setActioning]           = useState({}) // { completionId: 'approve'|'reject' }
+  const [dinnerPrompt, setDinnerPrompt]     = useState(null)  // conversation_log row | null
+  const [dismissing, setDismissing]         = useState(false)
 
   const displayName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'there'
 
@@ -156,6 +182,33 @@ export default function ParentDashboard() {
   }, [])
 
   useEffect(() => { loadPending() }, [loadPending])
+
+  // Load the most recently completed dinner prompt for this parent
+  const loadDinnerPrompt = useCallback(async () => {
+    if (!user?.id) return
+    const { data } = await supabase
+      .from('conversation_log')
+      .select('id, week_number, prompt_text, marked_done_at')
+      .eq('parent_id', user.id)
+      .not('marked_done_at', 'is', null)
+      .order('marked_done_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    setDinnerPrompt(data || null)
+  }, [user?.id])
+
+  useEffect(() => { loadDinnerPrompt() }, [loadDinnerPrompt])
+
+  async function handleDismissDinnerPrompt() {
+    if (!dinnerPrompt) return
+    setDismissing(true)
+    await supabase
+      .from('conversation_log')
+      .update({ marked_done_at: null })
+      .eq('id', dinnerPrompt.id)
+    setDismissing(false)
+    setDinnerPrompt(null)
+  }
 
   async function handleApproval(completionId, action) {
     setActioning(a => ({ ...a, [completionId]: action }))
@@ -250,6 +303,16 @@ export default function ParentDashboard() {
       <h1 className="page-title" style={{ marginBottom: 'var(--space-1)' }}>
         {getGreeting()},<br />{displayName}.
       </h1>
+
+      {/* Dinner prompt — only when child has completed a week */}
+      {dinnerPrompt && (
+        <DinnerPromptCard
+          row={dinnerPrompt}
+          childName={child?.name || 'Your child'}
+          onDismiss={handleDismissDinnerPrompt}
+          dismissing={dismissing}
+        />
+      )}
 
       {/* Portfolio card — premium empty state until a CAS is imported */}
       {portfolioTotal === null ? (

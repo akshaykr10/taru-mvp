@@ -1057,3 +1057,65 @@
   line-height: 1.5;
   margin-bottom: var(--sp6);
 }
+
+/* ── Dinner prompt card ──────────────────────────────────────── */
+
+.dinner-prompt-card {
+  background: var(--color-navy);
+  border-radius: var(--r-lg);
+  padding: var(--sp4) var(--sp6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp3);
+}
+
+.dinner-prompt-card__label {
+  font-family: var(--font-parent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+.dinner-prompt-card__meta {
+  font-family: var(--font-parent);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.4;
+}
+
+.dinner-prompt-card__text {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.dinner-prompt-card__btn {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--r-pill);
+  color: rgba(255, 255, 255, 0.75);
+  font-family: var(--font-parent);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  min-height: 44px;
+}
+
+.dinner-prompt-card__btn:hover:not(:disabled) {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+.dinner-prompt-card__btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+

@@ -25,7 +25,16 @@
       "Bash(python3 -c \"import sys,json; p=json.load\\(sys.stdin\\); print\\('main:', p.get\\('main'\\)\\); print\\('module:', p.get\\('module'\\)\\); print\\('exports:', list\\(p.get\\('exports',{}\\).keys\\(\\)\\)[:5]\\)\")",
       "Bash(node -e \"const fs=require\\('fs'\\);const p=JSON.parse\\(fs.readFileSync\\('/dev/stdin','utf8'\\)\\);console.log\\('main:',p.main\\);console.log\\('module:',p.module\\);console.log\\('exports:',JSON.stringify\\(p.exports,null,2\\).slice\\(0,400\\)\\)\")",
       "mcp__Claude_Preview__preview_start",
-      "Bash(echo.)"
+      "Bash(echo.)",
+      "Bash(python -c ':*)",
+      "Bash(where python:*)",
+      "Bash(where node:*)",
+      "Bash(where py:*)",
+      "Bash(npm list:*)",
+      "Bash(node \"C:/Users/aksha/taru-mvp/gen_curriculum.js\")",
+      "Bash(node --input-type=module)",
+      "Bash(2>&1)",
+      "Bash(xargs grep:*)"
     ]
   }
 }

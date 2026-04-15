@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import content from '../../data/content.json'
+import { getWeekContent, getAppText } from '../../data/weeklyContent.js'
 import { useActivityOnView } from '../../hooks/useActivityOnView.js'
+import Bridge from '../../components/learn/Bridge.jsx'
+import { BACKEND_URL } from '../../lib/api.js'
 
 // ── Trigger type display config ────────────────────────────────
 const TRIGGER_META = {
@@ -8,14 +11,6 @@ const TRIGGER_META = {
   nav_change:    { icon: '📈', label: 'Portfolio moved' },
   milestone:     { icon: '🎉', label: 'Milestone reached' },
   task_approved: { icon: '🪙', label: 'Coins earned' },
-}
-
-function getWeekCard(week, ageStage) {
-  const entry = content.weekly_concepts.find(w => w.week === week)
-  if (!entry) return null
-  const card  = entry[ageStage]
-  if (!card)  return null
-  return { ...card, week }
 }
 
 function getTriggerCard(triggerType, ageStage) {
@@ -33,17 +28,52 @@ function PennyIcon() {
   )
 }
 
-// ── CurrentWeekCard — sky-lt themed, Penny, Mark as Done ────────
-function CurrentWeekCard({ card, cardRef, onXpEarned }) {
-  const [markedDone,  setMarkedDone]  = useState(false)
-  const [showReward,  setShowReward]  = useState(false)
+// ── CurrentWeekCard ────────────────────────────────────────────
+function CurrentWeekCard({ weekContent, ageStage, weekNum, token, cardRef, onXpEarned }) {
+  const [markedDone,    setMarkedDone]    = useState(false)
+  const [showReward,    setShowReward]    = useState(false)
+  const [advanceError,  setAdvanceError]  = useState(false)
 
-  function handleMarkDone() {
+  async function handleMarkDone() {
+    // Immediate UI feedback — these run regardless of DB outcome
     setMarkedDone(true)
     setShowReward(true)
     onXpEarned(50)
     setTimeout(() => setShowReward(false), 1400)
+
+    // Step 1 + 2 + 3 + 4 — single backend call handles all DB writes in sequence.
+    // The backend handles steps 1–3 as best-effort and only fails if step 4 fails.
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/child/week-complete`, {
+        method:  'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Child-Token': token,
+        },
+        body: JSON.stringify({
+          current_week:  weekNum,
+          dinner_prompt: weekContent.dinner_prompt,
+          topic:         weekContent.topic,
+        }),
+      })
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        console.error('[week-complete] step 4 failed:', body.error || res.status)
+        setAdvanceError(true)
+      }
+    } catch (err) {
+      console.error('[week-complete] network error:', err)
+      setAdvanceError(true)
+    }
   }
+
+  const appText = getAppText(weekContent, ageStage)
+
+  // Capitalise first letter only, e.g. "co-discoverer" → "Co-discoverer"
+  const modeLabel = weekContent.penny_mode
+    ? weekContent.penny_mode.charAt(0).toUpperCase() + weekContent.penny_mode.slice(1)
+    : ''
 
   return (
     <div ref={cardRef} className="learn-week-card">
@@ -57,31 +87,38 @@ function CurrentWeekCard({ card, cardRef, onXpEarned }) {
 
       {/* Header: week badge + Penny */}
       <div className="learn-week-card__header">
-        <div className="learn-card__week-badge">Week {card.week}</div>
+        <div className="learn-card__week-badge">Week {weekNum}</div>
         <PennyIcon />
       </div>
 
-      {/* Lesson heading — bold, kid font, high contrast */}
-      <h2 className="learn-week-card__title">{card.title}</h2>
-
-      {/* Penny's speech */}
+      {/* a. Penny Moment — italic, tinted blue box */}
       <div className="learn-week-card__speech">
-        {card.penny_says}
+        {weekContent.penny_moment}
+        {modeLabel && (
+          <span className="learn-week-card__penny-mode">{modeLabel}</span>
+        )}
       </div>
 
-      {/* Optional body */}
-      {card.body && (
-        <p className="learn-week-card__body">{card.body}</p>
-      )}
+      {/* b. App Text — age-appropriate content */}
+      <p className="learn-week-card__body">{appText}</p>
 
-      {/* Optional question — reuses amber question style */}
-      {card.question && (
-        <div className="learn-card__question">
-          <p>{card.question}</p>
+      {/* c. Portfolio Moment Placeholder */}
+      {weekContent.portfolio_status !== 'NOT APPLICABLE' && (
+        <div
+          className="learn-week-card__portfolio-placeholder"
+          data-portfolio-status={weekContent.portfolio_status}
+        >
+          📊 Portfolio insight loading...
         </div>
       )}
 
-      {/* Mark as Done — morphs to confirmed state in-place; disabled = physically pressed */}
+      {/* d. Dinner Prompt Teaser */}
+      <div className="learn-week-card__dinner">
+        <span className="learn-week-card__dinner-label">Tonight at dinner 🌙</span>
+        <p className="learn-week-card__dinner-prompt">{weekContent.dinner_prompt}</p>
+      </div>
+
+      {/* e. Mark as Done — keep existing handler */}
       <button
         className="btn-kid-done"
         onClick={handleMarkDone}
@@ -90,11 +127,18 @@ function CurrentWeekCard({ card, cardRef, onXpEarned }) {
       >
         {markedDone ? '✓ 50 XP Earned!' : 'Mark as done ✓'}
       </button>
+
+      {/* Step 4 error only — shown if week advancement failed */}
+      {advanceError && (
+        <p className="learn-week-card__advance-error">
+          Couldn't save your progress. Try again in a moment.
+        </p>
+      )}
     </div>
   )
 }
 
-// ── TriggerCard — unchanged, Penny stays here ─────────────────
+// ── TriggerCard — unchanged ────────────────────────────────────
 function TriggerCard({ card }) {
   const meta = TRIGGER_META[card.type] || { icon: '💡', label: 'Update' }
   return (
@@ -117,21 +161,22 @@ function TriggerCard({ card }) {
 
 // ── Main Learn component ───────────────────────────────────────
 /**
- * Vertical timeline layout:
- *   1. "This Week" section heading  ← clear hierarchy via --font-display
- *   2. CurrentWeekCard              ← sky-lt card, Penny, Mark as Done
- *   3. "Recent Updates" divider     ← only rendered if trigger cards exist
- *   4. TriggerCard(s)               ← subtly muted bg to de-emphasise past
+ * Vertical layout:
+ *   1. "This Week" section heading
+ *   2. Bridge block (prior week callback, hidden for W1/W25/consolidation weeks)
+ *   3. CurrentWeekCard (Penny moment, app text, portfolio placeholder, dinner prompt, CTA)
+ *   4. "Recent Updates" + TriggerCard(s)
  *
  * @param {object} props
  * @param {string}      props.ageStage        - 'seed'|'sprout'|'growth'|'investor'
  * @param {number}      props.currentWeek     - from learning_state.current_week (1-based)
  * @param {string|null} props.lastTriggerType - from learning_state.last_trigger_type
  * @param {string}      props.token           - child JWT, forwarded to activity hook
+ * @param {function}    props.onXpEarned      - callback when Mark as Done pressed
  */
 export default function Learn({ ageStage, currentWeek, lastTriggerType, token, onXpEarned }) {
-  const week     = currentWeek || 1
-  const weekCard = getWeekCard(week, ageStage)
+  const week        = currentWeek || 1
+  const weekContent = getWeekContent(week)
 
   // Fires child_learn_card_viewed after 3-second dwell (CLAUDE.md spec)
   const weekCardRef = useActivityOnView(
@@ -151,15 +196,27 @@ export default function Learn({ ageStage, currentWeek, lastTriggerType, token, o
   return (
     <div className="garden-learn">
 
-      {/* ── "This Week" section heading ───────────────── */}
+      {/* 1. "This Week" section heading — unchanged */}
       <div>
         <h2 className="learn-section-heading">This Week</h2>
         <p className="learn-section-sub">Week {week} · {ageStage} stage</p>
       </div>
 
-      {/* ── Current week card ─────────────────────────── */}
-      {weekCard ? (
-        <CurrentWeekCard card={weekCard} cardRef={weekCardRef} onXpEarned={onXpEarned} />
+      {/* 2. Bridge block — prior week callback */}
+      {weekContent && (
+        <Bridge weekContent={weekContent} ageStage={ageStage} />
+      )}
+
+      {/* 3. Current week card */}
+      {weekContent ? (
+        <CurrentWeekCard
+          weekContent={weekContent}
+          ageStage={ageStage}
+          weekNum={week}
+          token={token}
+          cardRef={weekCardRef}
+          onXpEarned={onXpEarned}
+        />
       ) : (
         <div ref={weekCardRef} className="learn-week-card learn-card--empty">
           <div className="learn-week-card__header">
@@ -172,7 +229,7 @@ export default function Learn({ ageStage, currentWeek, lastTriggerType, token, o
         </div>
       )}
 
-      {/* ── Past trigger cards — timeline section ─────── */}
+      {/* 4. Past trigger cards — timeline section */}
       {triggerCards.length > 0 && (
         <>
           <div className="learn-section-label">Recent updates</div>

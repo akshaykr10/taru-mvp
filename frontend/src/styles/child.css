@@ -1010,3 +1010,85 @@
   .learn-reward-burst { animation: none; opacity: 0; }
   .btn-kid-done       { transition: none; }
 }
+
+/* ── Bridge block — prior week callback ──────────────────────── */
+
+.learn-bridge {
+  border-left: 3px solid var(--amber-md);
+  background: var(--amber-lt);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  padding: var(--sp3) var(--sp4);
+}
+
+.learn-bridge__text {
+  font-family: var(--font-kid);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--amber-dk);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── Penny mode label — inside the speech box ─────────────────── */
+
+.learn-week-card__penny-mode {
+  display: block;
+  margin-top: var(--sp2);
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink-30);
+  text-align: right;
+}
+
+/* ── Portfolio placeholder ────────────────────────────────────── */
+
+.learn-week-card__portfolio-placeholder {
+  background: var(--ink-10);
+  border: 1px dashed var(--ink-30);
+  border-radius: var(--r-md);
+  padding: var(--sp3) var(--sp4);
+  font-family: var(--font-kid);
+  font-size: 13px;
+  color: var(--ink-60);
+  text-align: center;
+}
+
+/* ── Dinner prompt teaser ─────────────────────────────────────── */
+
+.learn-week-card__dinner {
+  background: var(--color-navy);
+  border-radius: var(--r-md);
+  padding: var(--sp3) var(--sp4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp2);
+}
+
+.learn-week-card__dinner-label {
+  font-family: var(--font-kid);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.learn-week-card__dinner-prompt {
+  font-family: var(--font-kid);
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Step 4 error — only shown when week advancement fails */
+.learn-week-card__advance-error {
+  font-family: var(--font-kid);
+  font-size: 13px;
+  color: var(--color-error);
+  text-align: center;
+  margin: 0;
+}
