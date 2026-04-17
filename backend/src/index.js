@@ -76,14 +76,15 @@ app.get('/api/child/garden', async (req, res) => {
     return res.status(401).json({ error: 'Child token revoked or invalid' })
   }
 
-  // Return ONLY visible fund_tags — enforced at query level, not just route
-  const { data: fundTags } = await supabase
-    .from('fund_tags')
-    .select('isin, fund_type, is_visible_to_child')
-    .eq('parent_id', payload.parent_id)
-    .eq('is_visible_to_child', true)
+  // Return ONLY funds visible to child — query cas_funds, enforce at query level
+  const { data: casFunds } = await supabase
+    .from('cas_funds')
+    .select('isin, scheme_type, current_value, show_in_child_app')
+    .eq('user_id', payload.parent_id)
+    .eq('show_in_child_app', true)
 
-  const taggedTotal = (fundTags || []).reduce((sum, f) => sum + 0, 0) // ₹ values in Step 8
+  const taggedTotal = (casFunds || [])
+    .reduce((sum, f) => sum + (parseFloat(f.current_value) || 0), 0)
 
   const { data: learningState } = await supabase
     .from('learning_state')
@@ -99,7 +100,7 @@ app.get('/api/child/garden', async (req, res) => {
       goal_amount: child.goal_amount,
     },
     tagged_total:   taggedTotal,
-    fund_count:     (fundTags || []).length,
+    fund_count:     (casFunds || []).length,
     learning_state: learningState,
   })
 })
