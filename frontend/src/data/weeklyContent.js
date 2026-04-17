@@ -866,3 +866,51 @@ export const WEEKLY_CONTENT = [
     portfolio_reference: `Full portfolio snapshot: value, return, real return, asset allocation, goal progress. Forward-looking framing.`,
   }
 ];
+
+// ── Helper functions ──────────────────────────────────────────────────────────
+
+/**
+ * Look up a week's content object by week number (1–48).
+ * Returns null if the week number is out of range.
+ */
+export function getWeekContent(weekNumber) {
+  return WEEKLY_CONTENT.find(e => e.week_number === weekNumber) ?? null;
+}
+
+/**
+ * Return the age-appropriate app text for a given week content object.
+ *   seed (5–8)      → app_text_59
+ *   sprout (9–11)   → app_text_1014
+ *   growth (12–14)  → app_text_1014
+ *   investor (15+)  → app_text_15
+ */
+export function getAppText(weekContent, ageStage) {
+  if (!weekContent) return '';
+  if (ageStage === 'investor') return weekContent.app_text_15;
+  if (ageStage === 'growth' || ageStage === 'sprout') return weekContent.app_text_1014;
+  return weekContent.app_text_59; // seed + fallback
+}
+
+/**
+ * Returns true when a bridge (prior-week callback) should be rendered.
+ * Suppressed for W1, W25 (cycle restarts) and all consolidation weeks
+ * (W18, W24, W42, W48) — all of which have bridge_59 === "—" in the data.
+ */
+export function shouldShowBridge(weekContent) {
+  if (!weekContent) return false;
+  return weekContent.bridge_59 !== '—';
+}
+
+/**
+ * Return the age-appropriate bridge text for a given week content object.
+ *   seed (5–8)      → bridge_59
+ *   sprout (9–11)   → bridge_1014
+ *   growth (12–14)  → bridge_1014
+ *   investor (15+)  → bridge_15
+ */
+export function getBridge(weekContent, ageStage) {
+  if (!weekContent) return '';
+  if (ageStage === 'investor') return weekContent.bridge_15;
+  if (ageStage === 'growth' || ageStage === 'sprout') return weekContent.bridge_1014;
+  return weekContent.bridge_59; // seed + fallback
+}
