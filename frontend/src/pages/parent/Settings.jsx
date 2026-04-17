@@ -43,6 +43,204 @@ const QUICK_TASKS = [
   { label: '🌱 Water Plants', coins: 20, freq: 'one-time' },
 ]
 
+// ── Goal edit card ────────────────────────────────────────────
+function GoalEditCard({ child, onSaved }) {
+  const [editing,    setEditing]    = useState(false)
+  const [goalName,   setGoalName]   = useState(child?.goal_name   || '')
+  const [goalAmount, setGoalAmount] = useState(child?.goal_amount ? String(child.goal_amount) : '')
+  const [goalDate,   setGoalDate]   = useState(child?.goal_date   || '')
+  const [saving,     setSaving]     = useState(false)
+  const [errors,     setErrors]     = useState({})
+  const [saveError,  setSaveError]  = useState('')
+  const [saved,      setSaved]      = useState(false)
+
+  const todayStr = new Date().toISOString().split('T')[0]
+
+  // Max date = child's 18th birthday
+  const maxGoalDate = child?.dob
+    ? (() => {
+        const d = new Date(child.dob + 'T00:00:00')
+        d.setFullYear(d.getFullYear() + 18)
+        return d.toISOString().split('T')[0]
+      })()
+    : ''
+
+  function startEdit() {
+    setGoalName(child?.goal_name   || '')
+    setGoalAmount(child?.goal_amount ? String(child.goal_amount) : '')
+    setGoalDate(child?.goal_date   || '')
+    setErrors({})
+    setSaveError('')
+    setEditing(true)
+  }
+
+  function cancel() {
+    setEditing(false)
+    setErrors({})
+    setSaveError('')
+  }
+
+  async function save() {
+    const errs  = {}
+    const name   = goalName.trim()
+    const amount = parseFloat(goalAmount)
+
+    if (!name || name.length > 40)
+      errs.name = 'Give the goal a name.'
+    if (!goalAmount || isNaN(amount) || amount <= 0 || amount > 9999999)
+      errs.amount = 'Enter a valid amount.'
+    if (!goalDate || goalDate <= todayStr)
+      errs.date = 'Pick a future date.'
+
+    if (Object.keys(errs).length) { setErrors(errs); return }
+
+    setSaving(true)
+    setSaveError('')
+    try {
+      const res  = await fetch(`${BACKEND_URL}/api/children/${child.id}`, {
+        method:  'PATCH',
+        headers: await getAuthHeaders(),
+        body:    JSON.stringify({ goal_name: name, goal_amount: amount, goal_date: goalDate }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setSaveError("Couldn't save — try again."); return }
+      onSaved(data.child)
+      setEditing(false)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch {
+      setSaveError("Couldn't save — try again.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="card">
+      {editing ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp4)' }}>
+          <div>
+            <label className="form-label" htmlFor="goal-name-edit">Goal name</label>
+            <input
+              id="goal-name-edit"
+              className="form-input"
+              type="text"
+              placeholder="e.g. IIT fees, Europe trip, first bike"
+              maxLength={40}
+              value={goalName}
+              onChange={e => setGoalName(e.target.value)}
+              autoFocus
+            />
+            {errors.name && (
+              <p style={{ fontSize: '13px', color: 'var(--coral)', marginTop: 'var(--sp1)', fontFamily: 'var(--font-parent)' }}>
+                {errors.name}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="form-label" htmlFor="goal-amount-edit">Target amount</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp2)' }}>
+              <span style={{ fontSize: '15px', color: 'var(--ink)', fontFamily: 'var(--font-parent)', flexShrink: 0 }}>₹</span>
+              <input
+                id="goal-amount-edit"
+                className="form-input"
+                type="number"
+                inputMode="numeric"
+                placeholder="500000"
+                min="1"
+                max="9999999"
+                step="1"
+                value={goalAmount}
+                onChange={e => setGoalAmount(e.target.value)}
+                style={{ flex: 1 }}
+              />
+            </div>
+            {errors.amount && (
+              <p style={{ fontSize: '13px', color: 'var(--coral)', marginTop: 'var(--sp1)', fontFamily: 'var(--font-parent)' }}>
+                {errors.amount}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="form-label" htmlFor="goal-date-edit">Target date</label>
+            <input
+              id="goal-date-edit"
+              className="form-input"
+              type="date"
+              min={todayStr}
+              max={maxGoalDate}
+              value={goalDate}
+              onChange={e => setGoalDate(e.target.value)}
+            />
+            {errors.date && (
+              <p style={{ fontSize: '13px', color: 'var(--coral)', marginTop: 'var(--sp1)', fontFamily: 'var(--font-parent)' }}>
+                {errors.date}
+              </p>
+            )}
+          </div>
+
+          {saveError && (
+            <p style={{ fontSize: '13px', color: 'var(--coral)', fontFamily: 'var(--font-parent)' }}>
+              {saveError}
+            </p>
+          )}
+
+          <div style={{ display: 'flex', gap: 'var(--sp3)' }}>
+            <button className="btn btn-outline" style={{ flex: 1 }} onClick={cancel} disabled={saving}>
+              Cancel
+            </button>
+            <button className="btn btn-primary" style={{ flex: 1 }} onClick={save} disabled={saving}>
+              {saving ? 'Saving…' : 'Save goal'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--sp3)' }}>
+          <div style={{ flex: 1 }}>
+            {child?.goal_name ? (
+              <>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '16px', color: 'var(--ink)', marginBottom: 'var(--sp1)' }}>
+                  {child.goal_name}
+                </div>
+                <div style={{ fontFamily: 'var(--font-parent)', fontSize: '13px', color: 'var(--ink-60)' }}>
+                  {child.goal_amount && `₹${Number(child.goal_amount).toLocaleString('en-IN')}`}
+                  {child.goal_amount && child.goal_date && ' · '}
+                  {child.goal_date && new Date(child.goal_date + 'T00:00:00').toLocaleDateString('en-IN', {
+                    day: 'numeric', month: 'long', year: 'numeric',
+                  })}
+                </div>
+              </>
+            ) : (
+              <p style={{ fontFamily: 'var(--font-parent)', fontSize: '14px', color: 'var(--ink-60)', margin: 0 }}>
+                No goal set yet.
+              </p>
+            )}
+            {saved && (
+              <p style={{ fontFamily: 'var(--font-parent)', fontSize: '13px', color: 'var(--forest)', marginTop: 'var(--sp2)', margin: `var(--sp2) 0 0` }}>
+                Goal updated.
+              </p>
+            )}
+          </div>
+          <button
+            onClick={startEdit}
+            style={{
+              background: 'none', border: 'none', padding: 0,
+              cursor: 'pointer', fontSize: '13px', fontWeight: 500,
+              color: 'var(--forest)', fontFamily: 'var(--font-parent)',
+              flexShrink: 0, minHeight: '44px',
+              display: 'flex', alignItems: 'center',
+            }}
+          >
+            Edit
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Task rule form ────────────────────────────────────────────
 function TaskRuleForm({ childId, onSave, onCancel }) {
   const [name,      setName]      = useState('')
@@ -304,6 +502,10 @@ export default function ParentSettings() {
     setTimeout(() => setCopied(false), 2500)
   }
 
+  function handleGoalSaved(updatedChild) {
+    setChild(updatedChild)
+  }
+
   function handleRuleSaved(newRule) {
     setRules(prev => [...prev, newRule])
     setShowForm(false)
@@ -408,38 +610,15 @@ export default function ParentSettings() {
         <span className="section-title">Savings goal</span>
       </div>
 
-      <div className="card">
-        {child?.goal_name ? (
-          <>
-            <div className="summary-row">
-              <span className="summary-row__label">Goal</span>
-              <span className="summary-row__value">{child.goal_name}</span>
-            </div>
-            {child.goal_amount && (
-              <div className="summary-row">
-                <span className="summary-row__label">Target</span>
-                <span className="summary-row__value">
-                  ₹{Number(child.goal_amount).toLocaleString('en-IN')}
-                </span>
-              </div>
-            )}
-            {child.goal_date && (
-              <div className="summary-row">
-                <span className="summary-row__label">By</span>
-                <span className="summary-row__value">
-                  {new Date(child.goal_date + 'T00:00:00').toLocaleDateString('en-IN', {
-                    day: 'numeric', month: 'long', year: 'numeric',
-                  })}
-                </span>
-              </div>
-            )}
-          </>
-        ) : (
+      {child ? (
+        <GoalEditCard child={child} onSaved={handleGoalSaved} />
+      ) : (
+        <div className="card">
           <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>
-            No goal set yet.
+            Add a child profile first.
           </p>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* ── Task rules ─────────────────────────────────────── */}
       <div className="section-header" style={{ marginTop: 'var(--space-2)' }}>

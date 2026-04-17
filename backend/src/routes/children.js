@@ -51,6 +51,51 @@ async function generateAndStore(sb, childId, parentId, res) {
   })
 }
 
+// ── Update goal fields ────────────────────────────────────────
+router.patch('/:childId', async (req, res) => {
+  const { childId } = req.params
+  const sb = req.supabase
+
+  // Verify ownership at query level — not just route protection
+  const { data: existing, error: fetchErr } = await sb
+    .from('children')
+    .select('id')
+    .eq('id', childId)
+    .eq('parent_id', req.parentId)
+    .maybeSingle()
+
+  if (fetchErr || !existing) {
+    return res.status(404).json({ error: 'Child not found or not yours' })
+  }
+
+  const { goal_name, goal_amount, goal_date } = req.body
+
+  const name = typeof goal_name === 'string' ? goal_name.trim() : ''
+  if (!name) {
+    return res.status(400).json({ error: 'goal_name is required' })
+  }
+  const amount = parseFloat(goal_amount)
+  if (!goal_amount || isNaN(amount) || amount <= 0 || amount > 9999999) {
+    return res.status(400).json({ error: 'goal_amount must be a positive number up to 9999999' })
+  }
+  if (!goal_date) {
+    return res.status(400).json({ error: 'goal_date is required' })
+  }
+
+  const { data: updated, error: updateErr } = await sb
+    .from('children')
+    .update({ goal_name: name, goal_amount: amount, goal_date })
+    .eq('id', childId)
+    .select()
+    .single()
+
+  if (updateErr) {
+    return res.status(500).json({ error: 'Failed to update goal' })
+  }
+
+  return res.json({ child: updated })
+})
+
 // ── Generate token (first-time) ───────────────────────────────
 router.post('/:childId/token', async (req, res) => {
   const { childId } = req.params
