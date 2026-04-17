@@ -278,9 +278,15 @@ async function saveCasData(sb, userId, casData, method) {
     }
   })
 
+  // Deduplicate within the batch — same ISIN can appear multiple times in a CAS
+  // (e.g. duplicate scheme entries). Keep the last occurrence of each key.
+  const rowMap = new Map()
+  for (const row of rows) rowMap.set(`${row.isin}::${row.folio_number}`, row)
+  const dedupedRows = Array.from(rowMap.values())
+
   const { error: upsertErr } = await sb
     .from('cas_funds')
-    .upsert(rows, { onConflict: 'user_id,isin,folio_number' })
+    .upsert(dedupedRows, { onConflict: 'user_id,isin,folio_number' })
 
   if (upsertErr) throw new Error(`Fund upsert failed: ${upsertErr.message}`)
 
@@ -304,8 +310,8 @@ async function saveCasData(sb, userId, casData, method) {
     checkSipTrigger(sb, userId, schemes),
   ])
 
-  console.log('[cas] save complete | parentId:', userId, '| funds:', rows.length, '| tagged_total:', taggedTotal)
-  return { portfolio_id: portfolio.id, funds_saved: rows.length, tagged_total: taggedTotal }
+  console.log('[cas] save complete | parentId:', userId, '| funds:', dedupedRows.length, '| tagged_total:', taggedTotal)
+  return { portfolio_id: portfolio.id, funds_saved: dedupedRows.length, tagged_total: taggedTotal }
 }
 
 // ── Scheme flattening ─────────────────────────────────────────
