@@ -30,8 +30,6 @@ export default function Signup() {
       options: {
         // name is stored in user_metadata → picked up by the DB trigger
         data: { name: form.name.trim() },
-        // After email confirmation, Supabase redirects here
-        emailRedirectTo: `${window.location.origin}/parent/onboarding`,
       },
     })
     setLoading(false)
@@ -41,8 +39,7 @@ export default function Signup() {
       return
     }
 
-    // Go to the holding page — user must confirm email before they can log in
-    navigate('/verify-email', { state: { email: form.email.trim().toLowerCase() } })
+    navigate('/parent/onboarding')
   }
 
   return (

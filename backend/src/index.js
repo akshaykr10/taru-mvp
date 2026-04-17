@@ -5,6 +5,7 @@ const { createClient } = require('@supabase/supabase-js')
 
 const { requireParentAuth, supabase } = require('./middleware/auth')
 const casparsersRouter = require('./routes/casparser')
+const casRouter        = require('./routes/cas')
 const activityRouter   = require('./routes/activity')
 const childrenRouter   = require('./routes/children')
 const tasksRouter      = require('./routes/tasks')
@@ -33,8 +34,11 @@ app.get('/health', (_req, res) => {
 
 // ── Routes ────────────────────────────────────────────────────
 
-// CASParser — all endpoints require parent auth
+// CASParser legacy routes (preserved)
 app.use('/api/casparser', requireParentAuth, casparsersRouter)
+
+// CASParser production routes — rate-limited, richer schema
+app.use('/api/cas', requireParentAuth, casRouter)
 
 // Activity logging — resolves actor internally (parent JWT or child token)
 app.use('/api/activity', activityRouter)

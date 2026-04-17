@@ -239,52 +239,40 @@ export default function ParentDashboard() {
       })
   }, [user?.id])
 
-  // Load tagged portfolio total from fund_tags + latest snapshot
-  // Shows fund count until a CAS is imported; afterwards the ₹ value is computed
-  // by summing scheme.value for visible ISINs from the most recent snapshot.
+  // Load tagged portfolio total from cas_funds (new production tables).
+  // Sum current_value directly from rows where show_in_child_app = true.
+  // Also fetch last_updated from cas_fetch_log for the portfolio card subtitle.
   useEffect(() => {
     if (!user?.id || !session?.access_token) return
 
     async function loadPortfolio() {
-      // 1. Get visible fund ISINs
-      const { data: visibleFunds } = await supabase
-        .from('fund_tags')
-        .select('isin')
-        .eq('parent_id', user.id)
-        .eq('is_visible_to_child', true)
+      const [fundsResult, logResult] = await Promise.all([
+        supabase
+          .from('cas_funds')
+          .select('current_value, show_in_child_app')
+          .eq('user_id', user.id),
+        supabase
+          .from('cas_fetch_log')
+          .select('fetched_at')
+          .eq('user_id', user.id)
+          .eq('status', 'success')
+          .order('fetched_at', { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ])
 
-      if (!visibleFunds?.length) {
-        setPortfolioTotal({ rupees: 0, count: 0 })
+      const allFunds    = fundsResult.data || []
+      const visibleFunds = allFunds.filter(f => f.show_in_child_app)
+
+      if (allFunds.length === 0) {
+        setPortfolioTotal({ rupees: 0, count: 0, last_updated: null })
         return
       }
 
-      const visibleIsins = new Set(visibleFunds.map(f => f.isin))
+      const total      = visibleFunds.reduce((sum, f) => sum + (parseFloat(f.current_value) || 0), 0)
+      const lastUpdated = logResult.data?.fetched_at || null
 
-      // 2. Get latest snapshot to compute ₹ total
-      const { data: snap } = await supabase
-        .from('portfolio_snapshots')
-        .select('raw_json')
-        .eq('parent_id', user.id)
-        .order('fetched_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-
-      if (!snap) {
-        setPortfolioTotal({ rupees: 0, count: visibleFunds.length })
-        return
-      }
-
-      // Sum value of visible schemes from snapshot
-      let total = 0
-      for (const folio of (snap.raw_json?.folios || [])) {
-        for (const scheme of (folio.schemes || [])) {
-          if (visibleIsins.has(scheme.isin)) {
-            total += parseFloat(scheme.value ?? scheme.valuation?.value ?? 0) || 0
-          }
-        }
-      }
-
-      setPortfolioTotal({ rupees: total, count: visibleFunds.length })
+      setPortfolioTotal({ rupees: total, count: visibleFunds.length, last_updated: lastUpdated })
     }
 
     loadPortfolio()
@@ -333,6 +321,11 @@ export default function ParentDashboard() {
           </div>
           <div className="card__sub">
             {`${portfolioTotal.count} fund${portfolioTotal.count !== 1 ? 's' : ''} shared with ${child?.name || 'your child'}`}
+            {portfolioTotal.last_updated && (
+              <span style={{ display: 'block', fontSize: '11px', marginTop: '2px', opacity: 0.7 }}>
+                Updated {new Date(portfolioTotal.last_updated).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </span>
+            )}
           </div>
         </div>
       )}

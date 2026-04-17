@@ -30,11 +30,6 @@ export default function Login() {
     setLoading(false)
 
     if (signInError) {
-      // Supabase returns "Email not confirmed" for unverified accounts
-      if (signInError.message.toLowerCase().includes('email not confirmed')) {
-        navigate('/verify-email', { state: { email: form.email.trim().toLowerCase() } })
-        return
-      }
       setError('Incorrect email or password.')
       return
     }

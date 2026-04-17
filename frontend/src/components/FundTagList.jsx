@@ -9,37 +9,42 @@ function badgeClass(type) {
   return { Equity: 'equity', Debt: 'debt', Hybrid: 'hybrid' }[type] || 'other'
 }
 
+function fmtInr(n) {
+  if (n == null || isNaN(n)) return null
+  return `₹${Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
+}
+
 export default function FundTagList({ funds, onUpdate }) {
-  const [toggling, setToggling] = useState({}) // { isin: true } while toggling
+  const [toggling, setToggling] = useState({}) // { id: true } while toggling
 
-  async function handleToggle(isin, newValue) {
-    setToggling(t => ({ ...t, [isin]: true }))
+  async function handleToggle(fund, newValue) {
+    setToggling(t => ({ ...t, [fund.id]: true }))
 
-    // Optimistic update via parent callback
-    onUpdate(isin, newValue)
+    // Optimistic update
+    onUpdate(fund.id, newValue)
 
-    // Persist via backend (auth header added automatically via supabase session)
     const { data: { session } } = await supabase.auth.getSession()
-    await fetch(`${BACKEND_URL}/api/casparser/fund-tags/${encodeURIComponent(isin)}`, {
+    await fetch(`${BACKEND_URL}/api/cas/funds/${encodeURIComponent(fund.id)}`, {
       method:  'PATCH',
       headers: {
         'Content-Type':  'application/json',
         'Authorization': `Bearer ${session?.access_token}`,
       },
-      body: JSON.stringify({ is_visible_to_child: newValue }),
+      body: JSON.stringify({ show_in_child_app: newValue }),
     })
 
-    setToggling(t => ({ ...t, [isin]: false }))
+    setToggling(t => ({ ...t, [fund.id]: false }))
   }
 
-  // Group by fund type
+  // Group by scheme_type
   const grouped = {}
   for (const f of funds) {
-    if (!grouped[f.fund_type]) grouped[f.fund_type] = []
-    grouped[f.fund_type].push(f)
+    const key = f.scheme_type || 'Other'
+    if (!grouped[key]) grouped[key] = []
+    grouped[key].push(f)
   }
 
-  const visibleCount = funds.filter(f => f.is_visible_to_child).length
+  const visibleCount = funds.filter(f => f.show_in_child_app).length
 
   return (
     <div>
@@ -64,30 +69,38 @@ export default function FundTagList({ funds, onUpdate }) {
             </span>
           </div>
 
-          {grouped[type].map(fund => (
-            <div key={fund.isin} className="fund-row">
-              <div>
-                <div className="fund-row__name">{fund.fund_name}</div>
-                <div className="fund-row__isin">{fund.isin}</div>
-              </div>
+          {grouped[type].map(fund => {
+            const value = fmtInr(fund.current_value)
+            return (
+              <div key={fund.id} className="fund-row">
+                <div className="fund-row__info">
+                  <div className="fund-row__name">{fund.fund_name}</div>
+                  {fund.amc && (
+                    <div className="fund-row__isin">{fund.amc}</div>
+                  )}
+                  {value && (
+                    <div className="fund-row__value">{value}</div>
+                  )}
+                </div>
 
-              <div className="toggle-wrap">
-                <span className="toggle-label">
-                  {fund.is_visible_to_child ? 'Shared' : 'Hidden'}
-                </span>
-                <label className="toggle" aria-label={`Share ${fund.fund_name}`}>
-                  <input
-                    type="checkbox"
-                    checked={fund.is_visible_to_child}
-                    disabled={!!toggling[fund.isin]}
-                    onChange={e => handleToggle(fund.isin, e.target.checked)}
-                  />
-                  <span className="toggle__track" />
-                  <span className="toggle__thumb" />
-                </label>
+                <div className="toggle-wrap">
+                  <span className="toggle-label">
+                    {fund.show_in_child_app ? 'Shared' : 'Hidden'}
+                  </span>
+                  <label className="toggle" aria-label={`Share ${fund.fund_name}`}>
+                    <input
+                      type="checkbox"
+                      checked={fund.show_in_child_app}
+                      disabled={!!toggling[fund.id]}
+                      onChange={e => handleToggle(fund, e.target.checked)}
+                    />
+                    <span className="toggle__track" />
+                    <span className="toggle__thumb" />
+                  </label>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       ))}
     </div>

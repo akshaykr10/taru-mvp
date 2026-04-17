@@ -11,11 +11,10 @@ const TABS = [
   { id: 'pdf',    label: '📄 Upload PDF CAS'    },
 ]
 
-// Lite plan SDK config — matches CLAUDE.md exactly. Never change these flags.
 const SDK_CONFIG = {
-  enableGenerator: false,  // Lite plan
-  enableCdslFetch: false,  // Lite plan
-  enableInbox:     false,  // Lite plan
+  enableGenerator: true,   // CAMS/KFintech email-based fetch
+  enableCdslFetch: false,
+  enableInbox:     false,
 }
 
 async function getAuthHeaders() {
@@ -23,12 +22,20 @@ async function getAuthHeaders() {
   return { Authorization: `Bearer ${session?.access_token}` }
 }
 
+function fmtDate(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 export default function ParentPortfolio() {
   const [activeTab,    setActiveTab]    = useState('widget')
   const [funds,        setFunds]        = useState([])
   const [loadingFunds, setLoadingFunds] = useState(true)
 
-  // Shown at top of page when the SDK falls back to the PDF tab
+  // Rate-limit state — loaded once on mount
+  const [rateLimit, setRateLimit] = useState(null) // null = loading
+
+  // Shown at top when SDK falls back to PDF tab
   const [fallbackMsg, setFallbackMsg] = useState('')
 
   // ── Widget tab state ───────────────────────────────────────
@@ -49,46 +56,62 @@ export default function ParentPortfolio() {
 
   const fileInputRef = useRef(null)
 
-  // ── Load existing fund tags on mount ───────────────────────
-  useEffect(() => { loadFunds() }, [])
+  // ── Load status + funds on mount ───────────────────────────
+  useEffect(() => {
+    loadStatus()
+    loadFunds()
+  }, [])
+
+  async function loadStatus() {
+    try {
+      const headers = await getAuthHeaders()
+      const res  = await fetch(`${BACKEND_URL}/api/cas/status`, { headers })
+      const data = await res.json()
+      if (res.ok) setRateLimit(data)
+    } catch {
+      setRateLimit({ is_rate_limited: false, fund_count: 0 })
+    }
+  }
 
   async function loadFunds() {
-    console.log('3. Fetching funds from DB...')
     setLoadingFunds(true)
     try {
       const headers = await getAuthHeaders()
-      const res  = await fetch(`${BACKEND_URL}/api/casparser/fund-tags`, { headers })
+      const res  = await fetch(`${BACKEND_URL}/api/cas/funds`, { headers })
       const data = await res.json()
-      if (res.ok) setFunds(data.fund_tags || [])
+      if (res.ok) setFunds(data.funds || [])
     } catch {
-      // Silent — fund list stays as-is; user can refresh the page
+      // Silent — fund list stays as-is
     } finally {
       setLoadingFunds(false)
     }
   }
 
-  function handleFundUpdate(isin, newValue) {
-    setFunds(prev => prev.map(f => f.isin === isin ? { ...f, is_visible_to_child: newValue } : f))
+  function handleFundUpdate(id, newValue) {
+    setFunds(prev => prev.map(f => f.id === id ? { ...f, show_in_child_app: newValue } : f))
   }
 
   // ── Widget: fetch short-lived access token ─────────────────
-  // Fetch once per tab visit, only if we don't already have one.
-  // The master API key never leaves the backend.
   useEffect(() => {
     if (activeTab !== 'widget') return
-    if (widgetToken || widgetTokenLoading) return  // already available
+    if (rateLimit?.is_rate_limited) return
+    if (widgetToken || widgetTokenLoading) return
 
     async function fetchToken() {
       setWidgetTokenLoading(true)
       setWidgetTokenError('')
       try {
         const headers = await getAuthHeaders()
-        const res  = await fetch(`${BACKEND_URL}/api/casparser/token`, {
+        const res  = await fetch(`${BACKEND_URL}/api/cas/token`, {
           method: 'POST',
           headers,
         })
         const body = await res.json()
 
+        if (res.status === 429) {
+          setRateLimit(body)
+          return
+        }
         if (!res.ok || !body.access_token) {
           setWidgetTokenError(body.error || 'Could not get a Portfolio Connect token.')
           return
@@ -102,17 +125,11 @@ export default function ParentPortfolio() {
     }
 
     fetchToken()
-  // widgetToken / widgetTokenLoading intentionally absent from deps — we only
-  // want this to fire on tab switch, and the guard inside handles re-entry.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab])
+  }, [activeTab, rateLimit?.is_rate_limited])
 
-  // ── Widget: SDK onSuccess callback ─────────────────────────
-  // Called by the SDK with the fully-parsed CAS data.
-  // We forward it to our backend pipeline which stores the snapshot and
-  // upserts fund_tags. The master API key is never involved here.
+  // ── Widget: SDK onSuccess ──────────────────────────────────
   async function handleWidgetSuccess(data) {
-    // Treat SDK-reported parse failures as errors — don't silently store bad data
     if (data?.status === 'failed') {
       setWidgetError('Portfolio Connect returned a failed parse. Try the PDF upload instead.')
       return
@@ -126,10 +143,10 @@ export default function ParentPortfolio() {
         ...(await getAuthHeaders()),
         'Content-Type': 'application/json',
       }
-      const res = await fetch(`${BACKEND_URL}/api/casparser/process-widget`, {
+      const res  = await fetch(`${BACKEND_URL}/api/cas/save`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ data }),
+        body:   JSON.stringify(data),
       })
       const body = await res.json()
 
@@ -139,7 +156,7 @@ export default function ParentPortfolio() {
       }
 
       setWidgetDone(true)
-      await loadFunds()
+      await Promise.all([loadFunds(), loadStatus()])
     } catch {
       setWidgetError('Network error saving your portfolio. Try again.')
     } finally {
@@ -147,8 +164,7 @@ export default function ParentPortfolio() {
     }
   }
 
-  // ── Widget: SDK onError callback ───────────────────────────
-  // The SDK hit an unrecoverable error — switch the user to the PDF tab.
+  // ── Widget: SDK onError ────────────────────────────────────
   function handleWidgetError(err) {
     console.error('[PortfolioConnect] SDK error:', err?.code, err?.message)
     setFallbackMsg(
@@ -157,13 +173,12 @@ export default function ParentPortfolio() {
     setActiveTab('pdf')
   }
 
-  // ── Widget: manual fallback CTA ────────────────────────────
   function switchToPdf() {
     setFallbackMsg('')
     setActiveTab('pdf')
   }
 
-  // ── PDF: drag-and-drop handlers ────────────────────────────
+  // ── PDF: drag-and-drop ─────────────────────────────────────
   function handleDragOver(e)  { e.preventDefault(); setDragging(true)  }
   function handleDragLeave()  { setDragging(false) }
   function handleDrop(e) {
@@ -174,7 +189,7 @@ export default function ParentPortfolio() {
     else setUploadError('Please drop a PDF file.')
   }
 
-  const MAX_PDF_BYTES = 5 * 1024 * 1024 // 5 MB — matches CASParser's upstream limit
+  const MAX_PDF_BYTES = 5 * 1024 * 1024
 
   function pickFile(f) {
     if (f.size > MAX_PDF_BYTES) {
@@ -200,28 +215,30 @@ export default function ParentPortfolio() {
 
     try {
       const headers = await getAuthHeaders()
-      console.log('1. Sending PDF to backend...')
-      const res  = await fetch(`${BACKEND_URL}/api/casparser/parse-pdf`, {
+      const res  = await fetch(`${BACKEND_URL}/api/cas/upload`, {
         method: 'POST',
         headers,
         body:   form,
       })
-      console.log('2. Backend Response Status:', res.status)
       const data = await res.json()
 
+      if (res.status === 429) {
+        setRateLimit(data)
+        setUploadError('') // rate limit banner handles messaging
+        return
+      }
       if (!res.ok) {
         setUploadError(data.error || 'Failed to parse PDF. Please try again.')
         return
       }
 
-      // Clear any lingering error banners from previous attempts or widget failures
       setUploadError('')
       setFallbackMsg('')
       setWidgetError('')
       setFile(null)
       setPassword('')
       setUploadDone(true)
-      await loadFunds()  // loadFunds handles its own errors — won't overwrite success state
+      await Promise.all([loadFunds(), loadStatus()])
     } catch {
       setUploadError('Network error. Check your connection and try again.')
     } finally {
@@ -229,19 +246,28 @@ export default function ParentPortfolio() {
     }
   }
 
-  // ── Tab switch helper ──────────────────────────────────────
+  // ── Tab switch ─────────────────────────────────────────────
   function handleTabSwitch(id) {
     setActiveTab(id)
-    // Clear transient state when switching
     setUploadError('')
     setUploadDone(false)
     setWidgetError('')
     if (id !== 'pdf') setFallbackMsg('')
   }
 
+  const isRateLimited = rateLimit?.is_rate_limited === true
+
   return (
     <div className="page">
       <h1 className="page-title">Portfolio</h1>
+
+      {/* Rate-limit banner */}
+      {isRateLimited && (
+        <div className="import-rate-limit-banner">
+          Portfolio last updated on {fmtDate(rateLimit.last_fetched_at)}.
+          Next refresh available on {fmtDate(rateLimit.next_available_at)}.
+        </div>
+      )}
 
       {/* Fallback notification — shown after SDK error redirects to PDF tab */}
       {fallbackMsg && (
@@ -274,7 +300,6 @@ export default function ParentPortfolio() {
       {activeTab === 'widget' && (
         <div className="card">
           {widgetDone ? (
-            /* ── Success ───────────────────────────────── */
             <div className="import-status">
               <div style={{ fontSize: '32px', marginBottom: 'var(--space-3)' }}>✅</div>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-success)' }}>
@@ -293,14 +318,12 @@ export default function ParentPortfolio() {
             </div>
 
           ) : widgetProcessing ? (
-            /* ── Processing (after SDK success, saving to backend) ── */
             <div className="import-status">
               <div className="import-status__spinner">⚙️</div>
               <div className="import-status__text">Saving your portfolio data…</div>
             </div>
 
           ) : (
-            /* ── Widget ready / loading / error ────────── */
             <>
               <div className="card__label">One-click import</div>
               <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6, margin: 'var(--space-2) 0 var(--space-4)' }}>
@@ -337,8 +360,7 @@ export default function ParentPortfolio() {
                   </button>
                 </div>
 
-              ) : widgetToken ? (
-                /* ── SDK rendered — token is ready ─────── */
+              ) : widgetToken && !isRateLimited ? (
                 <PortfolioConnect
                   accessToken={widgetToken}
                   config={SDK_CONFIG}
@@ -350,7 +372,7 @@ export default function ParentPortfolio() {
                       className="btn btn-navy"
                       style={{ width: '100%' }}
                       onClick={open}
-                      disabled={!isReady}
+                      disabled={!isReady || isRateLimited}
                       aria-label="Open Portfolio Connect"
                     >
                       {isReady ? 'Open Portfolio Connect' : 'Connecting…'}
@@ -358,10 +380,10 @@ export default function ParentPortfolio() {
                   )}
                 </PortfolioConnect>
 
-              ) : null}
+              ) : !isRateLimited ? null : null}
 
               <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: 'var(--space-3)', textAlign: 'center' }}>
-                Powered by CASParser · Lite plan · No PDF required
+                Powered by CASParser · No PDF required
               </p>
             </>
           )}
@@ -440,7 +462,7 @@ export default function ParentPortfolio() {
                 type="submit"
                 className="btn btn-navy"
                 style={{ width: '100%' }}
-                disabled={!file || uploading}
+                disabled={!file || uploading || isRateLimited}
               >
                 Parse portfolio
               </button>
