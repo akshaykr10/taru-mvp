@@ -88,7 +88,7 @@ app.get('/api/child/garden', async (req, res) => {
 
   const { data: learningState } = await supabase
     .from('learning_state')
-    .select('current_week, coins_total, xp_total, last_trigger_type')
+    .select('current_week, coins_total, xp_total, last_trigger_type, week_completed_at, current_week_started_at')
     .eq('child_id', child.id)
     .maybeSingle()
 
@@ -132,6 +132,29 @@ app.post('/api/child/week-complete', async (req, res) => {
   const { current_week, dinner_prompt, topic } = req.body
   if (!current_week || typeof current_week !== 'number') {
     return res.status(400).json({ error: 'current_week (number) is required' })
+  }
+
+  // Guard: read current DB state to enforce once-per-week rule
+  const { data: ls } = await supabase
+    .from('learning_state')
+    .select('week_completed_at, current_week_started_at')
+    .eq('child_id', child.id)
+    .maybeSingle()
+
+  // Already marked done this week — idempotent no-op
+  if (ls?.week_completed_at) {
+    return res.json({ ok: true, already_done: true })
+  }
+
+  // 7-day gate: only allow advancing if a week has passed since the week started
+  if (ls?.current_week_started_at) {
+    const startedAt    = new Date(ls.current_week_started_at)
+    const msElapsed    = Date.now() - startedAt.getTime()
+    const sevenDaysMs  = 7 * 24 * 60 * 60 * 1000
+    if (msElapsed < sevenDaysMs) {
+      const availableAt = new Date(startedAt.getTime() + sevenDaysMs).toISOString()
+      return res.status(429).json({ error: 'Week not ready yet', available_at: availableAt })
+    }
   }
 
   const now = new Date().toISOString()

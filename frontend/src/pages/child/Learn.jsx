@@ -29,8 +29,8 @@ function PennyIcon() {
 }
 
 // ── CurrentWeekCard ────────────────────────────────────────────
-function CurrentWeekCard({ weekContent, ageStage, weekNum, token, cardRef, onXpEarned }) {
-  const [markedDone,    setMarkedDone]    = useState(false)
+function CurrentWeekCard({ weekContent, ageStage, weekNum, token, cardRef, onXpEarned, weekCompletedAt }) {
+  const [markedDone,    setMarkedDone]    = useState(!!weekCompletedAt)
   const [showReward,    setShowReward]    = useState(false)
   const [advanceError,  setAdvanceError]  = useState(false)
 
@@ -179,7 +179,7 @@ function TriggerCard({ card }) {
  * @param {string}      props.token           - child JWT, forwarded to activity hook
  * @param {function}    props.onXpEarned      - callback when Mark as Done pressed
  */
-export default function Learn({ ageStage, currentWeek, lastTriggerType, token, onXpEarned }) {
+export default function Learn({ ageStage, currentWeek, lastTriggerType, weekCompletedAt, token, onXpEarned }) {
   const week        = currentWeek || 1
   const weekContent = getWeekContent(week)
 
@@ -221,6 +221,7 @@ export default function Learn({ ageStage, currentWeek, lastTriggerType, token, o
           token={token}
           cardRef={weekCardRef}
           onXpEarned={onXpEarned}
+          weekCompletedAt={weekCompletedAt}
         />
       ) : (
         <div ref={weekCardRef} className="learn-week-card learn-card--empty">

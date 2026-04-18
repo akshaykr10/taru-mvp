@@ -279,6 +279,7 @@ export default function ChildGarden() {
             ageStage={child.age_stage}
             currentWeek={learning_state?.current_week ?? 1}
             lastTriggerType={learning_state?.last_trigger_type ?? null}
+            weekCompletedAt={learning_state?.week_completed_at ?? null}
             token={token}
             onXpEarned={handleXpEarned}
           />
