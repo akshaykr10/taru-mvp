@@ -6,6 +6,7 @@ import { logActivity } from '../../lib/activity.js'
 import { useActivityOnView } from '../../hooks/useActivityOnView.js'
 import { BACKEND_URL } from '../../lib/api.js'
 import { getWeekContent } from '../../data/weeklyContent.js'
+import { getParentWeekPrompt } from '../../data/parentWeeklyPrompts.js'
 import '../../styles/parent.css'
 
 async function getAuthHeaders() {
@@ -53,12 +54,6 @@ function PortfolioEmptyState() {
       </div>
     </div>
   )
-}
-
-// Seed prompt shown before CASParser is connected (Step 4 will replace with real prompts)
-const SEED_PROMPT = {
-  week: 1,
-  text: `Ask your child: "If you had ₹1,000 right now, what's the first thing you'd do with it?" — don't correct, just listen.`,
 }
 
 function ChildOverview({ child, portfolioTotal, pendingCount }) {
@@ -149,6 +144,7 @@ export default function ParentDashboard() {
   const [portfolioTotal, setPortfolioTotal] = useState(null)
   const [loadingChild, setLoadingChild]     = useState(true)
   const [promptDone, setPromptDone]         = useState(false)
+  const [currentWeek, setCurrentWeek]       = useState(1)
   const [pendingApprovals, setPendingApprovals] = useState([])
   const [actioning, setActioning]           = useState({}) // { completionId: 'approve'|'reject' }
   const [dinnerPrompt, setDinnerPrompt]     = useState(null)  // conversation_log row | null
@@ -238,6 +234,35 @@ export default function ParentDashboard() {
         setLoadingChild(false)
       })
   }, [user?.id])
+
+  // Load child's current curriculum week from learning_state
+  useEffect(() => {
+    if (!child?.id) return
+    supabase
+      .from('learning_state')
+      .select('current_week')
+      .eq('child_id', child.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.current_week) setCurrentWeek(data.current_week)
+      })
+  }, [child?.id])
+
+  function handlePromptDone() {
+    setPromptDone(d => !d)
+    if (!promptDone && session?.access_token) {
+      const weekPrompt = getParentWeekPrompt(currentWeek)
+      logActivity('parent', 'weekly_prompt_marked_done', {
+        authToken: session.access_token,
+        metadata: {
+          week:             currentWeek,
+          topic:            weekPrompt.topic,
+          portfolio_status: weekPrompt.portfolioStatus,
+          child_id:         child?.id ?? null,
+        },
+      })
+    }
+  }
 
   // Load tagged portfolio total from cas_funds (new production tables).
   // Sum current_value directly from rows where show_in_child_app = true.
@@ -357,22 +382,35 @@ export default function ParentDashboard() {
         <span className="section-title">Weekly Learning</span>
       </div>
 
-      <div
-        ref={promptCardRef}
-        className="prompt-card"
-      >
-        <div className="prompt-card__week">Week {SEED_PROMPT.week}</div>
-        <p className="prompt-card__text">{SEED_PROMPT.text}</p>
-        <div className="prompt-card__action">
-          <button
-            className="btn btn-outline"
-            style={{ fontSize: '13px', height: '36px', padding: '0 var(--space-4)' }}
-            onClick={() => setPromptDone(d => !d)}
-          >
-            {promptDone ? '✓ Done' : 'Mark as done'}
-          </button>
-        </div>
-      </div>
+      {(() => {
+        const weekPrompt = getParentWeekPrompt(currentWeek)
+        return (
+          <div ref={promptCardRef} className="prompt-card">
+            <div className="prompt-card__week">Week {currentWeek}</div>
+            <p className="prompt-card__text">{weekPrompt.dinnerPrompt}</p>
+            <p className="prompt-card__topic">This week: {weekPrompt.topic}</p>
+            {weekPrompt.portfolioStatus === 'REQUIRED' && (
+              <div className="prompt-card__portfolio-nudge--required">
+                📈 Open your portfolio together — this week's prompt connects directly to what's happening there.
+              </div>
+            )}
+            {weekPrompt.portfolioStatus === 'OPTIONAL' && (
+              <p className="prompt-card__portfolio-nudge--optional">
+                📊 If you've been tracking your portfolio, this is a good week to look at it together.
+              </p>
+            )}
+            <div className="prompt-card__action">
+              <button
+                className="btn btn-outline"
+                style={{ fontSize: '13px', height: '36px', padding: '0 var(--space-4)' }}
+                onClick={handlePromptDone}
+              >
+                {promptDone ? '✓ Done' : 'Mark as done'}
+              </button>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Pending task approvals */}
       <div className="section-header">

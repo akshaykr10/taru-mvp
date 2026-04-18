@@ -203,6 +203,33 @@
   margin-bottom: var(--space-4);
 }
 
+.prompt-card__topic {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: calc(-1 * var(--space-2));
+  margin-bottom: var(--space-3);
+}
+
+.prompt-card__portfolio-nudge--required {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  background: #DCFCE7;
+  color: #15803D;
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  margin-bottom: var(--space-4);
+}
+
+.prompt-card__portfolio-nudge--optional {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+  margin-bottom: var(--space-4);
+}
+
 .prompt-card__action {
   display: flex;
   justify-content: flex-end;
