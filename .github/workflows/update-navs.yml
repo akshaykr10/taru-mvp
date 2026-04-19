@@ -1,0 +1,15 @@
+name: Daily NAV Update
+
+on:
+  schedule:
+    - cron: "0 17 * * *"  # 17:00 UTC = 22:30 IST
+  workflow_dispatch:       # allow manual trigger from Actions tab
+
+jobs:
+  update-navs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: POST /api/cron/update-navs
+        run: |
+          curl -fsS -X POST "${{ secrets.BACKEND_URL }}/api/cron/update-navs" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
