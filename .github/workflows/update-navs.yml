@@ -2,7 +2,7 @@ name: Daily NAV Update
 
 on:
   schedule:
-    - cron: "0 17 * * *"  # 17:00 UTC = 22:30 IST
+    - cron: "0 20 * * *"  # 20:00 UTC = 01:30 IST
   workflow_dispatch:       # allow manual trigger from Actions tab
 
 jobs:
