@@ -7,6 +7,7 @@ const router = express.Router()
 // Called by the Render daily cron job (or manually for debugging).
 // Protected by CRON_SECRET — no Supabase auth involved.
 router.post('/update-navs', async (req, res) => {
+  console.log('[cron] hit: POST /api/cron/update-navs')
   const secret = process.env.CRON_SECRET
   if (!secret) {
     console.error('[cron] CRON_SECRET env var is not set')
