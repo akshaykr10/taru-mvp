@@ -378,6 +378,14 @@ Child endpoints: `X-Child-Token: <child_jwt>` validated against JWT signature + 
 | Method | Path | Auth | Action |
 |---|---|---|---|
 | GET | `/garden` | Child token | Fetch child record, tagged portfolio total, learning state |
+| POST | `/week-complete` | Child token | Mark current week done, upsert `conversation_log`, advance week after 7-day gate |
+
+### Cron — `/api/cron/*`
+| Method | Path | Auth | Action |
+|---|---|---|---|
+| POST | `/update-navs` | `CRON_SECRET` bearer token | Fetch AMFI NAVAll.txt, update `nav` + `current_value` in `cas_funds` for all matched ISINs |
+
+Cron is called daily at 22:30 IST (17:00 UTC) by the Render cron job defined in `render.yaml`. Can also be triggered manually with `Authorization: Bearer <CRON_SECRET>`.
 
 ### Activity — `/api/activity`
 | Method | Path | Auth | Action |
@@ -575,11 +583,29 @@ Backend validates `X-Child-Token` against both JWT signature and `children.child
 ### ✅ tokens.css Strictly Enforced
 All new components added during the Phase 0 sprint (cooldown badge, next milestone badge, Penny bubble wrapper, XP button done state) use only CSS variable references. Confirmed: no hardcoded hex, rgba, or font-family literals in any new rule.
 
+### ✅ Mark-as-Done Persistence Fixed — Child Learn Tab
+**Problem:** The backend's `POST /api/child/week-complete` returned `429` (week not ready) *before* writing `week_completed_at` to `learning_state`. On refresh, `weekCompletedAt` was null → button reset to active.
+
+**Fix (`backend/src/index.js`):** Steps 1 & 2 (write `week_completed_at` + upsert `conversation_log`) now run unconditionally before the 7-day gate. The gate only controls week advancement (Step 4). The response for within-7-days is now HTTP 200 `{ ok: true, next_week: null, available_at }` instead of 429.
+
+### ✅ Mark-as-Done Persistence Fixed — Parent Weekly Learning Card
+**Problem:** `promptDone` in `Dashboard.jsx` was pure `useState(false)` — never read from or written to the DB. Every refresh reset it to unchecked.
+
+**Fix (`frontend/src/pages/parent/Dashboard.jsx`):**
+- `promptDone` is now initialised by querying `conversation_log` for `parent_id + week_number` with `marked_done_at IS NOT NULL`, chained after the existing `learning_state` fetch.
+- `handlePromptDone` is now `async` — checks for an existing row, then UPDATEs `marked_done_at` or INSERTs a new row.
+
+### ✅ Daily NAV Update Job Added
+New files: `backend/src/jobs/updateNavs.js` and `backend/src/routes/cron.js`.
+- Fetches AMFI NAVAll.txt (pipe-delimited), builds an `{ isin → nav }` map, and updates `nav` + `current_value` in `cas_funds` via a single batched upsert.
+- Endpoint `POST /api/cron/update-navs` protected by `CRON_SECRET` bearer token.
+- Scheduled via Render cron job in `render.yaml` at `0 17 * * *` (22:30 IST).
+- Skips ISINs absent from the feed (stale/delisted funds are left untouched).
+
 ### ⚠️ Known Limitations (Phase 0, by design)
 - One child per family — multiple children out of scope
-- `learning_state.current_week` does not auto-advance — increment is manual / future sprint
 - `last_trigger_type` stores only the most recent trigger; history is not surfaced in the UI
-- XP total is updated in local React state on "Mark as done" — not persisted to DB until next session load (acceptable for Phase 0 pilot)
+- XP total (`xp_total`) is updated optimistically in local React state on "Mark as done" — the actual DB column is incremented only via task approval, not week completion (acceptable for Phase 0 pilot)
 
 ---
 
@@ -601,6 +627,7 @@ SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=    # server only — never in frontend
 CASPARSER_API_KEY=             # server only — use sandbox key in dev
 CHILD_TOKEN_SECRET=            # JWT signing secret for child tokens
+CRON_SECRET=                   # bearer token protecting POST /api/cron/update-navs
 PORT=3001
 
 # frontend/.env
@@ -608,6 +635,8 @@ VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=        # anon key only — never service role
 VITE_API_BASE_URL=http://localhost:3001
 ```
+
+**Render cron job:** `render.yaml` defines a `taru-nav-update` cron service that runs `updateAllNavs()` daily at 17:00 UTC. Add `CRON_SECRET` (and all other backend env vars) to both the web service and cron service in the Render dashboard, or use a shared Environment Group.
 
 **CASParser sandbox key:** `sandbox-with-json-responses` — always use in dev to avoid consuming production API credits.
 

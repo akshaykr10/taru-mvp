@@ -1,0 +1,32 @@
+# Render deployment config — web service + daily NAV cron job.
+# Env vars (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, CHILD_TOKEN_SECRET,
+# CASPARSER_API_KEY, CRON_SECRET, FRONTEND_URL) must be set in the Render dashboard
+# under each service's Environment tab, or via a shared Environment Group.
+
+services:
+  - type: web
+    name: taru-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: PORT
+        value: 3001
+
+crons:
+  - name: taru-nav-update
+    runtime: node
+    rootDir: backend
+    # 17:00 UTC = 22:30 IST. AMFI publishes NAVs after market close; running at
+    # 22:30 IST ensures the feed is populated before children check in the evening.
+    schedule: "0 17 * * *"
+    buildCommand: npm install
+    startCommand: >
+      node -e "
+        require('dotenv').config();
+        const { updateAllNavs } = require('./src/jobs/updateNavs');
+        updateAllNavs()
+          .then(s => { console.log('[nav-update] done:', JSON.stringify(s)); process.exit(0); })
+          .catch(e => { console.error('[nav-update] FAILED:', e.message); process.exit(1); });
+      "

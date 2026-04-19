@@ -9,6 +9,7 @@ const casRouter        = require('./routes/cas')
 const activityRouter   = require('./routes/activity')
 const childrenRouter   = require('./routes/children')
 const tasksRouter      = require('./routes/tasks')
+const cronRouter       = require('./routes/cron')
 
 const app  = express()
 const PORT = process.env.PORT || 3001
@@ -49,6 +50,9 @@ app.use('/api/children', requireParentAuth, childrenRouter)
 // Tasks — mixed auth: child endpoints validate X-Child-Token internally;
 // parent endpoints require Supabase JWT (middleware applied per-route in router)
 app.use('/api/tasks', tasksRouter)
+
+// Cron — protected by CRON_SECRET bearer token, no Supabase auth
+app.use('/api/cron', cronRouter)
 
 // ── Child garden data (Step 8) ────────────────────────────────
 // Token-gated: child sees only visible fund_tags for their parent.
@@ -134,7 +138,7 @@ app.post('/api/child/week-complete', async (req, res) => {
     return res.status(400).json({ error: 'current_week (number) is required' })
   }
 
-  // Guard: read current DB state to enforce once-per-week rule
+  // Guard: read current DB state
   const { data: ls } = await supabase
     .from('learning_state')
     .select('week_completed_at, current_week_started_at')
@@ -146,20 +150,10 @@ app.post('/api/child/week-complete', async (req, res) => {
     return res.json({ ok: true, already_done: true })
   }
 
-  // 7-day gate: only allow advancing if a week has passed since the week started
-  if (ls?.current_week_started_at) {
-    const startedAt    = new Date(ls.current_week_started_at)
-    const msElapsed    = Date.now() - startedAt.getTime()
-    const sevenDaysMs  = 7 * 24 * 60 * 60 * 1000
-    if (msElapsed < sevenDaysMs) {
-      const availableAt = new Date(startedAt.getTime() + sevenDaysMs).toISOString()
-      return res.status(429).json({ error: 'Week not ready yet', available_at: availableAt })
-    }
-  }
-
   const now = new Date().toISOString()
 
-  // Step 1: Mark week_completed_at on learning_state
+  // Step 1: Persist week_completed_at now — before the 7-day gate — so the
+  // button stays disabled on refresh even when the week hasn't advanced yet.
   const { error: s1Err } = await supabase
     .from('learning_state')
     .update({ week_completed_at: now })
@@ -197,7 +191,17 @@ app.post('/api/child/week-complete', async (req, res) => {
       if (error) console.error('[week-complete] step 3 error:', error.message)
     })
 
-  // Step 4: Advance current_week — this is the critical step
+  // 7-day gate — mark-done is already persisted above; only week advancement is gated.
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
+  if (ls?.current_week_started_at) {
+    const msElapsed = Date.now() - new Date(ls.current_week_started_at).getTime()
+    if (msElapsed < sevenDaysMs) {
+      const availableAt = new Date(new Date(ls.current_week_started_at).getTime() + sevenDaysMs).toISOString()
+      return res.json({ ok: true, next_week: null, available_at: availableAt })
+    }
+  }
+
+  // Step 4: Advance current_week — only reached after 7 days have elapsed
   const { error: s4Err } = await supabase
     .from('learning_state')
     .update({

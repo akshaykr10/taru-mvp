@@ -235,23 +235,64 @@ export default function ParentDashboard() {
       })
   }, [user?.id])
 
-  // Load child's current curriculum week from learning_state
+  // Load child's current curriculum week from learning_state, then check whether
+  // the parent has already marked this week's prompt as done in conversation_log.
   useEffect(() => {
-    if (!child?.id) return
+    if (!child?.id || !user?.id) return
     supabase
       .from('learning_state')
       .select('current_week')
       .eq('child_id', child.id)
       .maybeSingle()
-      .then(({ data }) => {
-        if (data?.current_week) setCurrentWeek(data.current_week)
-      })
-  }, [child?.id])
+      .then(async ({ data }) => {
+        const week = data?.current_week || 1
+        setCurrentWeek(week)
 
-  function handlePromptDone() {
-    setPromptDone(d => !d)
-    if (!promptDone && session?.access_token) {
-      const weekPrompt = getParentWeekPrompt(currentWeek)
+        const { data: log } = await supabase
+          .from('conversation_log')
+          .select('marked_done_at')
+          .eq('parent_id', user.id)
+          .eq('week_number', week)
+          .not('marked_done_at', 'is', null)
+          .limit(1)
+          .maybeSingle()
+        setPromptDone(!!log)
+      })
+  }, [child?.id, user?.id])
+
+  async function handlePromptDone() {
+    const newDone = !promptDone
+    setPromptDone(newDone)
+
+    const weekPrompt  = getParentWeekPrompt(currentWeek)
+    const nowIso      = new Date().toISOString()
+
+    // Check for an existing row for this week so we can update vs insert
+    const { data: existing } = await supabase
+      .from('conversation_log')
+      .select('id')
+      .eq('parent_id', user.id)
+      .eq('week_number', currentWeek)
+      .limit(1)
+      .maybeSingle()
+
+    if (existing) {
+      await supabase
+        .from('conversation_log')
+        .update({ marked_done_at: newDone ? nowIso : null })
+        .eq('id', existing.id)
+    } else if (newDone) {
+      await supabase
+        .from('conversation_log')
+        .insert({
+          parent_id:      user.id,
+          week_number:    currentWeek,
+          prompt_text:    weekPrompt.dinnerPrompt,
+          marked_done_at: nowIso,
+        })
+    }
+
+    if (newDone && session?.access_token) {
       logActivity('parent', 'weekly_prompt_marked_done', {
         authToken: session.access_token,
         metadata: {
