@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node generate_weekly_content.js)",
+      "Bash(gh run *)",
+      "Bash(netlify status *)",
+      "Bash(gh api *)",
+      "Bash(node -e ' *)",
+      "Bash(node --input-type=module)",
+      "Bash(npx tsc *)"
+    ]
+  }
+}
