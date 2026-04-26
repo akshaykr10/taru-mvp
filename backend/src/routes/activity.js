@@ -25,10 +25,14 @@ router.post('/', async (req, res) => {
   const authHeader = req.headers.authorization
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.slice(7)
-    const { data: { user } } = await sb.auth.getUser(token)
-    if (user) {
-      parentId  = user.id
-      actorType = 'parent'
+    try {
+      const { data: { user } } = await sb.auth.getUser(token)
+      if (user) {
+        parentId  = user.id
+        actorType = 'parent'
+      }
+    } catch (_) {
+      return res.status(401).json({ error: 'Failed to validate session' })
     }
   }
 

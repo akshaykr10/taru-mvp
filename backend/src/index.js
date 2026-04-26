@@ -133,17 +133,16 @@ app.post('/api/child/week-complete', async (req, res) => {
     return res.status(401).json({ error: 'Child token revoked or invalid' })
   }
 
-  const { current_week, dinner_prompt, topic } = req.body
-  if (!current_week || typeof current_week !== 'number') {
-    return res.status(400).json({ error: 'current_week (number) is required' })
-  }
+  const { dinner_prompt, topic } = req.body
 
   // Guard: read current DB state
   const { data: ls } = await supabase
     .from('learning_state')
-    .select('week_completed_at, current_week_started_at')
+    .select('current_week, week_completed_at, current_week_started_at')
     .eq('child_id', child.id)
     .maybeSingle()
+
+  const current_week = ls?.current_week ?? 1
 
   // Already marked done this week — idempotent no-op
   if (ls?.week_completed_at) {

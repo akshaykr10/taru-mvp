@@ -15,9 +15,10 @@
 9. [Database Schema](#9-database-schema)
 10. [Design System](#10-design-system)
 11. [Activity Tracking](#11-activity-tracking)
-12. [Code Health & Edge Cases](#12-code-health--edge-cases)
-13. [Dev Environment](#13-dev-environment)
-14. [Out of Scope — Phase 0](#14-out-of-scope--phase-0)
+12. [Security Audit — Session Fixes](#12-security-audit--session-fixes)
+13. [Code Health & Edge Cases](#13-code-health--edge-cases)
+14. [Dev Environment](#14-dev-environment)
+15. [Out of Scope — Phase 0](#15-out-of-scope--phase-0)
 
 ---
 
@@ -546,7 +547,51 @@ fetch('/api/activity', {
 
 ---
 
-## 12. Code Health & Edge Cases
+## 12. Security Audit — Session Fixes
+
+Full RLS and route authentication audit completed. All findings resolved.
+
+### ✅ Client-controlled week advancement patched (`/api/child/week-complete`)
+**Problem (MEDIUM):** `current_week` was read from `req.body` and used to advance `learning_state.current_week`. A child could send `current_week: 999` to skip to week 1000.
+
+**Fix (`backend/src/index.js`):** `current_week` is now ignored from the request body entirely. It is read from `learning_state.current_week` in the DB after child authentication, before any write occurs.
+
+### ✅ TOCTOU gap closed in task PATCH and DELETE (`/api/tasks/:id`)
+**Problem (LOW):** `ownedRule()` verified ownership, but the terminal `.update()` and `.delete()` queries filtered only by `id`. The service role bypasses RLS, so the final query had no parent scoping.
+
+**Fix (`backend/src/routes/tasks.js`):** Added `.eq('parent_id', req.parentId)` to both the terminal UPDATE and DELETE queries.
+
+### ✅ `conversation_log` RLS tightened — child_id ownership enforced
+**Problem (LOW):** The `FOR ALL` policy checked `parent_id = auth.uid()` but not whether the `child_id` being written belongs to that parent. A parent could insert a row referencing another parent's child.
+
+**Fix (`supabase/migrations/006_conversation_log_child_rls.sql`):** Drops and recreates the policy with `WITH CHECK` requiring `child_id IS NULL OR child_id IN (SELECT id FROM children WHERE parent_id = auth.uid())`.
+
+### ✅ `cas_funds` UPDATE policy — explicit WITH CHECK added
+**Problem (LOW):** The UPDATE policy had a `USING` clause but no `WITH CHECK`. PostgreSQL fills this implicitly, but the intent was not explicit.
+
+**Fix (`supabase/migrations/007_cas_funds_update_with_check.sql`):** Recreates the policy with `WITH CHECK (auth.uid() = user_id)` stated explicitly.
+
+### ✅ `conversation_log` upsert now has backing unique constraint
+**Problem (MEDIUM functional):** `POST /api/child/week-complete` uses `.upsert({ onConflict: 'parent_id,week_number' })` but no UNIQUE constraint existed — the upsert silently inserted duplicates instead of updating.
+
+**Fix (`supabase/migrations/008_conversation_log_unique_constraint.sql`):** Adds `CONSTRAINT uq_conversation_parent_week UNIQUE (parent_id, week_number)`.
+
+### ✅ `POST /api/activity` — try/catch added around parent JWT validation
+**Problem (LOW reliability):** `sb.auth.getUser(token)` was called without a try/catch. A malformed Supabase response would throw an uncaught exception in the async handler, causing the request to hang rather than returning 401.
+
+**Fix (`backend/src/routes/activity.js`):** Wrapped the `auth.getUser` call in a try/catch matching the existing pattern used for the child token path. Returns `401` on any error.
+
+### ✅ `resolveChildToken` — fail-closed warning comment added
+Added a prominent block comment above `resolveChildToken()` in `tasks.js` warning that it is the sole auth gate for child routes, must remain fail-closed, and that child routes have no middleware-level auth protection.
+
+### ✅ `.env.example` files sanitised
+Real production credentials (Supabase service role key, project URL, CHILD_TOKEN_SECRET) that were accidentally committed in example files have been replaced with `your_value_here` placeholders.
+
+> ⚠️ **Action required:** The previously committed service role key and CHILD_TOKEN_SECRET must be rotated in the Supabase dashboard and Render environment variables. The committed values are now invalid placeholders but the old secrets remain valid until rotated.
+
+---
+
+## 13. Code Health & Edge Cases
 
 ### ✅ 409 Conflict — Pending Task Button (patched)
 **Problem:** When `POST /api/tasks/:id/complete` returns `409` (a completion already exists in DB), `submitMsg[ruleId]` was set to `'pending'`. The `isPending` derivation only checked for `=== 'sent'`, leaving the "Done!" button re-clickable.
@@ -609,7 +654,7 @@ New files: `backend/src/jobs/updateNavs.js` and `backend/src/routes/cron.js`.
 
 ---
 
-## 13. Dev Environment
+## 14. Dev Environment
 
 Config stored at `.claude/launch.json`.
 
@@ -642,7 +687,7 @@ VITE_API_BASE_URL=http://localhost:3001
 
 ---
 
-## 14. Out of Scope — Phase 0
+## 15. Out of Scope — Phase 0
 
 Do not build any of the following. If a session starts drifting toward one, stop immediately.
 

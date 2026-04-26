@@ -34,6 +34,10 @@ function currentWeekStart() {
   return monday.toISOString()
 }
 
+// WARNING: This is the sole auth gate for child routes. It must remain
+// fail-closed (return null on any failure). Do not add fallback values
+// or default returns. Child routes in this file have no middleware-level
+// auth protection.
 /** Resolve child identity from X-Child-Token header. Returns null if invalid. */
 async function resolveChildToken(req) {
   const token = req.headers['x-child-token']
@@ -437,6 +441,7 @@ router.patch('/:id', requireParentAuth, async (req, res) => {
     .from('task_rules')
     .update(updates)
     .eq('id', req.params.id)
+    .eq('parent_id', req.parentId)
     .select('id, task_name, reward_coins, frequency, status, child_id, created_at')
     .single()
 
@@ -453,6 +458,7 @@ router.delete('/:id', requireParentAuth, async (req, res) => {
     .from('task_rules')
     .delete()
     .eq('id', req.params.id)
+    .eq('parent_id', req.parentId)
 
   if (error) return res.status(500).json({ error: 'Failed to delete task rule' })
   res.json({ ok: true })
