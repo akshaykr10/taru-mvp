@@ -106,7 +106,7 @@ export default function Landing() {
               </p>
               <div className="hero-cta-row">
                 <a href="#cta" className="btn primary">Join the waitlist</a>
-                <a href="#cta" className="btn ghost">Try the MVP &rarr;</a>
+                <Link to="/app/login" className="btn ghost">Try the MVP &rarr;</Link>
               </div>
               <div className="social-row">
                 <div className="avatars">
@@ -580,19 +580,17 @@ export default function Landing() {
         <div className="inner">
           <div className="f-left">
             <a href="#" className="logo">taru<span className="dot">.</span></a>
-            <div className="made-tag">
-              <span className="flag-dot"></span>
-              Made in India, for India
-            </div>
+            <div className="copy">&copy; 2026 Taru Money Pvt. Ltd.</div>
           </div>
           <div className="fnav">
             <a href="#how">How it works</a>
             <a href="#penny">Penny</a>
             <a href="#why">Why now</a>
-            <a href="#">Privacy</a>
-            <a href="#">Press</a>
           </div>
-          <div className="copy">&copy; 2026 Taru Money Pvt. Ltd.</div>
+          <div className="made-tag">
+            <span className="flag-dot"></span>
+            Made in India, for India
+          </div>
         </div>
       </footer>
 
