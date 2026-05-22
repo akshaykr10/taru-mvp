@@ -85,18 +85,31 @@
 
 /* ── Navbar ── */
 .landing-page nav.top {
-  position:         fixed;
-  inset:            0 0 auto 0;
-  z-index:          50;
-  backdrop-filter:  saturate(1.4) blur(14px);
-  -webkit-backdrop-filter: saturate(1.4) blur(14px);
-  background:       rgba(250, 248, 243, 0.75);
-  border-bottom:    1px solid transparent;
-  transition:       border-color .25s ease, background .25s ease;
+  position:      fixed;
+  inset:         0 0 auto 0;
+  z-index:       50;
+  /* Solid fallback — guarantees no bleed-through on mobile */
+  background:    #faf8f3;
+  border-bottom: 1px solid transparent;
+  transition:    border-color .25s ease, background .25s ease;
+}
+/* Progressive enhancement: frosted glass only where backdrop-filter works */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .landing-page nav.top {
+    background:               rgba(250, 248, 243, 0.92);
+    backdrop-filter:          saturate(1.4) blur(14px);
+    -webkit-backdrop-filter:  saturate(1.4) blur(14px);
+  }
 }
 .landing-page nav.top.scrolled {
-  border-bottom-color: var(--border);
-  background:          rgba(250, 248, 243, 0.9);
+  border-bottom-color: rgba(26, 61, 43, 0.10);
+  /* Solid in all cases once the user has scrolled */
+  background:          #faf8f3;
+}
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .landing-page nav.top.scrolled {
+    background: rgba(250, 248, 243, 0.97);
+  }
 }
 .landing-page nav.top .inner {
   max-width:       1200px;
@@ -550,7 +563,7 @@
 /* ── Section base ── */
 .landing-page section.block { padding: 120px 0; }
 .landing-page section.dark  { background: var(--forest); color: var(--cream); }
-.landing-page section.cream { background: var(--cream); }
+.landing-page section.cream { background-color: #faf8f3; } /* solid — no variable fallback risk */
 .landing-page section.mintbg { background: #eef6e6; }
 .landing-page section.white  { background: #ffffff; }
 
@@ -628,11 +641,11 @@
   gap:                   24px;
 }
 .landing-page .feature-card {
-  background:    white;
-  border:        1px solid var(--border);
-  border-radius: 24px;
-  padding:       36px;
-  box-shadow:    var(--shadow-sm);
+  background-color: #ffffff; /* explicit hex — no keyword/variable ambiguity */
+  border:           1px solid rgba(26, 61, 43, 0.10);
+  border-radius:    24px;
+  padding:          36px;
+  box-shadow:       0 1px 2px rgba(26,61,43,0.04);
 }
 .landing-page .feature-card h3 {
   font-family:    var(--serif);
@@ -679,9 +692,9 @@
 }
 
 .landing-page .flywheel {
-  margin-top:      40px;
-  background:      var(--forest);
-  color:           var(--cream);
+  margin-top:       40px;
+  background-color: #1a3d2b; /* solid hex — same as --forest, no variable risk */
+  color:            var(--cream);
   border-radius:   999px;
   padding:         22px 40px;
   text-align:      center;
