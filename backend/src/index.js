@@ -1,6 +1,6 @@
 require('dotenv').config()
-const express   = require('express')
-const cors      = require('cors')
+const express = require('express')
+const cors = require('cors')
 const { createClient } = require('@supabase/supabase-js')
 
 const { requireParentAuth, supabase } = require('./middleware/auth')
@@ -10,8 +10,9 @@ const activityRouter   = require('./routes/activity')
 const childrenRouter   = require('./routes/children')
 const tasksRouter      = require('./routes/tasks')
 const cronRouter       = require('./routes/cron')
+const waitlistRouter   = require('./routes/waitlist')
 
-const app  = express()
+const app = express()
 const PORT = process.env.PORT || 3001
 
 // ── Middleware ────────────────────────────────────────────────
@@ -54,6 +55,9 @@ app.use('/api/tasks', tasksRouter)
 // Cron — protected by CRON_SECRET bearer token, no Supabase auth
 app.use('/api/cron', cronRouter)
 
+// Waitlist — public, no auth required
+app.use('/api/waitlist', waitlistRouter)
+
 // ── Child garden data (Step 8) ────────────────────────────────
 // Token-gated: child sees only visible fund_tags for their parent.
 const jwt = require('jsonwebtoken')
@@ -83,12 +87,18 @@ app.get('/api/child/garden', async (req, res) => {
   // Return ONLY funds visible to child — query cas_funds, enforce at query level
   const { data: casFunds } = await supabase
     .from('cas_funds')
-    .select('isin, scheme_type, current_value, show_in_child_app')
+    .select('isin, scheme_type, current_value, cost, inception_nav, show_in_child_app')
     .eq('user_id', payload.parent_id)
     .eq('show_in_child_app', true)
 
   const taggedTotal = (casFunds || [])
     .reduce((sum, f) => sum + (parseFloat(f.current_value) || 0), 0)
+
+  const taggedCost = (casFunds || [])
+    .reduce((sum, f) => sum + (parseFloat(f.cost) || 0), 0)
+
+  const inceptionGainAbsolute = Math.round(taggedTotal - taggedCost)
+  const inceptionGainDirection = inceptionGainAbsolute >= 0 ? 'up' : 'down'
 
   const { data: learningState } = await supabase
     .from('learning_state')
@@ -98,13 +108,13 @@ app.get('/api/child/garden', async (req, res) => {
 
   res.json({
     child: {
-      name:        child.name,
-      age_stage:   child.age_stage,
-      goal_name:   child.goal_name,
+      name: child.name,
+      age_stage: child.age_stage,
+      goal_name: child.goal_name,
       goal_amount: child.goal_amount,
     },
-    tagged_total:   taggedTotal,
-    fund_count:     (casFunds || []).length,
+    tagged_total: taggedTotal,
+    fund_count: (casFunds || []).length,
     learning_state: learningState,
   })
 })
@@ -164,10 +174,10 @@ app.post('/api/child/week-complete', async (req, res) => {
     .from('conversation_log')
     .upsert(
       {
-        parent_id:      child.parent_id,
-        child_id:       child.id,
-        week_number:    current_week,
-        prompt_text:    dinner_prompt || '',
+        parent_id: child.parent_id,
+        child_id: child.id,
+        week_number: current_week,
+        prompt_text: dinner_prompt || '',
         marked_done_at: now,
       },
       { onConflict: 'parent_id,week_number' }
@@ -178,13 +188,13 @@ app.post('/api/child/week-complete', async (req, res) => {
   supabase
     .from('activity_events')
     .insert({
-      actor_type:  'child',
-      child_id:    child.id,
-      parent_id:   child.parent_id,
-      event_type:  'week_completed',
-      section:     'learn',
+      actor_type: 'child',
+      child_id: child.id,
+      parent_id: child.parent_id,
+      event_type: 'week_completed',
+      section: 'learn',
       occurred_at: now,
-      metadata:    { week_number: current_week, topic: topic || null },
+      metadata: { week_number: current_week, topic: topic || null },
     })
     .then(({ error }) => {
       if (error) console.error('[week-complete] step 3 error:', error.message)
@@ -204,9 +214,9 @@ app.post('/api/child/week-complete', async (req, res) => {
   const { error: s4Err } = await supabase
     .from('learning_state')
     .update({
-      current_week:            current_week + 1,
+      current_week: current_week + 1,
       current_week_started_at: now,
-      week_completed_at:       null,
+      week_completed_at: null,
     })
     .eq('child_id', child.id)
 
