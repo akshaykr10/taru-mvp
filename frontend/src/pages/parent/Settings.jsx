@@ -463,13 +463,18 @@ export default function ParentSettings() {
 
   useEffect(() => {
     async function loadRules() {
-      const headers = await getAuthHeaders()
-      const res     = await fetch(`${BACKEND_URL}/api/tasks`, { headers })
-      if (res.ok) {
-        const data = await res.json()
-        setRules(data.rules || [])
+      try {
+        const headers = await getAuthHeaders()
+        const res     = await fetch(`${BACKEND_URL}/api/tasks`, { headers })
+        if (res.ok) {
+          const data = await res.json()
+          setRules(data.rules || [])
+        }
+      } catch {
+        // network / CORS error — show empty state, user can add tasks
+      } finally {
+        setRulesLoading(false)
       }
-      setRulesLoading(false)
     }
     loadRules()
   }, [])
