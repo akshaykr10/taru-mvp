@@ -16,8 +16,20 @@ const app = express()
 const PORT = process.env.PORT || 3001
 
 // ── Middleware ────────────────────────────────────────────────
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://taru.money',
+  'https://www.taru.money',
+  'http://localhost:5173',
+].filter(Boolean)
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (curl, Render cron, health checks)
+    if (!origin) return callback(null, true)
+    if (allowedOrigins.includes(origin)) return callback(null, true)
+    callback(new Error(`CORS: origin ${origin} not allowed`))
+  },
   credentials: true,
 }))
 app.use(express.json({ limit: '2mb' }))
