@@ -12,6 +12,54 @@ function deriveAgeStage(dob) {
   return 'investor'
 }
 
+// ── Goal helpers (shared with onboarding) ────────────────────
+const GOAL_PRESETS = [
+  { emoji: '🎓', label: 'College / IIT fees' },
+  { emoji: '🏍️', label: 'First bike' },
+  { emoji: '💻', label: 'Laptop' },
+  { emoji: '✈️', label: 'Europe trip' },
+  { emoji: '🎮', label: 'Gaming PC' },
+  { emoji: '🌍', label: 'Study abroad' },
+]
+
+const MONTHS = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December',
+]
+
+const CURRENT_YEAR = new Date().getFullYear()
+const GOAL_YEARS   = Array.from({ length: 21 }, (_, i) => CURRENT_YEAR + 1 + i)
+
+function formatIndian(raw) {
+  const digits = String(raw).replace(/[^0-9]/g, '')
+  if (!digits) return ''
+  return Number(digits).toLocaleString('en-IN')
+}
+
+function toWords(raw) {
+  const n = parseInt(String(raw).replace(/[^0-9]/g, ''), 10)
+  if (!n) return ''
+  if (n >= 10000000) return `${(n / 10000000).toFixed(1).replace(/\.0$/, '')} crore`
+  if (n >= 100000)   return `${(n / 100000).toFixed(1).replace(/\.0$/, '')} lakh`
+  if (n >= 1000)     return `${(n / 1000).toFixed(1).replace(/\.0$/, '')} thousand`
+  return `${n}`
+}
+
+function buildGoalDate(year, month) {
+  if (!year) return ''
+  if (!month) return `${year}-12-31`
+  const lastDay = new Date(Number(year), Number(month), 0).getDate()
+  return `${year}-${String(month).padStart(2, '0')}-${lastDay}`
+}
+
+// Extract year/month from a stored YYYY-MM-DD date string
+function parseDateToYearMonth(dateStr) {
+  if (!dateStr) return { year: '', month: '' }
+  const year  = dateStr.slice(0, 4)
+  const month = dateStr.slice(5, 7)
+  return { year, month }
+}
+
 const STAGE_LABELS = {
   seed:     'Seed (ages 5–8)',
   sprout:   'Sprout (ages 9–11)',
@@ -45,54 +93,49 @@ const QUICK_TASKS = [
 
 // ── Goal edit card ────────────────────────────────────────────
 function GoalEditCard({ child, onSaved }) {
-  const [editing,    setEditing]    = useState(false)
-  const [goalName,   setGoalName]   = useState(child?.goal_name   || '')
-  const [goalAmount, setGoalAmount] = useState(child?.goal_amount ? String(child.goal_amount) : '')
-  const [goalDate,   setGoalDate]   = useState(child?.goal_date   || '')
-  const [saving,     setSaving]     = useState(false)
-  const [errors,     setErrors]     = useState({})
-  const [saveError,  setSaveError]  = useState('')
-  const [saved,      setSaved]      = useState(false)
+  const [editing,   setEditing]   = useState(false)
+  const [saving,    setSaving]    = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const [saved,     setSaved]     = useState(false)
 
-  const todayStr = new Date().toISOString().split('T')[0]
+  // Editing state — goal preset/custom
+  const [goalPreset, setGoalPreset] = useState('')
+  const [goalCustom, setGoalCustom] = useState('')
+  const [amountRaw,  setAmountRaw]  = useState('')
+  const [goalYear,   setGoalYear]   = useState('')
+  const [goalMonth,  setGoalMonth]  = useState('')
 
-  // Max date = child's 18th birthday
-  const maxGoalDate = child?.dob
-    ? (() => {
-        const d = new Date(child.dob + 'T00:00:00')
-        d.setFullYear(d.getFullYear() + 18)
-        return d.toISOString().split('T')[0]
-      })()
-    : ''
+  const goalName   = goalPreset === '__custom__' ? goalCustom.trim() : goalPreset
+  const goalAmount = amountRaw.replace(/[^0-9]/g, '')
+  const goalDate   = buildGoalDate(goalYear, goalMonth)
 
   function startEdit() {
-    setGoalName(child?.goal_name   || '')
-    setGoalAmount(child?.goal_amount ? String(child.goal_amount) : '')
-    setGoalDate(child?.goal_date   || '')
-    setErrors({})
+    // Initialise from child's current values
+    const existingName = child?.goal_name || ''
+    const isPreset = GOAL_PRESETS.some(p => p.label === existingName)
+    setGoalPreset(existingName ? (isPreset ? existingName : '__custom__') : '')
+    setGoalCustom(isPreset ? '' : existingName)
+    setAmountRaw(child?.goal_amount ? String(Math.round(child.goal_amount)) : '')
+    const { year, month } = parseDateToYearMonth(child?.goal_date)
+    setGoalYear(year)
+    setGoalMonth(month)
     setSaveError('')
     setEditing(true)
   }
 
   function cancel() {
     setEditing(false)
-    setErrors({})
     setSaveError('')
   }
 
   async function save() {
-    const errs  = {}
-    const name   = goalName.trim()
+    if (!goalName) { setSaveError('Choose or type a goal name.'); return }
     const amount = parseFloat(goalAmount)
-
-    if (!name || name.length > 40)
-      errs.name = 'Give the goal a name.'
-    if (!goalAmount || isNaN(amount) || amount <= 0 || amount > 9999999)
-      errs.amount = 'Enter a valid amount.'
-    if (!goalDate || goalDate <= todayStr)
-      errs.date = 'Pick a future date.'
-
-    if (Object.keys(errs).length) { setErrors(errs); return }
+    if (!goalAmount || isNaN(amount) || amount <= 0 || amount > 9999999) {
+      setSaveError('Enter a valid target amount (up to ₹99,99,999).')
+      return
+    }
+    if (!goalYear) { setSaveError('Pick a target year.'); return }
 
     setSaving(true)
     setSaveError('')
@@ -100,7 +143,7 @@ function GoalEditCard({ child, onSaved }) {
       const res  = await fetch(`${BACKEND_URL}/api/children/${child.id}`, {
         method:  'PATCH',
         headers: await getAuthHeaders(),
-        body:    JSON.stringify({ goal_name: name, goal_amount: amount, goal_date: goalDate }),
+        body:    JSON.stringify({ goal_name: goalName, goal_amount: amount, goal_date: goalDate }),
       })
       const data = await res.json()
       if (!res.ok) { setSaveError("Couldn't save — try again."); return }
@@ -115,88 +158,17 @@ function GoalEditCard({ child, onSaved }) {
     }
   }
 
-  return (
-    <div className="card">
-      {editing ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp4)' }}>
-          <div>
-            <label className="form-label" htmlFor="goal-name-edit">Goal name</label>
-            <input
-              id="goal-name-edit"
-              className="form-input"
-              type="text"
-              placeholder="e.g. IIT fees, Europe trip, first bike"
-              maxLength={40}
-              value={goalName}
-              onChange={e => setGoalName(e.target.value)}
-              autoFocus
-            />
-            {errors.name && (
-              <p style={{ fontSize: '13px', color: 'var(--coral)', marginTop: 'var(--sp1)', fontFamily: 'var(--font-parent)' }}>
-                {errors.name}
-              </p>
-            )}
-          </div>
+  // ── Display mode ─────────────────────────────────────────────
+  if (!editing) {
+    const { year, month } = parseDateToYearMonth(child?.goal_date)
+    const dateLabel = year
+      ? (month && month !== '12'
+          ? `${MONTHS[parseInt(month, 10) - 1]} ${year}`
+          : year)
+      : null
 
-          <div>
-            <label className="form-label" htmlFor="goal-amount-edit">Target amount</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--sp2)' }}>
-              <span style={{ fontSize: '15px', color: 'var(--ink)', fontFamily: 'var(--font-parent)', flexShrink: 0 }}>₹</span>
-              <input
-                id="goal-amount-edit"
-                className="form-input"
-                type="number"
-                inputMode="numeric"
-                placeholder="500000"
-                min="1"
-                max="9999999"
-                step="1"
-                value={goalAmount}
-                onChange={e => setGoalAmount(e.target.value)}
-                style={{ flex: 1 }}
-              />
-            </div>
-            {errors.amount && (
-              <p style={{ fontSize: '13px', color: 'var(--coral)', marginTop: 'var(--sp1)', fontFamily: 'var(--font-parent)' }}>
-                {errors.amount}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="form-label" htmlFor="goal-date-edit">Target date</label>
-            <input
-              id="goal-date-edit"
-              className="form-input"
-              type="date"
-              min={todayStr}
-              max={maxGoalDate}
-              value={goalDate}
-              onChange={e => setGoalDate(e.target.value)}
-            />
-            {errors.date && (
-              <p style={{ fontSize: '13px', color: 'var(--coral)', marginTop: 'var(--sp1)', fontFamily: 'var(--font-parent)' }}>
-                {errors.date}
-              </p>
-            )}
-          </div>
-
-          {saveError && (
-            <p style={{ fontSize: '13px', color: 'var(--coral)', fontFamily: 'var(--font-parent)' }}>
-              {saveError}
-            </p>
-          )}
-
-          <div style={{ display: 'flex', gap: 'var(--sp3)' }}>
-            <button className="btn btn-outline" style={{ flex: 1 }} onClick={cancel} disabled={saving}>
-              Cancel
-            </button>
-            <button className="btn btn-primary" style={{ flex: 1 }} onClick={save} disabled={saving}>
-              {saving ? 'Saving…' : 'Save goal'}
-            </button>
-          </div>
-        </div>
-      ) : (
+    return (
+      <div className="card">
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--sp3)' }}>
           <div style={{ flex: 1 }}>
             {child?.goal_name ? (
@@ -206,10 +178,10 @@ function GoalEditCard({ child, onSaved }) {
                 </div>
                 <div style={{ fontFamily: 'var(--font-parent)', fontSize: '13px', color: 'var(--ink-60)' }}>
                   {child.goal_amount && `₹${Number(child.goal_amount).toLocaleString('en-IN')}`}
-                  {child.goal_amount && child.goal_date && ' · '}
-                  {child.goal_date && new Date(child.goal_date + 'T00:00:00').toLocaleDateString('en-IN', {
-                    day: 'numeric', month: 'long', year: 'numeric',
-                  })}
+                  {child.goal_amount && child.goal_amount && toWords(String(Math.round(child.goal_amount))) &&
+                    ` (${toWords(String(Math.round(child.goal_amount)))})`}
+                  {child.goal_amount && dateLabel && ' · '}
+                  {dateLabel && `by ${dateLabel}`}
                 </div>
               </>
             ) : (
@@ -218,7 +190,7 @@ function GoalEditCard({ child, onSaved }) {
               </p>
             )}
             {saved && (
-              <p style={{ fontFamily: 'var(--font-parent)', fontSize: '13px', color: 'var(--forest)', marginTop: 'var(--sp2)', margin: `var(--sp2) 0 0` }}>
+              <p style={{ fontFamily: 'var(--font-parent)', fontSize: '13px', color: 'var(--forest)', margin: `var(--sp2) 0 0` }}>
                 Goal updated.
               </p>
             )}
@@ -236,7 +208,125 @@ function GoalEditCard({ child, onSaved }) {
             Edit
           </button>
         </div>
-      )}
+      </div>
+    )
+  }
+
+  // ── Edit mode ────────────────────────────────────────────────
+  return (
+    <div className="card">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp4)' }}>
+
+        {/* Goal name — presets + custom */}
+        <div>
+          <label className="form-label">Goal</label>
+          <div className="quick-assign-rail quick-assign-rail--wrap" style={{ marginBottom: 'var(--sp2)' }}>
+            {GOAL_PRESETS.map(p => (
+              <button
+                key={p.label}
+                type="button"
+                className={`quick-assign-chip${goalPreset === p.label ? ' quick-assign-chip--active' : ''}`}
+                onClick={() => { setGoalPreset(p.label); setGoalCustom('') }}
+              >
+                {p.emoji} {p.label}
+              </button>
+            ))}
+            <button
+              type="button"
+              className={`quick-assign-chip${goalPreset === '__custom__' ? ' quick-assign-chip--active' : ''}`}
+              onClick={() => setGoalPreset('__custom__')}
+            >
+              ✏️ Other
+            </button>
+          </div>
+          {goalPreset === '__custom__' && (
+            <input
+              className="form-input"
+              type="text"
+              placeholder="Type your goal…"
+              value={goalCustom}
+              onChange={e => setGoalCustom(e.target.value)}
+              autoFocus
+              maxLength={40}
+            />
+          )}
+        </div>
+
+        {/* Target amount */}
+        <div>
+          <label className="form-label" htmlFor="goal-amount-edit">Target amount</label>
+          <div className="amount-input-wrap">
+            <span className="amount-input-wrap__prefix">₹</span>
+            <input
+              id="goal-amount-edit"
+              className="form-input amount-input-wrap__input"
+              type="text"
+              inputMode="numeric"
+              placeholder="5,00,000"
+              value={amountRaw ? formatIndian(amountRaw) : ''}
+              onChange={e => setAmountRaw(e.target.value.replace(/[^0-9]/g, ''))}
+            />
+          </div>
+          {amountRaw && (
+            <p style={{ fontSize: '12px', color: 'var(--forest)', marginTop: 'var(--sp1)', fontFamily: 'var(--font-parent)', fontWeight: 500 }}>
+              ₹{toWords(amountRaw)}
+            </p>
+          )}
+        </div>
+
+        {/* Target year + optional month */}
+        <div>
+          <label className="form-label">Target year</label>
+          <div style={{ display: 'flex', gap: 'var(--sp3)' }}>
+            <select
+              className="form-input"
+              value={goalYear}
+              onChange={e => { setGoalYear(e.target.value); setGoalMonth('') }}
+              style={{ flex: 1 }}
+            >
+              <option value="">Select year</option>
+              {GOAL_YEARS.map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+            {goalYear && (
+              <select
+                className="form-input"
+                value={goalMonth}
+                onChange={e => setGoalMonth(e.target.value)}
+                style={{ flex: 1 }}
+              >
+                <option value="">Any month</option>
+                {MONTHS.map((m, i) => (
+                  <option key={m} value={String(i + 1).padStart(2, '0')}>{m}</option>
+                ))}
+              </select>
+            )}
+          </div>
+          {goalYear && (
+            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: 'var(--sp1)', fontFamily: 'var(--font-parent)' }}>
+              Target: {goalMonth
+                ? `${MONTHS[parseInt(goalMonth, 10) - 1]} ${goalYear}`
+                : `End of ${goalYear}`}
+            </p>
+          )}
+        </div>
+
+        {saveError && (
+          <p style={{ fontSize: '13px', color: 'var(--coral)', fontFamily: 'var(--font-parent)' }}>
+            {saveError}
+          </p>
+        )}
+
+        <div style={{ display: 'flex', gap: 'var(--sp3)' }}>
+          <button className="btn btn-outline" style={{ flex: 1 }} onClick={cancel} disabled={saving}>
+            Cancel
+          </button>
+          <button className="btn btn-primary" style={{ flex: 1 }} onClick={save} disabled={saving}>
+            {saving ? 'Saving…' : 'Save goal'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

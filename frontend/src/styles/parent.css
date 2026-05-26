@@ -476,6 +476,81 @@
   color: var(--color-text-primary);
 }
 
+/* ── Value proposition (onboarding step 0) ──────────────────── */
+.onboarding-intro-icon {
+  font-size: 52px;
+  text-align: center;
+  margin-bottom: var(--space-4);
+}
+
+.value-props {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.value-prop-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.value-prop-row__icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  width: 36px;
+  text-align: center;
+  padding-top: 2px;
+}
+
+.value-prop-row__text {
+  flex: 1;
+}
+
+.value-prop-row__title {
+  font-family: var(--font-parent);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-navy);
+  margin-bottom: 2px;
+}
+
+.value-prop-row__body {
+  font-family: var(--font-parent);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Amount input with ₹ prefix ─────────────────────────────── */
+.amount-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.amount-input-wrap__prefix {
+  position: absolute;
+  left: 14px;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-parent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.amount-input-wrap__input {
+  width: 100%;
+  padding-left: 28px !important;
+}
+
+/* ── Wrapping chip rail (goal presets) ──────────────────────── */
+.quick-assign-rail--wrap {
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
+
 /* Age badge */
 .age-badge {
   display: inline-block;
