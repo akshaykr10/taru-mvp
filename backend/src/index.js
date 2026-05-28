@@ -212,17 +212,7 @@ app.post('/api/child/week-complete', async (req, res) => {
       if (error) console.error('[week-complete] step 3 error:', error.message)
     })
 
-  // 7-day gate — mark-done is already persisted above; only week advancement is gated.
-  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
-  if (ls?.current_week_started_at) {
-    const msElapsed = Date.now() - new Date(ls.current_week_started_at).getTime()
-    if (msElapsed < sevenDaysMs) {
-      const availableAt = new Date(new Date(ls.current_week_started_at).getTime() + sevenDaysMs).toISOString()
-      return res.json({ ok: true, next_week: null, available_at: availableAt })
-    }
-  }
-
-  // Step 4: Advance current_week — only reached after 7 days have elapsed
+  // Step 4: Advance current_week immediately on completion
   const { error: s4Err } = await supabase
     .from('learning_state')
     .update({

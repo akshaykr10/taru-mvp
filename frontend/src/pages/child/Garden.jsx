@@ -150,6 +150,17 @@ export default function ChildGarden() {
     }))
   }
 
+  function handleWeekAdvanced(nextWeek) {
+    setGardenData(prev => ({
+      ...prev,
+      learning_state: {
+        ...prev.learning_state,
+        current_week:      nextWeek,
+        week_completed_at: null,   // new week starts fresh
+      }
+    }))
+  }
+
   function handleTabClick(tabId) {
     setActiveTab(tabId)
     logActivity('child', 'child_tab_visit', {
@@ -282,6 +293,7 @@ export default function ChildGarden() {
             weekCompletedAt={learning_state?.week_completed_at ?? null}
             token={token}
             onXpEarned={handleXpEarned}
+            onWeekAdvanced={handleWeekAdvanced}
           />
         )}
 

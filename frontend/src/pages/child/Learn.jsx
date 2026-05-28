@@ -29,7 +29,7 @@ function PennyIcon() {
 }
 
 // ── CurrentWeekCard ────────────────────────────────────────────
-function CurrentWeekCard({ weekContent, ageStage, weekNum, token, cardRef, onXpEarned, weekCompletedAt }) {
+function CurrentWeekCard({ weekContent, ageStage, weekNum, token, cardRef, onXpEarned, weekCompletedAt, onWeekAdvanced }) {
   const [markedDone,    setMarkedDone]    = useState(!!weekCompletedAt)
   const [showReward,    setShowReward]    = useState(false)
   const [advanceError,  setAdvanceError]  = useState(false)
@@ -41,8 +41,7 @@ function CurrentWeekCard({ weekContent, ageStage, weekNum, token, cardRef, onXpE
     onXpEarned(50)
     setTimeout(() => setShowReward(false), 1400)
 
-    // Step 1 + 2 + 3 + 4 — single backend call handles all DB writes in sequence.
-    // The backend handles steps 1–3 as best-effort and only fails if step 4 fails.
+    // Single backend call handles all DB writes in sequence.
     try {
       const res = await fetch(`${BACKEND_URL}/api/child/week-complete`, {
         method:  'POST',
@@ -59,8 +58,15 @@ function CurrentWeekCard({ weekContent, ageStage, weekNum, token, cardRef, onXpE
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        console.error('[week-complete] step 4 failed:', body.error || res.status)
+        console.error('[week-complete] failed:', body.error || res.status)
         setAdvanceError(true)
+        return
+      }
+
+      const body = await res.json().catch(() => ({}))
+      // If the backend advanced the week, notify the parent component
+      if (body.next_week && onWeekAdvanced) {
+        onWeekAdvanced(body.next_week)
       }
     } catch (err) {
       console.error('[week-complete] network error:', err)
@@ -178,8 +184,9 @@ function TriggerCard({ card }) {
  * @param {string|null} props.lastTriggerType - from learning_state.last_trigger_type
  * @param {string}      props.token           - child JWT, forwarded to activity hook
  * @param {function}    props.onXpEarned      - callback when Mark as Done pressed
+ * @param {function}    props.onWeekAdvanced  - callback(nextWeek) when backend confirms advancement
  */
-export default function Learn({ ageStage, currentWeek, lastTriggerType, weekCompletedAt, token, onXpEarned }) {
+export default function Learn({ ageStage, currentWeek, lastTriggerType, weekCompletedAt, token, onXpEarned, onWeekAdvanced }) {
   const week        = currentWeek || 1
   const weekContent = getWeekContent(week)
 
@@ -222,6 +229,7 @@ export default function Learn({ ageStage, currentWeek, lastTriggerType, weekComp
           cardRef={weekCardRef}
           onXpEarned={onXpEarned}
           weekCompletedAt={weekCompletedAt}
+          onWeekAdvanced={onWeekAdvanced}
         />
       ) : (
         <div ref={weekCardRef} className="learn-week-card learn-card--empty">
