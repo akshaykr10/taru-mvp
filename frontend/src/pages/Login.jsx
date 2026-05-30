@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
+import { EULA_VERSION } from '../legal/index.js'
 import '../styles/auth.css'
 
 export default function Login() {
@@ -31,6 +32,23 @@ export default function Login() {
 
     if (signInError) {
       setError('Incorrect email or password.')
+      return
+    }
+
+    // Check whether the user has already accepted the current EULA version.
+    // Do this before navigating so we can intercept first-time users.
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data: consentRow } = await supabase
+      .from('consent_log')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('eula_version', EULA_VERSION)
+      .maybeSingle()
+
+    if (!consentRow) {
+      // No acceptance on record — show EULA before proceeding.
+      // Pass the intended destination so /eula can redirect there after acceptance.
+      navigate('/eula', { replace: true, state: { from } })
       return
     }
 

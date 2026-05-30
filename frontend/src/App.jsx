@@ -1,8 +1,5 @@
-import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
-import { supabase } from './lib/supabase.js'
-import { EULA_VERSION } from './legal/index.js'
 
 // Landing
 import Landing from './pages/Landing.jsx'
@@ -11,6 +8,7 @@ import Landing from './pages/Landing.jsx'
 import Signup      from './pages/Signup.jsx'
 import Login       from './pages/Login.jsx'
 import VerifyEmail from './pages/VerifyEmail.jsx'
+import EulaPage    from './pages/EulaPage.jsx'
 
 // Legal pages
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
@@ -25,10 +23,9 @@ import ParentSettings   from './pages/parent/Settings.jsx'
 // Child route (token-gated, no login)
 import ChildGarden from './pages/child/Garden.jsx'
 
-// Guards, layout, modals
+// Guards & layout
 import RequireParentAuth from './components/RequireParentAuth.jsx'
 import ParentLayout      from './components/ParentLayout.jsx'
-import EulaModal         from './components/EulaModal.jsx'
 
 function AppRedirect() {
   const { session, loading } = useAuth()
@@ -36,45 +33,6 @@ function AppRedirect() {
   return session
     ? <Navigate to="/parent/dashboard" replace />
     : <Navigate to="/login" replace />
-}
-
-/**
- * Shown over authenticated parent routes only.
- * Checks consent_log server-side (via supabase admin client on backend) —
- * uses the anon client here just to read the record for the current user.
- */
-function EulaGate({ children }) {
-  const { session, loading } = useAuth()
-  // null = still checking, false = no consent, true = consented
-  const [hasConsent, setHasConsent] = useState(null)
-
-  useEffect(() => {
-    if (loading || !session) return
-
-    async function checkConsent() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { setHasConsent(false); return }
-
-      const { data } = await supabase
-        .from('consent_log')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('eula_version', EULA_VERSION)
-        .maybeSingle()
-
-      setHasConsent(!!data)
-    }
-
-    checkConsent()
-  }, [session, loading])
-
-  if (loading || hasConsent === null) return null
-
-  if (!hasConsent) {
-    return <EulaModal onAccepted={() => setHasConsent(true)} />
-  }
-
-  return children
 }
 
 export default function App() {
@@ -97,26 +55,27 @@ export default function App() {
           <Route path="/app/login"        element={<Login />} />
           <Route path="/app/verify-email" element={<VerifyEmail />} />
 
+          {/* ── EULA acceptance — public (user is authed but hasn't agreed yet) */}
+          <Route path="/eula" element={<EulaPage />} />
+
           {/* ── Legal pages (public) ─────────────────────────────────── */}
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms"   element={<TermsOfUse />} />
 
           {/* ── Parent — auth required (original paths + /app/* aliases) */}
           <Route element={<RequireParentAuth />}>
-            <Route element={<EulaGate><Outlet /></EulaGate>}>
-              {/* Onboarding is full-screen (no nav shell) */}
-              <Route path="/parent/onboarding"     element={<ParentOnboarding />} />
-              <Route path="/app/parent/onboarding" element={<ParentOnboarding />} />
+            {/* Onboarding is full-screen (no nav shell) */}
+            <Route path="/parent/onboarding"     element={<ParentOnboarding />} />
+            <Route path="/app/parent/onboarding" element={<ParentOnboarding />} />
 
-              {/* All other parent routes share the header + bottom-nav shell */}
-              <Route element={<ParentLayout />}>
-                <Route path="/parent/dashboard"      element={<ParentDashboard />} />
-                <Route path="/parent/portfolio"      element={<ParentPortfolio />} />
-                <Route path="/parent/settings"       element={<ParentSettings />} />
-                <Route path="/app/parent/dashboard"  element={<ParentDashboard />} />
-                <Route path="/app/parent/portfolio"  element={<ParentPortfolio />} />
-                <Route path="/app/parent/settings"   element={<ParentSettings />} />
-              </Route>
+            {/* All other parent routes share the header + bottom-nav shell */}
+            <Route element={<ParentLayout />}>
+              <Route path="/parent/dashboard"      element={<ParentDashboard />} />
+              <Route path="/parent/portfolio"      element={<ParentPortfolio />} />
+              <Route path="/parent/settings"       element={<ParentSettings />} />
+              <Route path="/app/parent/dashboard"  element={<ParentDashboard />} />
+              <Route path="/app/parent/portfolio"  element={<ParentPortfolio />} />
+              <Route path="/app/parent/settings"   element={<ParentSettings />} />
             </Route>
           </Route>
 
