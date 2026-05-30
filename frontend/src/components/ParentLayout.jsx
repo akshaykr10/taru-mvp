@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { logActivity } from '../lib/activity.js'
+import Footer from './Footer.jsx'
 import '../styles/parent.css'
 
 const NAV_ITEMS = [
@@ -47,6 +48,7 @@ export default function ParentLayout() {
 
       <main className="parent-main">
         <Outlet />
+        <Footer />
       </main>
 
       <nav className="parent-nav">

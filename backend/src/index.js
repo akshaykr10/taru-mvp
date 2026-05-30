@@ -11,6 +11,7 @@ const childrenRouter   = require('./routes/children')
 const tasksRouter      = require('./routes/tasks')
 const cronRouter       = require('./routes/cron')
 const waitlistRouter   = require('./routes/waitlist')
+const consentRouter    = require('./routes/consent')
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -69,6 +70,9 @@ app.use('/api/cron', cronRouter)
 
 // Waitlist — public, no auth required
 app.use('/api/waitlist', waitlistRouter)
+
+// Consent — public POST (userId from request body, validated by service role)
+app.use('/api/consent', consentRouter)
 
 // ── Child garden data (Step 8) ────────────────────────────────
 // Token-gated: child sees only visible fund_tags for their parent.
