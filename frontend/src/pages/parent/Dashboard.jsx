@@ -8,6 +8,9 @@ import { BACKEND_URL } from '../../lib/api.js'
 import { getWeekContent } from '../../data/weeklyContent.js'
 import { getParentWeekPrompt } from '../../data/parentWeeklyPrompts.js'
 import '../../styles/parent.css'
+import InvestComingSoon from '../../components/InvestComingSoon'
+import InvestmentApp from '../../investment/InvestmentApp'
+import { INVEST_CTA_PROMINENCE, INVESTMENT_ENABLED } from '../../config'
 
 async function getAuthHeaders() {
   const { data: { session } } = await supabase.auth.getSession()
@@ -513,6 +516,12 @@ export default function ParentDashboard() {
           )
         })
       )}
+
+      {/* Invest CTA — flag-gated: InvestmentApp when enabled, demand-capture surface when not */}
+      {INVESTMENT_ENABLED
+        ? <InvestmentApp />
+        : INVEST_CTA_PROMINENCE !== 'hidden' && <InvestComingSoon />
+      }
     </div>
   )
 }

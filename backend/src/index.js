@@ -4,7 +4,7 @@ const cors = require('cors')
 const { createClient } = require('@supabase/supabase-js')
 
 const { requireParentAuth, supabase } = require('./middleware/auth')
-const casparsersRouter = require('./routes/casparser')
+const { guardNarration } = require('./lib/narrationGuard')
 const casRouter        = require('./routes/cas')
 const activityRouter   = require('./routes/activity')
 const childrenRouter   = require('./routes/children')
@@ -48,9 +48,6 @@ app.get('/health', (_req, res) => {
 })
 
 // ── Routes ────────────────────────────────────────────────────
-
-// CASParser legacy routes (preserved)
-app.use('/api/casparser', requireParentAuth, casparsersRouter)
 
 // CASParser production routes — rate-limited, richer schema
 app.use('/api/cas', requireParentAuth, casRouter)
@@ -121,6 +118,26 @@ app.get('/api/child/garden', async (req, res) => {
     .select('current_week, coins_total, xp_total, last_trigger_type, week_completed_at, current_week_started_at')
     .eq('child_id', child.id)
     .maybeSingle()
+
+  // ── Narration guard ────────────────────────────────────────────
+  // TODAY: this response contains no strings constructed from cas_funds data —
+  // only raw numeric fields (tagged_total, fund_count) and the child's own name.
+  // The frontend selects Penny copy entirely from weeklyContent.js and content.json
+  // using these numbers as inputs. There is nothing for the guard to intercept right now.
+  //
+  // PROACTIVE WIRING: the guard is placed here — at the response builder — because
+  // this is the natural point where a future developer would add fund-aware text
+  // (e.g. "Your [fund name] grew ₹X this month"). When that happens, pass the
+  // candidate string through guardNarration() before including it in the response:
+  //
+  //   const pennyText = guardNarration(candidateText, 'growth_happened')
+  //
+  // Valid intents: growth_happened | dip_is_normal | streak_milestone |
+  //               save_regularly | generic_encouragement
+  // guardNarration never throws and always returns a safe renderable string.
+  //
+  // DO NOT add a fund name, AMC name, ISIN, return projection, or advisory phrase
+  // to this response without passing it through guardNarration first.
 
   res.json({
     child: {

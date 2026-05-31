@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { eulaContent, EULA_VERSION } from '../legal/index.js'
 import { supabase } from '../lib/supabase.js'
+import { BACKEND_URL } from '../lib/api.js'
 
 export default function EulaModal({ onAccepted }) {
   const [canAgree, setCanAgree] = useState(false)
@@ -26,7 +27,7 @@ export default function EulaModal({ onAccepted }) {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/consent`, {
+      const res = await fetch(`${BACKEND_URL}/api/consent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -275,6 +275,10 @@ async function saveCasData(sb, userId, casData, method) {
       gain_absolute:     s.gain_absolute,
       gain_percentage:   s.gain_percentage,
       show_in_child_app: key in existingMap ? existingMap[key] : defaultVis,
+      // source is intentionally omitted here — the column DEFAULT ('cas_import') handles
+      // the INSERT path. Excluding it from the row object means the ON CONFLICT DO UPDATE
+      // SET clause will not touch source, so a future 'taru_invested' row whose ISIN
+      // collides with a CAS re-import will keep its correct provenance.
     }
   })
 

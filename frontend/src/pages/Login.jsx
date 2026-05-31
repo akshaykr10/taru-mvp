@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
+import { BACKEND_URL } from '../lib/api.js'
 import { EULA_VERSION } from '../legal/index.js'
 import '../styles/auth.css'
 
@@ -36,16 +37,24 @@ export default function Login() {
     }
 
     // Check whether the user has already accepted the current EULA version.
-    // Do this before navigating so we can intercept first-time users.
-    const { data: { user } } = await supabase.auth.getUser()
-    const { data: consentRow } = await supabase
-      .from('consent_log')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('eula_version', EULA_VERSION)
-      .maybeSingle()
+    // Uses the backend (service role) so RLS on consent_log is not a factor.
+    const { data: { session: newSession } } = await supabase.auth.getSession()
+    let accepted = false
+    try {
+      const statusRes = await fetch(
+        `${BACKEND_URL}/api/consent/status?eulaVersion=${encodeURIComponent(EULA_VERSION)}`,
+        { headers: { Authorization: `Bearer ${newSession?.access_token}` } }
+      )
+      if (statusRes.ok) {
+        const body = await statusRes.json()
+        accepted = body.accepted
+      }
+    } catch {
+      // Network error — treat as unaccepted so the user sees the EULA
+      accepted = false
+    }
 
-    if (!consentRow) {
+    if (!accepted) {
       // No acceptance on record — show EULA before proceeding.
       // Pass the intended destination so /eula can redirect there after acceptance.
       navigate('/eula', { replace: true, state: { from } })

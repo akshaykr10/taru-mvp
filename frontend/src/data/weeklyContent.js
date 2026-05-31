@@ -266,7 +266,9 @@ export const WEEKLY_CONTENT = [
     penny_mode: `co-discoverer`,
     app_text_59: `Gold has been valuable for thousands of years — across every country, every language, every ruler. Paper money has come and gone. But gold stays. Not because it's useful for most things — but because people have agreed, for a very long time, that it holds value.`,
     app_text_1014: `Gold holds value across time because it can't be created easily — it has to be mined and refined. Government schemes like PPF offer guaranteed returns with no risk of the scheme failing — different reasons, similar effect. Both are ways families protect value across time.`,
-    app_text_15: `Gold's 50-year inflation-adjusted return in India is positive but modest — roughly 7–8% nominal. Equity has outperformed it but with far more volatility. Gold's value is in what it does during crises — when other assets fall, gold often rises. It's insurance for the portfolio, not a return driver. How much does your family hold, and why?`,
+    // SOURCE-XLSX UPDATE REQUIRED (Week 15, app_text_15): removed "Equity has outperformed it"
+    // — comparative asset-class ranking is advisory language. Replaced with role-based framing.
+    app_text_15: `Gold's value is in what it does during crises — when equity falls sharply, gold often holds or moves differently. The two assets serve different roles: gold is a stabiliser, equity is a long-term growth engine. Most diversified families hold some of both. How much does your family hold, and why?`,
     dinner_prompt: `Is there anything in our family that has been kept for a long time because it holds its value — and what makes some things hold value while others don't?`,
     portfolio_status: `OPTIONAL`,
     portfolio_reference: `Reference gold component of portfolio if present. Do not force if portfolio is equity-only.`,
@@ -517,7 +519,9 @@ export const WEEKLY_CONTENT = [
     penny_moment: `Penny found the number that matters most. Not the size of the pile. Not how much comes in. How much is kept. Grown-ups call it the savings rate. She calculated her own. She noticed something: this number matters more than the total amount she finds. A small pile with a high savings rate beats a large pile with a low one. Always.`,
     penny_mode: `co-discoverer`,
     app_text_59: `Of everything that comes into your family, what fraction is kept and invested? That fraction — the savings rate — matters more than the total income. A family that earns less but keeps more builds more wealth over time than one that earns more but keeps very little. Your family's SIP is your savings rate in action.`,
-    app_text_1014: `The savings rate is the single most powerful determinant of long-term wealth — more powerful than investment returns, more powerful than income level. A 20% savings rate on ₹50,000/month, invested at 10% for 30 years, produces more wealth than a 5% rate on ₹1,50,000/month. What is your family's actual rate?`,
+    // SOURCE-XLSX UPDATE REQUIRED (Week 29, app_text_1014): removed "invested at 10% for 30 years"
+    // — specific return projection. Replaced with concept-only framing of savings rate vs income.
+    app_text_1014: `The savings rate is the single most powerful determinant of long-term wealth — more powerful than investment returns, more powerful than income level. A family that earns less but keeps a higher fraction builds more wealth over time than one that earns more but keeps very little. The fraction kept matters more than the total earned. What is your family's actual rate?`,
     app_text_15: `At a 15% savings rate, financial independence typically arrives in 30–35 years. At 30%, in 20–25 years. At 50%, in 15 years. The relationship is non-linear — higher savings both increases the invested amount and decreases the income that needs replacing. What rate would meaningfully change your family's timeline?`,
     dinner_prompt: `If our family increased the savings rate by just 5% — not the income, just the kept portion — what would that produce in 20 years?`,
     portfolio_status: `REQUIRED`,
@@ -554,7 +558,10 @@ export const WEEKLY_CONTENT = [
     penny_mode: `co-discoverer`,
     app_text_59: `Remember that feeling — the pile growing even when you're not adding to it? Grown-ups call that compounding. The pile earns something. That earned amount earns something too. It's growth-on-growth. Your Money Garden is doing this right now — the same SIP is producing slightly more growth each month than it did the month before.`,
     app_text_1014: `Compounding is growth applied to an expanding base. Month 1: ₹10,000 earns ₹83. Month 12: the base is larger, so the same rate produces more. Month 120: the monthly return is many times what it was in Month 1. Look at your portfolio's monthly return compared to its first month — can you see the acceleration?`,
-    app_text_15: `Rule of 72: divide 72 by the annual return rate to find years to double. At 10%, money doubles every 7.2 years. A SIP started at age 12 versus age 22 produces approximately 3× more by age 60 — not because of the extra 10 years of contributions, but because those 10 years of compounding operate on a larger base. Your family's portfolio today — at 10% — will approximately double in 7 years. Is that the plan?`,
+    // SOURCE-XLSX UPDATE REQUIRED (Week 31, app_text_15): removed "Your family's portfolio today
+    // — at 10% — will approximately double in 7 years" — specific forecast of the child's
+    // actual portfolio at a named return rate. Replaced with generic concept illustration.
+    app_text_15: `Rule of 72: divide 72 by the annual return rate to find years to double. At 10%, money doubles every 7.2 years — a concept illustration, not a prediction. A SIP started at age 12 versus age 22 produces approximately 3× more by age 60 — not because of the extra 10 years of contributions, but because those 10 years of compounding operate on a larger base. The earlier the clock starts, the more doublings it gets. What does that mean for the timeline your family has already set in motion?`,
     dinner_prompt: `If our portfolio keeps growing at its current rate, what will it be worth in 10 years — and what is the biggest thing that could get in the way of that?`,
     portfolio_status: `REQUIRED`,
     portfolio_reference: `Month-by-month return showing acceleration. Portfolio as live demonstration of compounding.`,
@@ -571,8 +578,15 @@ export const WEEKLY_CONTENT = [
     penny_moment: `Penny mapped out the options this week. Four kinds of places to grow a pile. Some are smooth but slow — like a savings account or FD. Some are faster but bumpier — like equity funds. Some are in between — like gold. Some are government-backed and reliable — like PPF. Each has a speed and a texture. She wants to know the trade-off for each.`,
     penny_mode: `co-discoverer`,
     app_text_59: `There are different places your family's money can grow — and they behave very differently. A savings account is smooth but slow. Gold is steady but unpredictable. Equity mutual funds — the kind your family likely uses — are the fastest over long periods, but the bumpiest. Your portfolio shows which type you're in.`,
-    app_text_1014: `Investment options by risk and return: Savings (3–4%, no bumpiness), Fixed Deposit (6–7%, no bumpiness but taxable), Debt fund (7–8%, low bumpiness), Gold (7–8%, variable), Equity fund (10–12% long-term, high bumpiness). Higher expected return always comes with higher short-term volatility. Where does your portfolio sit?`,
-    app_text_15: `20-year approximate returns in India: equities 12–14%, gold 8%, fixed income 7%, savings 4%. After 5–6% inflation, real returns: equities 6–8%, gold 2–3%, fixed income 1–2%, savings negative. This is why long-term wealth requires equity exposure. The timeline is everything — equity's bumpiness is irrelevant over 15–20 years. What is the time horizon for each component of your family's portfolio?`,
+    // SOURCE-XLSX UPDATE REQUIRED (Week 32, app_text_1014): removed specific return % ranges
+    // (3-4%, 6-7%, 7-8%, 10-12%) for each asset class — return projections. Replaced with
+    // relative/behavioural description of the growth-vs-bumpiness trade-off.
+    app_text_1014: `Investment options differ in two ways: how fast they grow over time, and how bumpy the journey is. Savings accounts and FDs are the smoothest but grow the slowest. Debt funds are slightly bumpier but grow a bit faster. Gold sits in the middle — steady but unpredictable. Equity mutual funds grow fastest over long periods, but with the most day-to-day movement. Higher growth potential always comes with higher short-term volatility. Where does your portfolio sit?`,
+    // SOURCE-XLSX UPDATE REQUIRED (Week 32, app_text_15): removed specific historical return %
+    // figures (12-14%, 8%, 7%, 4%, etc.) and "long-term wealth requires equity exposure" —
+    // the former are return projections; the latter is a direct investment recommendation.
+    // Replaced with concept-level real-return framing without naming a required allocation.
+    app_text_15: `After inflation, different assets leave very different amounts of real purchasing power. Over long horizons, the smoothest and safest options often barely keep pace with inflation — or fall behind it in real terms. Assets that carry more day-to-day movement have historically compensated for that discomfort with higher real growth over time. The time horizon matters enormously — short-term bumpiness becomes less relevant when the goal is fifteen or twenty years away. What is the time horizon for each component of your family's portfolio?`,
     dinner_prompt: `If we laid out every place our family keeps money and ranked them by how fast they grow — would we be happy with how much is in each category?`,
     portfolio_status: `REQUIRED`,
     portfolio_reference: `Portfolio breakdown by asset type with return and bumpiness for each component.`,
@@ -698,7 +712,11 @@ export const WEEKLY_CONTENT = [
     penny_mode: `co-discoverer`,
     app_text_59: `The government runs some savings places of its own — safer than any private company because the government guarantees them. PPF: a 15-year savings plan with tax-free interest. SSY: a special plan for daughters only, with an even higher rate. Government gold bonds: a way to own gold without storing it. These are different from your mutual fund — slower, safer, government-backed.`,
     app_text_1014: `PPF offers 7.1% interest, fully tax-free, with a 15-year lock-in. SSY offers 8.0% for daughters below 10 years, with 80C benefits and tax-free maturity. Sovereign Gold Bonds offer gold price appreciation plus 2.5% annual interest, with capital gains exemption if held to maturity. Each serves a different function. Does your family's strategy include any of these?`,
-    app_text_15: `After-tax return for 30% taxpayer: ELSS at 12% nominal ≈ 10.2% post-tax. PPF at 7.1% = 7.1% effective (tax-free). FD at 7% = 4.9% effective (taxed). SSY at 8% = 8% effective (tax-free). The ranking changes dramatically once tax is applied. A family with a daughter under 10 and no SSY account is leaving a guaranteed 8% tax-free return unused. Is that the case for your family?`,
+    // SOURCE-XLSX UPDATE REQUIRED (Week 39, app_text_15): removed "ELSS at 12% nominal" (return
+    // projection), "The ranking changes dramatically" (comparative ranking), and "leaving a
+    // guaranteed 8% tax-free return unused" (implied recommendation). Replaced with concept-level
+    // explanation of tax impact on effective returns without projecting or ranking instruments.
+    app_text_15: `The tax you pay on returns is just as important as the nominal rate itself. Tax-free instruments like PPF and SSY let you keep every rupee of the declared interest. An FD earns interest taxed at your income slab rate, so the effective return is meaningfully lower than the headline figure. ELSS has its own tax treatment with a lock-in period. The same nominal interest rate has a very different real value depending on how it's taxed. Does your family account for this when comparing options?`,
     dinner_prompt: `If our family has a daughter, do we have an SSY account — and does our family use PPF for the safer, government-backed part of the savings?`,
     portfolio_status: `OPTIONAL`,
     portfolio_reference: `Gold or PPF/SSY component if present in portfolio. Do not force if not present.`,
@@ -806,7 +824,11 @@ export const WEEKLY_CONTENT = [
     penny_mode: `co-discoverer`,
     app_text_59: `Every loan has two prices: the monthly amount (the one they show you) and the total amount (the one they hope you don't calculate). For a ₹10 lakh loan at 12% over 5 years, the monthly amount is ₹22,244. But the total paid is ₹13.3 lakh — over ₹3 lakh more than borrowed. Always calculate the total before deciding.`,
     app_text_1014: `Good debt funds something that appreciates or generates income — home loan, education loan. Bad debt funds something that depreciates — personal loan for a holiday, credit card for consumption. The distinction isn't about interest rate alone — it's about whether the borrowed amount creates an asset or funds a liability. What category does any loan your family holds fall into?`,
-    app_text_15: `IRR analysis for loans: compare cost of debt against the return on the asset it funds. Home loan at 8.5% versus equity at 12% — the 3.5% gap on large amounts over 20 years is significant. But property also appreciates — if it appreciates at 8%+, the home loan cost is offset. For consumer debt at 36%, the maths is unambiguous: clear it before investing. Does your family hold any consumer debt alongside investments?`,
+    // SOURCE-XLSX UPDATE REQUIRED (Week 45, app_text_15): removed "equity at 12%" and "if it
+    // appreciates at 8%+" (return projections) and "clear it before investing" (advisory
+    // recommendation). Replaced with the same IRR concept framed around the logical question,
+    // not a projected answer.
+    app_text_15: `IRR analysis for loans: the right question isn't "can I afford the EMI?" — it's "does the asset this debt funds generate a return that exceeds the interest rate?" A home loan funds something that appreciates and provides shelter, making the comparison genuinely nuanced. Consumer debt at credit-card rates funds consumption with no asset created — the interest compounds against you with nothing offsetting it. Does your family hold any consumer debt alongside investments?`,
     dinner_prompt: `If our family currently has any loans, do we know the total amount we'll pay back — not the monthly amount, the total — and does that change how we feel about the decision?`,
     portfolio_status: `OPTIONAL`,
     portfolio_reference: `Portfolio return rate vs loan interest rate for 15+ only. Illustrates good/bad debt distinction.`,

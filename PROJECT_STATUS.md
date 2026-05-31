@@ -52,6 +52,7 @@
 | `006_conversation_log_child_rls.sql` | Tightened RLS WITH CHECK on `conversation_log` (child_id ownership guard) |
 | `007_cas_funds_update_with_check.sql` | Explicit `WITH CHECK` on `cas_funds` UPDATE policy |
 | `008_conversation_log_unique_constraint.sql` | Unique constraint on `conversation_log(parent_id, week_number)` — required for week-complete upsert |
+| `012_consent_log_create.sql` | Creates `consent_log` table + RLS (migration 009 was written but never applied to production) |
 
 ### Tables
 

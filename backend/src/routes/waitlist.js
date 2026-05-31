@@ -2,7 +2,10 @@
  * Waitlist endpoint
  *
  * POST /api/waitlist
- * Body: { email: string }
+ * Body: { email: string, source?: string, consent_given?: boolean }
+ *
+ * source defaults to 'landing' when absent (landing page sends only { email }).
+ * consent_given defaults to false when absent.
  *
  * Validates the email, inserts into `waitlist_emails`, and handles
  * duplicate entries gracefully (idempotent — re-joining is not an error).
@@ -33,11 +36,13 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'A valid email address is required.' })
   }
 
-  const email = rawEmail.trim().toLowerCase()
+  const email         = rawEmail.trim().toLowerCase()
+  const source        = typeof req.body?.source === 'string' ? req.body.source : 'landing'
+  const consent_given = req.body?.consent_given === true
 
   const { error } = await sb
     .from('waitlist_emails')
-    .insert({ email })
+    .insert({ email, source, consent_given })
 
   if (error) {
     // Postgres unique-constraint violation code — treat duplicate as success
