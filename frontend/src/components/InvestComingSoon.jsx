@@ -175,7 +175,7 @@ export default function InvestComingSoon() {
           disabled={!canSubmit}
           style={canSubmit ? styles.submitBtnFull : { ...styles.submitBtnFull, ...styles.submitBtnDisabled }}
         >
-          {submitting ? 'Saving…' : 'Notify me when it's ready'}
+          {submitting ? 'Saving…' : "Notify me when it's ready"}
         </button>
       </form>
     </div>
