@@ -30,3 +30,11 @@
 // See brief section 5 and open item #1 in CLAUDE.md.
 
 export const INVEST_CTA_PROMINENCE = 'footer'
+
+// ── Investment feature flag ────────────────────────────────────────────────────
+//
+// When false (default): Dashboard renders InvestComingSoon.
+// When true: Dashboard renders InvestmentApp.
+// Flip only after BSE StAR MF empanelment and KYC-acceptance question resolved.
+
+export const INVESTMENT_ENABLED = import.meta.env.VITE_INVESTMENT_ENABLED === 'true'
