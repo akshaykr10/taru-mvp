@@ -39,6 +39,9 @@ export default function Signup() {
       return
     }
 
+    // Fire Google Ads sign-up conversion (fire-and-forget — don't block navigation)
+    window.gtag?.('event', 'conversion', { send_to: 'AW-18172166013/aC8FCKyqn7YcEP3-lNlD' })
+
     navigate('/parent/onboarding')
   }
 
