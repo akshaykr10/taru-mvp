@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 
 // Landing
@@ -13,6 +14,10 @@ import EulaPage    from './pages/EulaPage.jsx'
 // Legal pages
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import TermsOfUse    from './pages/TermsOfUse.jsx'
+
+// Blog
+import BlogIndex from './components/blog/BlogIndex.jsx'
+import BlogPost  from './components/blog/BlogPost.jsx'
 
 // Parent routes (auth-gated)
 import ParentOnboarding from './pages/parent/Onboarding.jsx'
@@ -37,12 +42,17 @@ function AppRedirect() {
 
 export default function App() {
   return (
+    <HelmetProvider>
     <AuthProvider>
       <BrowserRouter>
         <Routes>
 
           {/* ── Landing page ─────────────────────────────────────────── */}
           <Route path="/" element={<Landing />} />
+
+          {/* ── Blog (public, no auth) ───────────────────────────────── */}
+          <Route path="/blog"        element={<BlogIndex />} />
+          <Route path="/blog/:slug"  element={<BlogPost />} />
 
           {/* ── /app entry: auth-gate redirect ───────────────────────── */}
           <Route path="/app" element={<AppRedirect />} />
@@ -89,5 +99,6 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </HelmetProvider>
   )
 }

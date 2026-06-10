@@ -79,6 +79,7 @@ export default function Landing() {
             <a href="#how">How it works</a>
             <a href="#penny">Penny</a>
             <a href="#why">Why now</a>
+            <Link to="/blog">Blogs</Link>
             <a href="#cta" className="btn primary">Join waitlist</a>
           </div>
         </div>
