@@ -5,6 +5,8 @@ export default function Footer() {
     <footer style={styles.footer}>
       <span style={styles.brand}>Taru</span>
       <div style={styles.links}>
+        <Link to="/blog" style={styles.link}>Blogs</Link>
+        <span style={styles.divider}>·</span>
         <Link to="/privacy" style={styles.link}>Privacy Policy</Link>
         <span style={styles.divider}>·</span>
         <Link to="/terms" style={styles.link}>Terms of Use</Link>
