@@ -3,12 +3,14 @@
 
 [build]
   base    = "frontend"          # Netlify runs all commands from here
-  command = "npm run build"     # vite build → outputs to frontend/dist
+  command = "npm install && npm run build"
   publish = "dist"              # relative to base, so resolves to frontend/dist
+  timeout = 300
 
 [build.environment]
-  NODE_VERSION   = "20"                                    # pin to LTS; Vite 8 requires Node ≥ 18
-  VITE_BACKEND_URL = "https://taru-mvp-dr4o.onrender.com" # Render backend URL baked at build time
+  NODE_VERSION     = "20"                                    # pin to LTS; Vite 8 requires Node ≥ 18
+  VITE_BACKEND_URL = "https://taru-mvp-dr4o.onrender.com"   # Render backend URL baked at build time
+  NODE_ENV         = "production"
 
 # ── SPA redirect rule ─────────────────────────────────────────────
 # All routes (/, /app, /app/*, /child/:token, /parent/*, /login, etc.)
