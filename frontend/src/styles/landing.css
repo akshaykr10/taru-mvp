@@ -1244,7 +1244,7 @@
   .landing-page .hero                               { padding: 120px 0 64px; }
   .landing-page .quote-block                        { padding: 48px 28px; }
   .landing-page .quote-block .qmark                 { font-size: 140px; left: 14px; }
-  .landing-page .nav-links a:not(.btn)              { display: none; }
+  .landing-page .nav-links a:not(.btn):not(.nav-blogs) { display: none; }
   .landing-page footer .inner                       { flex-direction: column; text-align: center; }
   .landing-page .phone-stage                        { min-height: auto; }
 }
