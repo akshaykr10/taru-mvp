@@ -10,7 +10,7 @@
 [build.environment]
   NODE_VERSION     = "20"                                    # pin to LTS; Vite 8 requires Node ≥ 18
   VITE_BACKEND_URL = "https://taru-mvp-dr4o.onrender.com"   # Render backend URL baked at build time
-  NODE_ENV         = "production"
+  NPM_FLAGS        = "--include=dev"
 
 # ── SPA redirect rule ─────────────────────────────────────────────
 # All routes (/, /app, /app/*, /child/:token, /parent/*, /login, etc.)
