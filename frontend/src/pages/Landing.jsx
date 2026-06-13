@@ -76,10 +76,8 @@ export default function Landing() {
         <div className="inner">
           <a href="#" className="logo">taru<span className="dot">.</span></a>
           <div className="nav-links">
-            <a href="#how">How it works</a>
-            <a href="#penny">Penny</a>
-            <a href="#why">Why now</a>
             <Link to="/blog" className="nav-blogs">Blogs</Link>
+            <Link to="/tax-calculator">Tax calculator</Link>
             <a href="#cta" className="btn primary">Join waitlist</a>
           </div>
         </div>
@@ -533,6 +531,25 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ══════════ TAX CALCULATOR BRIDGE ══════════ */}
+      <section className="why-section cream">
+        <div className="wrap-narrow">
+          <div className="tc-bridge reveal">
+            <span className="eyebrow">Free calculator</span>
+            <h2 className="serif">
+              See what 18 years of investing <em className="italic-amber">builds</em>
+            </h2>
+            <p>
+              A parent investing ₹5,000 a month from birth builds a corpus of over ₹60 lakhs by the
+              time their child turns 18 — ringfenced, compounding, and tax-efficient.
+            </p>
+            <Link to="/tax-calculator" className="btn primary">
+              Calculate your child&apos;s corpus &rarr;
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ══════════ CTA ══════════ */}
       <section className="block dark cta-section" id="cta">
         <div className="wrap-narrow reveal">
@@ -584,9 +601,8 @@ export default function Landing() {
             <div className="copy">&copy; 2026 Taru Money Pvt. Ltd.</div>
           </div>
           <div className="fnav">
-            <a href="#how">How it works</a>
-            <a href="#penny">Penny</a>
-            <a href="#why">Why now</a>
+            <Link to="/blog">Blogs</Link>
+            <Link to="/tax-calculator">Tax calculator</Link>
           </div>
           <div className="made-tag">
             <span className="flag-dot"></span>

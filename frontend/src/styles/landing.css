@@ -1074,6 +1074,43 @@
   border:        1px solid rgba(239,159,39,0.18);
 }
 
+/* ── Tax calculator bridge ── */
+.landing-page .tc-bridge {
+  background:    white;
+  border:        1px solid rgba(26, 61, 43, 0.10);
+  border-radius: 32px;
+  padding:       56px 64px;
+  text-align:    center;
+  box-shadow:    var(--shadow-md);
+}
+
+.landing-page .tc-bridge h2 {
+  font-family:    var(--serif);
+  font-weight:    500;
+  font-size:      clamp(32px, 4vw, 52px);
+  line-height:    1.08;
+  letter-spacing: -0.02em;
+  margin:         14px 0 16px;
+  color:          var(--forest);
+}
+
+.landing-page .tc-bridge p {
+  font-family: var(--sans);
+  font-size:   17px;
+  font-weight: 300;
+  line-height: 1.55;
+  color:       var(--sage);
+  margin:      0 auto 32px;
+  max-width:   500px;
+}
+
+@media (max-width: 680px) {
+  .landing-page .tc-bridge {
+    padding: 36px 24px;
+    border-radius: 24px;
+  }
+}
+
 /* ── CTA section ── */
 .landing-page .cta-section { text-align: center; }
 .landing-page .cta-section h2 {

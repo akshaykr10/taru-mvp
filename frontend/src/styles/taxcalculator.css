@@ -1,0 +1,757 @@
+/* ═══════════════════════════════════════════════════════════
+   Tax Calculator — all rules scoped to .landing-page
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Hero ─────────────────────────────────────────────────── */
+
+.landing-page .tc-hero {
+  padding: 100px 0 24px;
+  text-align: center;
+  background: var(--cream);
+}
+
+.landing-page .tc-hero__title {
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 1.12;
+  color: var(--forest);
+  margin: 16px 0 20px;
+}
+
+.landing-page .tc-hero__sub {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--sage);
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.landing-page .tc-seo-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Section wrapper ──────────────────────────────────────── */
+
+.landing-page .tc-section {
+  padding: 56px 0 80px;
+  background: var(--cream);
+}
+
+/* ── Two-column page grid ─────────────────────────────────── */
+
+.landing-page .tc-page-grid {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── Left panel ───────────────────────────────────────────── */
+
+.landing-page .tc-left-panel {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Inputs white card ────────────────────────────────────── */
+
+.landing-page .tc-inputs {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.landing-page .tc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.landing-page .tc-field__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.landing-page .tc-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--forest);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.landing-page .tc-value-box {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--cream);
+  height: 36px;
+}
+
+.landing-page .tc-rupee-prefix {
+  padding: 0 8px 0 10px;
+  font-size: 15px;
+  color: var(--sage);
+  border-right: 1.5px solid var(--border);
+  line-height: 36px;
+}
+
+.landing-page .tc-number-input {
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--forest);
+  padding: 0 10px;
+  width: 100px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+.landing-page .tc-number-input::-webkit-outer-spin-button,
+.landing-page .tc-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.landing-page .tc-value-pill {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sage);
+  background: rgba(107, 124, 110, 0.10);
+  border-radius: 20px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+.landing-page .tc-value-pill--amber {
+  color: var(--amber);
+  background: rgba(239, 159, 39, 0.12);
+}
+
+/* ── Slider ───────────────────────────────────────────────── */
+
+.landing-page .tc-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    var(--forest) 0%,
+    var(--forest) var(--fill),
+    var(--border) var(--fill),
+    var(--border) 100%
+  );
+}
+
+.landing-page .tc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--forest);
+  border: 2.5px solid #fff;
+  box-shadow: 0 1px 6px rgba(26, 61, 43, 0.25);
+  cursor: grab;
+}
+
+.landing-page .tc-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--forest);
+  border: 2.5px solid #fff;
+  box-shadow: 0 1px 6px rgba(26, 61, 43, 0.25);
+  cursor: grab;
+}
+
+.landing-page .tc-slider:active::-webkit-slider-thumb { cursor: grabbing; }
+.landing-page .tc-slider:active::-moz-range-thumb    { cursor: grabbing; }
+
+.landing-page .tc-slider-bounds {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--sage);
+  gap: 4px;
+}
+
+.landing-page .tc-not-guarantee {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* ── Pills (asset class) ──────────────────────────────────── */
+
+.landing-page .tc-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.landing-page .tc-pill {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sage);
+  background: rgba(107, 124, 110, 0.08);
+  border: 1.5px solid transparent;
+  border-radius: 99px;
+  padding: 6px 14px;
+  cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.landing-page .tc-pill--active {
+  background: var(--forest);
+  color: #fff;
+  border-color: var(--forest);
+}
+
+.landing-page .tc-pill:not(.tc-pill--active):hover {
+  background: rgba(26, 61, 43, 0.12);
+  color: var(--forest);
+}
+
+/* ── Assumptions section ──────────────────────────────────── */
+
+.landing-page .tc-assumptions {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 24px;
+}
+
+.landing-page .tc-assumptions__heading {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--sage);
+  opacity: 0.65;
+  margin-bottom: 12px;
+}
+
+.landing-page .tc-assumptions__list {
+  margin: 0;
+  padding: 0 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.landing-page .tc-assumptions__list li {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--sage);
+}
+
+/* ── Right panel ──────────────────────────────────────────── */
+
+.landing-page .tc-right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Zone A: Corpus card ──────────────────────────────────── */
+
+.landing-page .tc-corpus-card {
+  background: var(--forest);
+  border-radius: 20px;
+  padding: 36px 40px;
+  color: #fff;
+}
+
+.landing-page .tc-corpus__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 8px;
+}
+
+.landing-page .tc-corpus__big {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 52px;
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.landing-page .tc-corpus__sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* Gains chips — used inside .tc-corpus-stat-row__mid */
+
+.landing-page .tc-gains-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.landing-page .tc-chip-ltcg,
+.landing-page .tc-chip-stcg,
+.landing-page .tc-chip-single {
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 99px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+.landing-page .tc-chip-ltcg {
+  background: rgba(64, 145, 108, 0.30);
+  color: #a3e4c5;
+}
+
+.landing-page .tc-chip-stcg {
+  background: rgba(239, 159, 39, 0.28);
+  color: #fddfa0;
+}
+
+.landing-page .tc-chip-single {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Stat row — invested → [arrow + chips] → corpus */
+
+.landing-page .tc-corpus-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.landing-page .tc-corpus-stat-row__num {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.landing-page .tc-corpus-stat-row small {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Middle column: arrow stacked above chips */
+.landing-page .tc-corpus-stat-row__mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.landing-page .tc-corpus-stat-row__arrow {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Chips inside the stat row inherit the mid column's centering */
+.landing-page .tc-corpus-stat-row .tc-gains-chips {
+  margin-top: 0;
+  justify-content: center;
+}
+
+/* ── Zone B: Tax card ─────────────────────────────────────── */
+
+.landing-page .tc-tax-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 36px;
+}
+
+.landing-page .tc-tax-card__header {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 24px;
+}
+
+/* Comparison table */
+
+.landing-page .tc-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.landing-page .tc-comparison-table th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sage);
+  padding: 0 0 10px;
+  text-align: right;
+}
+
+.landing-page .tc-comparison-table th:first-child {
+  text-align: left;
+}
+
+.landing-page .tc-comparison-table td {
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  color: var(--forest);
+  text-align: right;
+}
+
+.landing-page .tc-comparison-table td:first-child {
+  text-align: left;
+  color: var(--sage);
+  padding-right: 16px;
+}
+
+.landing-page .tc-col-child {
+  text-align: right !important;
+}
+
+.landing-page .tc-tax-bad {
+  color: var(--coral);
+}
+
+.landing-page .tc-tax-good {
+  color: var(--leaf);
+}
+
+.landing-page .tc-tax-bold {
+  font-weight: 600;
+}
+
+/* Table row group headers */
+
+.landing-page .tc-group-header td {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--sage);
+  padding: 14px 0 6px;
+  border-top: none;
+}
+
+/* Second and subsequent group headers get a separator line above */
+.landing-page .tc-group-header--sep td {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+
+/* Total row — light separator when preceded by STCG/LTCG rows */
+.landing-page .tc-row-total td {
+  border-top: 1px dashed var(--border);
+}
+
+.landing-page .tc-row-keep td {
+  padding-top: 14px;
+  border-top: 2px solid var(--forest);
+}
+
+/* Explanatory exemption rows — Option A treatment */
+
+.landing-page .tc-row-explain td {
+  font-size: 13px;
+  color: var(--sage);
+  background: #F7F6F3; /* no --bg-secondary token exists; closest off-white */
+  border-top: 0.5px solid var(--border);
+  padding: 7px 0;
+}
+
+.landing-page .tc-row-explain td:first-child {
+  padding-left: 14px;
+  padding-right: 16px;
+  border-left: 2.5px solid var(--leaf);
+}
+
+/* Muted secondary value — parent "already used", taxable amounts */
+.landing-page .tc-expl-muted {
+  color: var(--sage) !important;
+  font-size: 13px;
+}
+
+/* Child's exemption deduction value (−₹4,25,000) */
+.landing-page .tc-expl-exemption {
+  color: var(--leaf) !important;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Saving banner */
+
+.landing-page .tc-saving-banner {
+  background: rgba(64, 145, 108, 0.10);   /* --leaf hex with alpha */
+  border: 1.5px solid rgba(64, 145, 108, 0.30); /* --leaf hex with alpha */
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px;
+  color: var(--leaf);
+  margin-bottom: 16px;
+}
+
+.landing-page .tc-saving-banner strong {
+  font-weight: 700;
+}
+
+.landing-page .tc-no-saving-banner {
+  background: rgba(239, 159, 39, 0.10);
+  border: 1.5px solid rgba(239, 159, 39, 0.30);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px;
+  color: var(--amber);
+  margin-bottom: 16px;
+}
+
+.landing-page .tc-no-saving-banner strong {
+  font-weight: 700;
+}
+
+.landing-page .tc-no-saving__reason {
+  opacity: 0.80;
+}
+
+/* Explanation collapsible */
+
+.landing-page .tc-expl {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.landing-page .tc-expl__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--forest);
+  text-align: left;
+  min-height: 44px;
+}
+
+.landing-page .tc-expl__chevron {
+  font-size: 16px;
+  color: var(--sage);
+  transition: transform 0.2s;
+  display: inline-block;
+}
+
+.landing-page .tc-expl__chevron--open {
+  transform: rotate(180deg);
+}
+
+.landing-page .tc-expl__body {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--sage);
+  margin: 12px 0 0;
+}
+
+/* ── Zone C: Milestones card ──────────────────────────────── */
+
+.landing-page .tc-milestone-card {
+  background: var(--amber-pale, #FEF9EC);
+  border: 1.5px solid rgba(239, 159, 39, 0.22);
+  border-radius: 20px;
+  padding: 32px 36px;
+}
+
+.landing-page .tc-milestone-card__header {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 20px;
+}
+
+.landing-page .tc-milestone-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.landing-page .tc-milestone-row {
+  font-size: 14px;
+  color: var(--sage);
+  padding: 12px 16px;
+  background: rgba(239, 159, 39, 0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(239, 159, 39, 0.15);
+  line-height: 1.4;
+}
+
+.landing-page .tc-milestone-row--done {
+  color: var(--forest);
+  font-weight: 500;
+  background: rgba(239, 159, 39, 0.14);
+  border-color: rgba(239, 159, 39, 0.30);
+}
+
+.landing-page .tc-milestone-note {
+  font-size: 11px;
+  color: var(--sage);
+  opacity: 0.65;
+  font-style: italic;
+}
+
+/* ── CTA block ────────────────────────────────────────────── */
+
+.landing-page .tc-cta-block {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 36px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.landing-page .tc-cta-block__heading {
+  font-size: 22px;
+  color: var(--forest);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.landing-page .tc-cta-block__btn {
+  display: inline-block;
+  min-height: 52px;
+  line-height: 52px;
+  padding: 0 32px;
+  border-radius: 99px;
+}
+
+.landing-page .tc-cta-block__coming-soon {
+  font-size: 13px;
+  color: var(--sage);
+  margin: 0;
+}
+
+.landing-page .tc-cta-block__disclaimer {
+  font-size: 11px;
+  color: var(--sage);
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Mobile — 960px breakpoint: stack to single column
+   ══════════════════════════════════════════════════════════ */
+
+@media (max-width: 960px) {
+  .landing-page .tc-hero {
+    padding: 88px 0 20px;
+  }
+
+  .landing-page .tc-hero__title {
+    font-size: 34px;
+  }
+
+  .landing-page .tc-hero__sub {
+    font-size: 16px;
+  }
+
+  .landing-page .tc-page-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .landing-page .tc-left-panel {
+    position: static;
+  }
+
+  .landing-page .tc-inputs {
+    padding: 24px;
+    gap: 24px;
+  }
+
+  .landing-page .tc-corpus-card {
+    padding: 28px 24px;
+  }
+
+  .landing-page .tc-corpus__big {
+    font-size: 38px;
+  }
+
+  .landing-page .tc-tax-card {
+    padding: 24px;
+  }
+
+  .landing-page .tc-milestone-card {
+    padding: 24px;
+  }
+
+  .landing-page .tc-cta-block {
+    padding: 24px;
+  }
+
+  .landing-page .tc-comparison-table {
+    font-size: 13px;
+  }
+
+  .landing-page .tc-comparison-table td:first-child {
+    padding-right: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-page .tc-corpus__big {
+    font-size: 32px;
+  }
+
+  .landing-page .tc-comparison-table {
+    font-size: 12px;
+  }
+}

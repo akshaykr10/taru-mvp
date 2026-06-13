@@ -16,8 +16,11 @@ import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import TermsOfUse    from './pages/TermsOfUse.jsx'
 
 // Blog
-import BlogIndex from './components/blog/BlogIndex.jsx'
-import BlogPost  from './components/blog/BlogPost.jsx'
+import BlogIndex     from './components/blog/BlogIndex.jsx'
+import BlogPost      from './components/blog/BlogPost.jsx'
+
+// Public tools
+import TaxCalculator from './pages/TaxCalculator.jsx'
 
 // Parent routes (auth-gated)
 import ParentOnboarding from './pages/parent/Onboarding.jsx'
@@ -51,8 +54,11 @@ export default function App() {
           <Route path="/" element={<Landing />} />
 
           {/* ── Blog (public, no auth) ───────────────────────────────── */}
-          <Route path="/blog"        element={<BlogIndex />} />
-          <Route path="/blog/:slug"  element={<BlogPost />} />
+          <Route path="/blog"           element={<BlogIndex />} />
+          <Route path="/blog/:slug"     element={<BlogPost />} />
+
+          {/* ── Public tools ─────────────────────────────────────────── */}
+          <Route path="/tax-calculator" element={<TaxCalculator />} />
 
           {/* ── /app entry: auth-gate redirect ───────────────────────── */}
           <Route path="/app" element={<AppRedirect />} />
