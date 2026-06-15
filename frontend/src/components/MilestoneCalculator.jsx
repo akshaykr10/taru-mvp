@@ -51,42 +51,44 @@ function sipNeeded(corpus, y, r) {
   return corpus / (((Math.pow(1 + mr, n) - 1) / mr) * (1 + mr));
 }
 
-// ─── COLOURS & BASE STYLES ───────────────────────────────────────────────────
-
-const G = "#1D9E75", GL = "#E8F8F2", GD = "#085041", GM = "#0F6E56";
+// ─── DESIGN TOKENS (CSS variables from tokens.css / landing.css) ─────────────
 
 const base = {
-  wrap:    { fontFamily: "'Inter', -apple-system, sans-serif", maxWidth: 560, margin: "0 auto", padding: "28px 18px", overflow: "hidden" },
-  pBar:    { height: 3, background: "#f0f0f0", borderRadius: 2, marginBottom: 36 },
-  pFill: w => ({ height: "100%", width: w + "%", background: G, borderRadius: 2, transition: "width 0.4s ease" }),
-  stepLbl: { fontSize: 11, color: "#aaa", letterSpacing: "0.09em", textTransform: "uppercase", marginBottom: 8 },
-  h1:      { fontSize: 23, fontWeight: 700, color: "#111", marginBottom: 6, lineHeight: 1.25 },
-  sub:     { fontSize: 15, color: "#666", marginBottom: 28, lineHeight: 1.65 },
-  grid2:   { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 24 },
-  card: s => ({ border: s ? `2px solid ${G}` : "1.5px solid #e8e8e8", borderRadius: 14, padding: "14px 15px", cursor: "pointer", background: s ? GL : "#fff", transition: "all 0.15s" }),
-  cIcon:   { fontSize: 24, marginBottom: 8 },
-  cTitle: s => ({ fontSize: 14, fontWeight: 600, color: s ? GD : "#1a1a1a", marginBottom: 3 }),
-  cSub:   s => ({ fontSize: 12, color: s ? GM : "#999", lineHeight: 1.4 }),
-  cMeta:  s => ({ fontSize: 11, color: s ? GM : "#bbb", marginTop: 5 }),
-  pill:   s => ({ display: "inline-block", border: s ? `2px solid ${G}` : "1.5px solid #e8e8e8", borderRadius: 100, padding: "7px 13px", fontSize: 13, cursor: "pointer", color: s ? GD : "#555", background: s ? GL : "#fff", fontWeight: s ? 600 : 400, marginRight: 8, marginBottom: 8, transition: "all 0.15s" }),
-  pgLbl:   { fontSize: 13, fontWeight: 600, color: "#333", marginBottom: 10 },
-  slWrap:  { marginBottom: 22 },
-  slRow:   { display: "flex", justifyContent: "space-between", fontSize: 14, color: "#666", marginBottom: 8 },
-  slVal:   { fontWeight: 700, color: "#111" },
-  slider:  { width: "100%", accentColor: G, cursor: "pointer" },
-  fldLbl:  { fontSize: 13, color: "#555", display: "block", marginBottom: 7, fontWeight: 500 },
-  inp:     { width: "100%", padding: "11px 14px", fontSize: 15, border: "1.5px solid #e8e8e8", borderRadius: 10, background: "#fff", color: "#111", outline: "none", boxSizing: "border-box", marginBottom: 16, transition: "border-color 0.15s" },
-  btnN:  d => ({ background: d ? "#e8e8e8" : G, color: d ? "#bbb" : "#fff", border: "none", borderRadius: 10, padding: "13px 28px", fontSize: 15, fontWeight: 600, cursor: d ? "not-allowed" : "pointer", marginTop: 6, transition: "background 0.15s" }),
-  btnB:    { background: "none", border: "1.5px solid #e8e8e8", borderRadius: 10, padding: "13px 20px", fontSize: 14, color: "#777", cursor: "pointer", marginRight: 10, marginTop: 6 },
-  riskRow: { display: "flex", gap: 8, marginBottom: 24 },
-  riskP: s => ({ flex: 1, border: s ? `2px solid ${G}` : "1.5px solid #e8e8e8", borderRadius: 10, padding: "10px 6px", fontSize: 12, fontWeight: s ? 700 : 400, cursor: "pointer", textAlign: "center", color: s ? GD : "#666", background: s ? GL : "#fff", lineHeight: 1.4 }),
-  hint:    { fontSize: 12, color: "#bbb", marginBottom: 16, marginTop: -8, lineHeight: 1.5 },
-  toggle:  { display: "flex", alignItems: "center", gap: 10, marginBottom: 20, cursor: "pointer" },
-  toggleBox: on => ({ width: 38, height: 22, borderRadius: 11, background: on ? G : "#ddd", position: "relative", transition: "background 0.2s", flexShrink: 0 }),
+  wrap:      { maxWidth: 560, margin: "0 auto", padding: "28px 18px", overflow: "hidden" },
+  pBar:      { height: 3, background: "var(--border)", borderRadius: 2, marginBottom: 36 },
+  pFill: w  => ({ height: "100%", width: w + "%", background: "var(--leaf)", borderRadius: 2, transition: "width 0.4s ease" }),
+  stepLbl:   { fontSize: 12, color: "var(--sage)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 8 },
+  h1:        { fontSize: 23, fontWeight: 600, color: "var(--forest)", marginBottom: 6, lineHeight: 1.25 },
+  sub:       { fontSize: 15, color: "var(--sage)", marginBottom: 28, lineHeight: 1.65 },
+  grid2:     { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 24 },
+  card: s   => ({ border: s ? "2px solid var(--leaf)" : "1px solid var(--border)", borderRadius: 12, padding: "14px 15px", cursor: "pointer", background: s ? "var(--frost)" : "#fff", transition: "all 0.15s" }),
+  cIcon:     { fontSize: 24, marginBottom: 8 },
+  cTitle: s => ({ fontSize: 14, fontWeight: 600, color: s ? "var(--forest)" : "var(--ink)", marginBottom: 3 }),
+  cSub:   s => ({ fontSize: 12, color: s ? "var(--moss)" : "var(--sage)", lineHeight: 1.4 }),
+  cMeta:  s => ({ fontSize: 11, color: s ? "var(--moss)" : "var(--ink-30)", marginTop: 5 }),
+  pill:   s => ({ display: "inline-block", border: s ? "2px solid var(--leaf)" : "1px solid var(--border)", borderRadius: 100, padding: "7px 13px", fontSize: 13, cursor: "pointer", color: s ? "var(--forest)" : "var(--sage)", background: s ? "var(--frost)" : "#fff", fontWeight: s ? 600 : 400, marginRight: 8, marginBottom: 8, transition: "all 0.15s" }),
+  pgLbl:     { fontSize: 13, fontWeight: 600, color: "var(--forest)", marginBottom: 10 },
+  slWrap:    { marginBottom: 22 },
+  slRow:     { display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--sage)", marginBottom: 8 },
+  slVal:     { fontWeight: 700, color: "var(--forest)" },
+  slider:    { width: "100%", accentColor: "var(--leaf)", cursor: "pointer" },
+  fldLbl:    { fontSize: 13, color: "var(--sage)", display: "block", marginBottom: 7, fontWeight: 500 },
+  inp:       { width: "100%", padding: "11px 14px", fontSize: 15, border: "1px solid var(--border)", borderRadius: "var(--r-md)", background: "#fff", color: "var(--forest)", outline: "none", boxSizing: "border-box", marginBottom: 16, transition: "border-color 0.15s" },
+  riskRow:   { display: "flex", gap: 8, marginBottom: 24 },
+  riskP: s  => ({ flex: 1, border: s ? "2px solid var(--leaf)" : "1px solid var(--border)", borderRadius: "var(--r-sm)", padding: "10px 6px", fontSize: 12, fontWeight: s ? 700 : 400, cursor: "pointer", textAlign: "center", color: s ? "var(--forest)" : "var(--sage)", background: s ? "var(--frost)" : "#fff", lineHeight: 1.4 }),
+  hint:      { fontSize: 12, color: "var(--ink-30)", marginBottom: 16, marginTop: -8, lineHeight: 1.5 },
+  toggle:    { display: "flex", alignItems: "center", gap: 10, marginBottom: 20, cursor: "pointer" },
+  toggleBox: on => ({ width: 38, height: 22, borderRadius: 11, background: on ? "var(--leaf)" : "var(--border)", position: "relative", transition: "background 0.2s", flexShrink: 0 }),
   toggleDot: on => ({ position: "absolute", top: 3, left: on ? 19 : 3, width: 16, height: 16, borderRadius: 8, background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }),
-  toggleLbl: { fontSize: 13, color: "#555", fontWeight: 500 },
-  infoBanner: { background: GL, border: `1px solid ${G}30`, borderRadius: 10, padding: "10px 14px", fontSize: 13, color: GM, marginBottom: 20 },
+  toggleLbl: { fontSize: 13, color: "var(--sage)", fontWeight: 500 },
+  infoBanner:{ background: "var(--frost)", border: "1px solid var(--leaf)", borderRadius: "var(--r-sm)", padding: "10px 14px", fontSize: 13, color: "var(--moss)", marginBottom: 20 },
 };
+
+const btnPrimary = (disabled) => ({
+  marginTop: 6,
+  ...(disabled ? { opacity: 0.4, pointerEvents: "none" } : {}),
+});
+const btnBack = { marginRight: 10, marginTop: 6 };
 
 // ─── ANIMATED STEP WRAPPER ───────────────────────────────────────────────────
 
@@ -159,14 +161,14 @@ function Ring({ pct, size = 80 }) {
   const r = (size - 8) / 2;
   const circ = 2 * Math.PI * r;
   const dash = (pct / 100) * circ;
+  const ringColor = pct >= 100 ? "var(--leaf)" : pct > 50 ? "var(--amber)" : "var(--coral)";
   return (
     <svg width={size} height={size} style={{ flexShrink: 0 }}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#f0f0f0" strokeWidth={6} />
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={pct >= 100 ? G : pct > 50 ? "#F5A623" : "#E05C3A"}
+      <circle cx={size/2} cy={size/2} r={r} fill="none" style={{ stroke: "var(--border)" }} strokeWidth={6} />
+      <circle cx={size/2} cy={size/2} r={r} fill="none" style={{ stroke: ringColor }}
         strokeWidth={6} strokeDasharray={`${dash} ${circ - dash}`} strokeDashoffset={0}
-        strokeLinecap="round" style={{ transition: "stroke-dasharray 0.6s ease" }}
-        transform={`rotate(-90 ${size/2} ${size/2})`} />
-      <text x="50%" y="50%" textAnchor="middle" dy="0.35em" fontSize={13} fontWeight={700} fill="#111">{pct}%</text>
+        strokeLinecap="round" transform={`rotate(-90 ${size/2} ${size/2})`} />
+      <text x="50%" y="50%" textAnchor="middle" dy="0.35em" fontSize={13} fontWeight={700} style={{ fill: "var(--forest)" }}>{pct}%</text>
     </svg>
   );
 }
@@ -252,17 +254,17 @@ export default function TaruCalculator() {
       {!showResults && step === 1 && (
         <StepWrap stepKey="s1">
           <p style={base.stepLbl}>Step 1</p>
-          <h1 style={base.h1}>How old is your child?</h1>
+          <h2 style={base.h1}>How old is your child?</h2>
           <p style={base.sub}>This sets how many years you have to build the corpus.</p>
           <div style={base.slWrap}>
             <div style={base.slRow}><span>Child's current age</span><span style={base.slVal}>{childAge} {childAge === 1 ? "year" : "years"}</span></div>
             <input type="range" min={0} max={17} value={childAge} step={1} style={base.slider}
               onChange={e => setChildAge(parseInt(e.target.value))} />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#ccc", marginTop: 4 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--ink-30)", marginTop: 4 }}>
               <span>Newborn</span><span>17 years</span>
             </div>
           </div>
-          <button style={base.btnN(false)} onClick={() => goTo(2)}>Continue →</button>
+          <button className="btn primary" style={btnPrimary(false)} onClick={() => goTo(2)}>Continue →</button>
         </StepWrap>
       )}
 
@@ -270,7 +272,7 @@ export default function TaruCalculator() {
       {!showResults && step === 2 && (
         <StepWrap stepKey="s2">
           <p style={base.stepLbl}>Step 2</p>
-          <h1 style={base.h1}>What are you saving for?</h1>
+          <h2 style={base.h1}>What are you saving for?</h2>
           <p style={base.sub}>Pick all that apply. Each milestone gets its own projection.</p>
           <div style={base.grid2}>
             {Object.entries(MILESTONE_META).map(([key, meta]) => (
@@ -285,8 +287,8 @@ export default function TaruCalculator() {
               </div>
             ))}
           </div>
-          <button style={base.btnB} onClick={() => goTo(1)}>← Back</button>
-          <button style={base.btnN(milestoneKeys.length === 0)} disabled={milestoneKeys.length === 0} onClick={nextFrom2}>Continue →</button>
+          <button className="btn ghost" style={btnBack} onClick={() => goTo(1)}>← Back</button>
+          <button className="btn primary" style={btnPrimary(milestoneKeys.length === 0)} disabled={milestoneKeys.length === 0} onClick={nextFrom2}>Continue →</button>
         </StepWrap>
       )}
 
@@ -294,7 +296,7 @@ export default function TaruCalculator() {
       {!showResults && step === 3 && hasEdu && (
         <StepWrap stepKey="s3">
           <p style={base.stepLbl}>Step 3 · Higher education</p>
-          <h1 style={base.h1}>What degree are you planning for?</h1>
+          <h2 style={base.h1}>What degree are you planning for?</h2>
           <p style={base.sub}>This sets the target age and timeline for savings.</p>
           <div style={base.grid2}>
             {DEGREE_TYPES.map(dt => (
@@ -305,8 +307,8 @@ export default function TaruCalculator() {
               </div>
             ))}
           </div>
-          <button style={base.btnB} onClick={backFrom3}>← Back</button>
-          <button style={base.btnN(!edu3Ok)} disabled={!edu3Ok} onClick={nextFrom3}>Continue →</button>
+          <button className="btn ghost" style={btnBack} onClick={backFrom3}>← Back</button>
+          <button className="btn primary" style={btnPrimary(!edu3Ok)} disabled={!edu3Ok} onClick={nextFrom3}>Continue →</button>
         </StepWrap>
       )}
 
@@ -314,7 +316,7 @@ export default function TaruCalculator() {
       {!showResults && step === 4 && hasEdu && (
         <StepWrap stepKey="s4">
           <p style={base.stepLbl}>Step 4 · Higher education</p>
-          <h1 style={base.h1}>Which institution tier?</h1>
+          <h2 style={base.h1}>Which institution tier?</h2>
           <p style={base.sub}>We'll inflate today's cost at 8% per year to project the future amount.</p>
           {degreeType && (
             <div style={base.infoBanner}>
@@ -326,13 +328,13 @@ export default function TaruCalculator() {
               const cost = EDU_COST_MATRIX[degreeType]?.[t.key] || 0;
               return (
                 <span key={t.key} style={base.pill(eduTier === t.key)} onClick={() => setEduTier(t.key)}>
-                  {t.label}&nbsp;<span style={{ fontSize: 11, color: eduTier === t.key ? GM : "#bbb" }}>· {fmtINR(cost)} today</span>
+                  {t.label}&nbsp;<span style={{ fontSize: 11, color: eduTier === t.key ? "var(--moss)" : "var(--ink-30)" }}>· {fmtINR(cost)} today</span>
                 </span>
               );
             })}
           </div>
-          <button style={base.btnB} onClick={backFrom4}>← Back</button>
-          <button style={base.btnN(!edu4Ok)} disabled={!edu4Ok} onClick={nextFrom4}>Continue →</button>
+          <button className="btn ghost" style={btnBack} onClick={backFrom4}>← Back</button>
+          <button className="btn primary" style={btnPrimary(!edu4Ok)} disabled={!edu4Ok} onClick={nextFrom4}>Continue →</button>
         </StepWrap>
       )}
 
@@ -340,7 +342,7 @@ export default function TaruCalculator() {
       {!showResults && step === 5 && hasOthers && (
         <StepWrap stepKey="s5">
           <p style={base.stepLbl}>Step {hasEdu ? "5" : "3"}</p>
-          <h1 style={base.h1}>A few more details</h1>
+          <h2 style={base.h1}>A few more details</h2>
           <p style={base.sub}>Help us size the remaining milestones.</p>
 
           {["mar","house","startup"].filter(k => milestones[k]).map(key => {
@@ -352,21 +354,21 @@ export default function TaruCalculator() {
               <div key={key} style={{ marginBottom: 32 }}>
 
                 {/* a) Section heading */}
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#222", marginBottom: 14 }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "var(--forest)", marginBottom: 14 }}>
                   {MILESTONE_META[key].icon} {MILESTONE_META[key].label}
                 </div>
 
                 {/* b) Age slider */}
                 <div style={base.slWrap}>
                   <div style={base.slRow}>
-                    <span style={{ fontSize: 13, color: "#666" }}>When do you expect this milestone?</span>
+                    <span style={{ fontSize: 13, color: "var(--sage)" }}>When do you expect this milestone?</span>
                     <span style={{ ...base.slVal, fontSize: 13 }}>
                       When your child is {tAge} · {yearsAway} {yearsAway === 1 ? "year" : "years"} away
                     </span>
                   </div>
                   <input type="range" min={min} max={max} step={1} value={tAge} style={base.slider}
                     onChange={e => setTargetAges(prev => ({ ...prev, [key]: parseInt(e.target.value) }))} />
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#ccc", marginTop: 4 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--ink-30)", marginTop: 4 }}>
                     <span>{min}</span><span>{max}</span>
                   </div>
                 </div>
@@ -377,7 +379,7 @@ export default function TaruCalculator() {
                     {BENCHMARKS[key].map(b => (
                       <span key={b.key} style={base.pill(selections[key] === b.key)}
                         onClick={() => setSelections(p => ({ ...p, [key]: b.key }))}>
-                        {b.label}&nbsp;<span style={{ fontSize: 11, color: selections[key] === b.key ? GM : "#bbb" }}>· {fmtINR(b.cost)}</span>
+                        {b.label}&nbsp;<span style={{ fontSize: 11, color: selections[key] === b.key ? "var(--moss)" : "var(--ink-30)" }}>· {fmtINR(b.cost)}</span>
                       </span>
                     ))}
                   </div>
@@ -452,9 +454,10 @@ export default function TaruCalculator() {
             );
           })}
 
-          <button style={base.btnB} onClick={backFrom5}>← Back</button>
+          <button className="btn ghost" style={btnBack} onClick={backFrom5}>← Back</button>
           <button
-            style={base.btnN(milestones["house"] && propertyCost === 0)}
+            className="btn primary"
+            style={btnPrimary(milestones["house"] && propertyCost === 0)}
             disabled={milestones["house"] && propertyCost === 0}
             onClick={() => goTo(6)}>
             Continue →
@@ -466,7 +469,7 @@ export default function TaruCalculator() {
       {!showResults && step === 6 && (
         <StepWrap stepKey="s6">
           <p style={base.stepLbl}>Last step</p>
-          <h1 style={base.h1}>What are you saving today?</h1>
+          <h2 style={base.h1}>What are you saving today?</h2>
           <p style={base.sub}>Zero is a perfectly valid answer.</p>
 
           <label style={base.fldLbl}>Already saved for this child (₹)</label>
@@ -486,7 +489,7 @@ export default function TaruCalculator() {
           {stepUpEnabled && (
             <div style={{ ...base.slWrap, marginTop: -8 }}>
               <div style={base.slRow}>
-                <span style={{ fontSize: 13, color: "#666" }}>Annual increase</span>
+                <span style={{ fontSize: 13, color: "var(--sage)" }}>Annual increase</span>
                 <span style={{ ...base.slVal, fontSize: 14 }}>{stepUpPct}% per year</span>
               </div>
               <input type="range" min={5} max={25} step={5} value={stepUpPct} style={base.slider}
@@ -504,8 +507,8 @@ export default function TaruCalculator() {
             ))}
           </div>
 
-          <button style={base.btnB} onClick={backFrom6}>← Back</button>
-          <button style={base.btnN(false)} onClick={() => setShowResults(true)}>See my plan →</button>
+          <button className="btn ghost" style={btnBack} onClick={backFrom6}>← Back</button>
+          <button className="btn primary" style={btnPrimary(false)} onClick={() => setShowResults(true)}>See my plan →</button>
         </StepWrap>
       )}
 
@@ -513,15 +516,15 @@ export default function TaruCalculator() {
       {showResults && live && (
         <StepWrap stepKey="results">
           <p style={base.stepLbl}>Your savings plan</p>
-          <h1 style={base.h1}>Here's where you stand</h1>
+          <h2 style={base.h1}>Here's where you stand</h2>
 
           {/* Overall progress ring + summary */}
-          <div style={{ display: "flex", gap: 16, alignItems: "center", background: "#fafafa", border: "1.5px solid #f0f0f0", borderRadius: 14, padding: "16px 20px", marginBottom: 20 }}>
+          <div style={{ display: "flex", gap: 16, alignItems: "center", background: "#fff", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px", marginBottom: 20 }}>
             <Ring pct={live.totalPct} size={80} />
             <div>
-              <div style={{ fontSize: 12, color: "#999", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>Overall funding</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "#111" }}>{fmtINR(live.totalOnTrack)} <span style={{ fontSize: 14, fontWeight: 400, color: "#aaa" }}>of {fmtINR(live.totalCorpus)}</span></div>
-              <div style={{ fontSize: 13, color: "#888", marginTop: 3 }}>
+              <div style={{ fontSize: 12, color: "var(--sage)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 4 }}>Overall funding</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--forest)" }}>{fmtINR(live.totalOnTrack)} <span style={{ fontSize: 14, fontWeight: 400, color: "var(--ink-30)" }}>of {fmtINR(live.totalCorpus)}</span></div>
+              <div style={{ fontSize: 13, color: "var(--sage)", marginTop: 3 }}>
                 {live.totalPct < 50 ? "You have a significant gap to close." : live.totalPct < 90 ? "Good start — a small SIP boost will get you there." : "You're nearly fully funded across all milestones."}
               </div>
             </div>
@@ -529,50 +532,50 @@ export default function TaruCalculator() {
 
           {/* Per-milestone cards */}
           {live.rows.map(r => (
-            <div key={r.key} style={{ border: "1.5px solid #f0f0f0", borderRadius: 14, padding: "16px 18px", marginBottom: 10 }}>
+            <div key={r.key} style={{ border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px", marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                 <div style={{ flex: 1, marginRight: 12 }}>
-                  <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 5 }}>{r.icon} {r.label} — in {r.years} yr{r.years !== 1 ? "s" : ""}</div>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: "#111" }}>{fmtINR(r.corpus)}</div>
-                  <div style={{ fontSize: 12, color: "#aaa", marginTop: 3 }}>{r.durationLabel} · today {fmtINR(r.todayCost)} @ {(INFLATION[r.key === "edu" ? "edu" : r.key]*100).toFixed(0)}% inflation</div>
+                  <div style={{ fontSize: 11, color: "var(--sage)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 5 }}>{r.icon} {r.label} — in {r.years} yr{r.years !== 1 ? "s" : ""}</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: "var(--forest)" }}>{fmtINR(r.corpus)}</div>
+                  <div style={{ fontSize: 12, color: "var(--ink-30)", marginTop: 3 }}>{r.durationLabel} · today {fmtINR(r.todayCost)} @ {(INFLATION[r.key === "edu" ? "edu" : r.key]*100).toFixed(0)}% inflation</div>
                 </div>
                 <Ring pct={r.pct} size={60} />
               </div>
               {/* Progress bar */}
-              <div style={{ marginTop: 12, height: 5, background: "#f0f0f0", borderRadius: 3 }}>
-                <div style={{ height: "100%", width: r.pct + "%", borderRadius: 3, background: r.pct >= 100 ? G : r.pct > 50 ? "#F5A623" : "#E05C3A", transition: "width 0.5s ease" }} />
+              <div style={{ marginTop: 12, height: 5, background: "var(--border)", borderRadius: 3 }}>
+                <div style={{ height: "100%", width: r.pct + "%", borderRadius: 3, background: r.pct >= 100 ? "var(--leaf)" : r.pct > 50 ? "var(--amber)" : "var(--coral)", transition: "width 0.5s ease" }} />
               </div>
             </div>
           ))}
 
           {/* Gap / on-track card */}
-          <div style={{ background: live.totalAddSIP > 0 ? "#FFFBF0" : GL, border: `1.5px solid ${live.totalAddSIP > 0 ? "#F5C842" : G}`, borderRadius: 14, padding: "20px 20px", marginBottom: 12, marginTop: 4 }}>
+          <div style={{ background: live.totalAddSIP > 0 ? "var(--amber-lt)" : "var(--frost)", border: `1.5px solid ${live.totalAddSIP > 0 ? "var(--amber)" : "var(--leaf)"}`, borderRadius: 14, padding: "20px 20px", marginBottom: 12, marginTop: 4 }}>
             {live.totalAddSIP > 0 ? (
               <>
-                <div style={{ fontSize: 11, color: "#9A6F00", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Additional SIP needed to close the gap</div>
-                <div style={{ fontSize: 30, fontWeight: 700, color: "#5A3D00" }}>{fmtINR(Math.round(live.totalAddSIP))} <span style={{ fontSize: 16, fontWeight: 500 }}>/ month</span></div>
-                <div style={{ fontSize: 13, color: "#9A6F00", marginTop: 6, lineHeight: 1.5 }}>
+                <div style={{ fontSize: 11, color: "var(--amber-dk)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Additional SIP needed to close the gap</div>
+                <div style={{ fontSize: 30, fontWeight: 700, color: "var(--amber-dk)" }}>{fmtINR(Math.round(live.totalAddSIP))} <span style={{ fontSize: 16, fontWeight: 500 }}>/ month</span></div>
+                <div style={{ fontSize: 13, color: "var(--amber-dk)", marginTop: 6, lineHeight: 1.5 }}>
                   On top of your current ₹{(parseFloat(monthlySIP)||0).toLocaleString("en-IN")}/month.
                   That's ₹{Math.round((parseFloat(monthlySIP)||0) + live.totalAddSIP).toLocaleString("en-IN")}/month total to fund all milestones on time.
                 </div>
               </>
             ) : (
               <>
-                <div style={{ fontSize: 11, color: GM, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>You are fully on track</div>
-                <div style={{ fontSize: 30, fontWeight: 700, color: GD }}>No gap 🎉</div>
-                <div style={{ fontSize: 13, color: GM, marginTop: 6 }}>Your current savings rate covers all selected milestones.</div>
+                <div style={{ fontSize: 11, color: "var(--moss)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>You are fully on track</div>
+                <div style={{ fontSize: 30, fontWeight: 700, color: "var(--forest)" }}>No gap 🎉</div>
+                <div style={{ fontSize: 13, color: "var(--moss)", marginTop: 6 }}>Your current savings rate covers all selected milestones.</div>
               </>
             )}
           </div>
 
           {/* Live what-if sliders */}
-          <div style={{ background: "#fafafa", border: "1.5px solid #f0f0f0", borderRadius: 14, padding: "18px 18px", marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#333", marginBottom: 16 }}>What if I change my plan?</div>
+          <div style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 18px", marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--forest)", marginBottom: 16 }}>What if I change my plan?</div>
 
             <div style={base.slWrap}>
               <div style={base.slRow}>
-                <span style={{ fontSize: 13, color: "#666" }}>Monthly SIP</span>
-                <span style={{ ...base.slVal, fontSize: 14, color: G }}>₹{(parseFloat(monthlySIP)||0).toLocaleString("en-IN")}</span>
+                <span style={{ fontSize: 13, color: "var(--sage)" }}>Monthly SIP</span>
+                <span style={{ ...base.slVal, fontSize: 14, color: "var(--leaf)" }}>₹{(parseFloat(monthlySIP)||0).toLocaleString("en-IN")}</span>
               </div>
               <input type="range" min={0} max={100000} step={500} value={parseFloat(monthlySIP)||0} style={base.slider}
                 onChange={e => setMonthlySIP(e.target.value)} />
@@ -580,8 +583,8 @@ export default function TaruCalculator() {
 
             <div style={base.slWrap}>
               <div style={base.slRow}>
-                <span style={{ fontSize: 13, color: "#666" }}>Already saved</span>
-                <span style={{ ...base.slVal, fontSize: 14, color: G }}>₹{(parseFloat(existingSavings)||0).toLocaleString("en-IN")}</span>
+                <span style={{ fontSize: 13, color: "var(--sage)" }}>Already saved</span>
+                <span style={{ ...base.slVal, fontSize: 14, color: "var(--leaf)" }}>₹{(parseFloat(existingSavings)||0).toLocaleString("en-IN")}</span>
               </div>
               <input type="range" min={0} max={5000000} step={50000} value={parseFloat(existingSavings)||0} style={base.slider}
                 onChange={e => setExistingSavings(e.target.value)} />
@@ -594,7 +597,7 @@ export default function TaruCalculator() {
           </div>
 
           {/* CTA block */}
-          <div style={{ background: `linear-gradient(135deg, ${GD} 0%, #0D7A5F 100%)`, borderRadius: 16, padding: "24px 22px", marginBottom: 16, textAlign: "center" }}>
+          <div style={{ background: "linear-gradient(135deg, var(--forest) 0%, var(--moss) 100%)", borderRadius: 16, padding: "24px 22px", marginBottom: 16, textAlign: "center" }}>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.7)", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.07em" }}>
               Ready to start?
             </div>
@@ -607,7 +610,7 @@ export default function TaruCalculator() {
               Taru invests in mutual funds for your child and teaches them about money — so the corpus you build today becomes a lesson they carry forever.
             </div>
             <a href="https://taru.money" target="_blank" rel="noopener noreferrer"
-              style={{ display: "inline-block", background: "#fff", color: GD, fontWeight: 700, fontSize: 15, padding: "13px 28px", borderRadius: 10, textDecoration: "none", letterSpacing: "0.01em" }}>
+              style={{ display: "inline-block", background: "#fff", color: "var(--forest)", fontWeight: 700, fontSize: 15, padding: "13px 28px", borderRadius: 10, textDecoration: "none", letterSpacing: "0.01em" }}>
               Invest on Taru →
             </a>
             <div style={{ marginTop: 14, fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
@@ -616,11 +619,11 @@ export default function TaruCalculator() {
           </div>
 
           <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
-            <button style={{ ...base.btnB, flex: 1, textAlign: "center", marginRight: 0 }} onClick={() => setShowResults(false)}>← Edit plan</button>
-            <button style={{ ...base.btnB, flex: 1, textAlign: "center" }} onClick={reset}>Start over</button>
+            <button className="btn ghost" style={{ flex: 1, textAlign: "center" }} onClick={() => setShowResults(false)}>← Edit plan</button>
+            <button className="btn ghost" style={{ flex: 1, textAlign: "center" }} onClick={reset}>Start over</button>
           </div>
 
-          <p style={{ fontSize: 11, color: "#ccc", marginTop: 16, lineHeight: 1.7 }}>
+          <p style={{ fontSize: 11, color: "var(--ink-30)", marginTop: 16, lineHeight: 1.7 }}>
             Projections use today's benchmark costs inflated at 8% / yr for education and 6–7% for other milestones. Expected returns are illustrative. This is not financial advice.
           </p>
         </StepWrap>
