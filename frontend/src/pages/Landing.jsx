@@ -76,8 +76,8 @@ export default function Landing() {
         <div className="inner">
           <a href="#" className="logo">taru<span className="dot">.</span></a>
           <div className="nav-links">
+            <Link to="/tax-calculator" className="nav-tax-calc">Tax calculator</Link>
             <Link to="/blog" className="nav-blogs">Blogs</Link>
-            <Link to="/tax-calculator">Tax calculator</Link>
             <a href="#cta" className="btn primary">Join waitlist</a>
           </div>
         </div>

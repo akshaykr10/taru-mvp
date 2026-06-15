@@ -1,19 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { BACKEND_URL } from '../lib/api.js'
 import { EULA_VERSION } from '../legal/index.js'
+import { useAuth } from '../context/AuthContext.jsx'
 import '../styles/auth.css'
 
 export default function Login() {
   const navigate  = useNavigate()
   const location  = useLocation()
+  const { session } = useAuth()
   const [form, setForm]       = useState({ email: '', password: '' })
   const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
+  const [navigateTo, setNavigateTo] = useState(null)
 
   // Redirect to wherever the user was trying to go, or default to dashboard
   const from = location.state?.from || '/parent/dashboard'
+
+  // Wait for AuthContext to confirm the session before navigating to protected routes.
+  // This avoids a race condition where navigate() fires before onAuthStateChange updates the context.
+  useEffect(() => {
+    if (session && navigateTo) {
+      navigate(navigateTo, { replace: true })
+    }
+  }, [session, navigateTo, navigate])
 
   function handleChange(e) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -56,12 +67,14 @@ export default function Login() {
 
     if (!accepted) {
       // No acceptance on record — show EULA before proceeding.
-      // Pass the intended destination so /eula can redirect there after acceptance.
+      // /eula is not auth-protected so we can navigate immediately.
       navigate('/eula', { replace: true, state: { from } })
       return
     }
 
-    navigate(from, { replace: true })
+    // Don't navigate immediately — wait for AuthContext to confirm the session
+    // via onAuthStateChange, then the useEffect above will fire the navigation.
+    setNavigateTo(from)
   }
 
   return (

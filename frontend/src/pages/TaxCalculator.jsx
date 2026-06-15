@@ -395,7 +395,7 @@ export default function TaxCalculator() {
         <div className="wrap">
           <div className="tc-page-grid">
 
-            {/* ════ LEFT PANEL — Inputs + Assumptions ════ */}
+            {/* ════ LEFT PANEL — Inputs (+ Assumptions on desktop) ════ */}
             <div className="tc-left-panel">
 
               <div className="tc-inputs">
@@ -498,8 +498,8 @@ export default function TaxCalculator() {
 
               </div>{/* /tc-inputs */}
 
-              {/* Assumptions — scoped to selected asset class */}
-              <div className="tc-assumptions">
+              {/* Assumptions — desktop only (hidden on mobile via CSS) */}
+              <div className="tc-assumptions tc-assumptions--desktop">
                 <div className="tc-assumptions__heading">Assumptions</div>
                 <ul className="tc-assumptions__list">
                   {assumptions.map((a, i) => (
@@ -551,7 +551,100 @@ export default function TaxCalculator() {
               <div className="tc-tax-card">
                 <div className="tc-tax-card__header">What tax does to it</div>
 
-                <table className="tc-comparison-table">
+                {/* Mobile-only: two stacked scenario cards */}
+                <div className="tc-mobile-tax-cards">
+                  {[
+                    {
+                      heading: 'Invested in your name',
+                      stcgTax: results.parentStcgTax,
+                      ltcgTax: results.parentLtcgTax,
+                      totalTax: results.parentTax,
+                      netCorpus: results.parentNetCorpus,
+                      exemption: null,
+                      isChild: false,
+                    },
+                    {
+                      heading: "Invested in child's name",
+                      stcgTax: results.childStcgTax,
+                      ltcgTax: results.childLtcgTax,
+                      totalTax: results.childTax,
+                      netCorpus: results.childNetCorpus,
+                      exemption: results.childLtcgExemption > 0 ? results.childLtcgExemption : null,
+                      isChild: true,
+                    },
+                  ].map((card) => (
+                    <div key={card.heading} className="tc-mobile-card">
+                      <div className="tc-mobile-card__heading">{card.heading}</div>
+                      <div className="tc-mobile-card__divider" />
+                      {showSplitRows && (
+                        <>
+                          {hasStcg && (
+                            <div className="tc-mobile-row">
+                              <span>STCG gains</span>
+                              <span>{fmt(results.stcgGains)}</span>
+                            </div>
+                          )}
+                          <div className="tc-mobile-row">
+                            <span>LTCG gains</span>
+                            <span>{fmt(results.ltcgGains)}</span>
+                          </div>
+                          {card.isChild && showLtcgExemptionRows && (
+                            <>
+                              <div className="tc-mobile-row tc-mobile-row--explain">
+                                <span>Less: exemption</span>
+                                <span className="tc-expl-exemption">−{fmt(results.childLtcgExemption)}</span>
+                              </div>
+                              <div className="tc-mobile-row tc-mobile-row--explain">
+                                <span>LTCG taxable after exemption</span>
+                                <span className="tc-expl-muted">{fmt(childLtcgTaxable)}</span>
+                              </div>
+                            </>
+                          )}
+                          {!card.isChild && showLtcgExemptionRows && (
+                            <div className="tc-mobile-row tc-mobile-row--explain">
+                              <span>Less: exemption</span>
+                              <span className="tc-expl-muted">— (already used)</span>
+                            </div>
+                          )}
+                          {card.isChild && showGoldExemptionRow && (
+                            <div className="tc-mobile-row tc-mobile-row--explain">
+                              <span>Less: basic exemption</span>
+                              <span className="tc-expl-exemption">−{fmt(results.childLtcgExemption)}</span>
+                            </div>
+                          )}
+                          {hasStcg && (
+                            <div className="tc-mobile-row">
+                              <span>{stcgRateLabel}</span>
+                              <span className={card.isChild ? '' : 'tc-tax-bad'}>{fmt(card.stcgTax)}</span>
+                            </div>
+                          )}
+                          <div className="tc-mobile-row">
+                            <span>{ltcgRateLabel}</span>
+                            <span className={card.isChild && results.taxSaving > 0 ? 'tc-tax-good' : (!card.isChild ? 'tc-tax-bad' : '')}>
+                              {fmt(card.ltcgTax)}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                      <div className="tc-mobile-row">
+                        <span>Total tax on gains</span>
+                        <span className={card.isChild && results.taxSaving > 0 ? 'tc-tax-good' : (!card.isChild ? 'tc-tax-bad' : '')}>
+                          {fmt(card.totalTax)}
+                        </span>
+                      </div>
+                      <div className="tc-mobile-card__divider tc-mobile-card__divider--bold" />
+                      <div className="tc-mobile-row tc-mobile-row--keep">
+                        <span><strong>You keep</strong></span>
+                        <span className={card.isChild && results.taxSaving > 0 ? 'tc-tax-good tc-tax-bold' : ''}>
+                          <strong>{fmt(card.netCorpus)}</strong>
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop-only: three-column table */}
+                <table className="tc-comparison-table tc-comparison-table--desktop">
                   <thead>
                     <tr>
                       <th></th>
@@ -719,6 +812,16 @@ export default function TaxCalculator() {
             </div>{/* /tc-right-panel */}
 
           </div>{/* /tc-page-grid */}
+
+          {/* ════ MOBILE-ONLY: Assumptions (after results) ════ */}
+          <div className="tc-assumptions tc-assumptions--mobile">
+            <div className="tc-assumptions__heading">Assumptions</div>
+            <ul className="tc-assumptions__list">
+              {assumptions.map((a, i) => (
+                <li key={i}>{a}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 

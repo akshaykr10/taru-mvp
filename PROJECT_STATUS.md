@@ -1,6 +1,112 @@
 # Taru MVP — Project Status
 
-> Last updated: 28 May 2026. Reflects the live codebase on `main`. All architecture, security, and product decisions are as per `CLAUDE.md` (aligned with PRD v2.1).
+> Last updated: 14 June 2026. Reflects the live codebase on `main`. All architecture, security, and product decisions are as per `CLAUDE.md` (aligned with PRD v2.1).
+
+---
+
+## Changelog
+
+### 14 June 2026 — Tax Savings Calculator launch
+
+#### New page: /tax-calculator (public, no auth)
+
+Built and deployed a fully public tax savings calculator at taru.money/tax-calculator.
+
+**What it does**
+- Shows parents the corpus their child builds at 18 given monthly SIP, child's current age, expected return, and asset class
+- Compares tax liability in parent's name vs child's name side by side
+- Calculates exact rupee tax saving from investing in the child's name
+
+**Asset classes covered**
+Equity MF, Equity Hybrid MF, Direct Stocks, ULIP, Digital Gold, Debt MF, FD/RD
+
+**Tax logic implemented**
+- Equity-type assets: last 12 SIP months = STCG at 20% (Sec 111A), remaining = LTCG at 12.5% (Sec 112A)
+- Child LTCG exemption: ₹4.25L (₹3L basic + ₹1.25L Sec 112A) — both fresh since child has no other income
+- Parent LTCG exemption: nil (assumed already used)
+- Digital Gold: last 24 months = STCG at slab rate (30%), remaining = LTCG at 12.5%; child gets ₹3L basic exemption only (Sec 112A is equity-only)
+- Debt MF (purchased Apr 2023 onwards): all gains taxed at slab rate under Sec 50AA regardless of holding period — zero tax saving due to minority clubbing (Sec 64(1A))
+- FD/RD: interest taxed at slab rate, clubbed with parent during minority — zero saving
+- Hybrid MF label updated to "Equity Hybrid MF" with assumption that ≥65% equity exposure applies
+
+**UI components**
+- Left panel (sticky): SIP slider (default ₹10,000), child age slider with Age X badge, return slider (default 12%), asset class pills, conditional assumptions section scoped per asset class
+- Corpus card (forest bg): headline corpus, invested/corpus stat row, LTCG/STCG chips inline under arrow
+- Tax comparison table: three row groups — Taxable gains (with indented exemption rows styled in tinted bg + 2.5px green left border to distinguish from data rows), Tax applied, You keep
+- Exemption rows: "Less: exemption" and "LTCG taxable after exemption" — 13px, var(--sage), tinted background, child exemption value in var(--leaf)
+- Saving banner: green for equity-type assets, amber no-saving state for Debt MF / FD/RD
+- Milestones card (amber pale bg): college years, study abroad (₹25L threshold), startup seed (₹15L)
+- CTA: "Open your child's investment account" → /signup
+- Column headers: "INVESTED IN YOUR NAME" / "INVESTED IN CHILD'S NAME"
+- Saving banner copy: "Investing in your child's name saves ₹X in taxes"
+
+**SEO**
+- Page title: "Child Investment Tax Calculator — Save Tax by Investing in Your Child's Name | Taru"
+- Meta description, OG title, OG description, OG URL tags
+- h1: "The best investment you'll ever make is in your child's name."
+- Subheadline: "See your corpus, your tax bill, and exactly how much you save by investing in your child's name. Live, with your numbers."
+- Visually hidden SEO paragraph placed at bottom of DOM for crawlers (standard accessible visually-hidden pattern — not visible to users)
+
+**Nav updates (Landing page)**
+- Removed: "How it works", "Penny", "Why now"
+- Added: "Tax calculator" → /tax-calculator (plain text link, same style as Blogs)
+- "Join waitlist" CTA retained
+- Landing page bridge block pointing to /tax-calculator retained
+
+**Tax logic verified against**
+- Section 111A (STCG equity, 20% post July 23 2024)
+- Section 112A (LTCG equity, 12.5%, ₹1.25L exemption)
+- Section 50AA (Debt MF slab rate regardless of holding)
+- Section 64(1A) (minor income clubbing during minority)
+- Finance Act 2024 changes (holding period and rate changes effective July 23 2024)
+
+**Deployed**: taru.money/tax-calculator (Netlify, prod)
+
+---
+
+### 10–11 June 2026 — Blog section + SEO infrastructure
+
+#### New section: /blog (public, no auth)
+
+- `BlogIndex` (`/blog`) and `BlogPost` (`/blog/:slug`) with `react-helmet-async` per-route SEO
+- 6 articles in `src/data/blogs.js` as typed content blocks (pull quotes, step blocks, reading-time badge, sticky CTA bar)
+- Blog 4 has alternate high-intent CTA text
+- `gtag blog_view` event per post; console.log fallback if `gtag` absent
+- Blogs link added to landing page navbar and footer
+
+#### SEO infrastructure (all routes)
+
+- `@prerenderer/prerenderer` + `@prerenderer/renderer-puppeteer` added as devDependencies
+- Build script: `vite build && node prerender-run.mjs` — pre-renders `/`, `/blog`, `/blog/:slug`, `/tax-calculator` to static HTML in `dist/`
+- `prerender-run.mjs` is non-fatal: build still succeeds if puppeteer unavailable (Netlify CI)
+- `frontend/public/robots.txt` — allows all, sitemap pointer
+- `frontend/public/sitemap.xml` — lists all public routes with `lastmod`
+- `index.html` — global `<meta name="description">`, canonical, OG tags for home page
+- `vite.config.js` — updated to support prerender output
+
+---
+
+### 30–31 May 2026 — Legal pages, EULA modal, and consent gate
+
+#### Legal pages (public routes)
+
+- `/privacy` → `PrivacyPolicy.jsx` — full privacy policy rendered from `src/legal/privacy-policy.md` via `react-markdown`; `[bracketed placeholders]` highlighted via `<mark>`; sticky back nav
+- `/terms` → `TermsOfUse.jsx` — same pattern from `src/legal/terms-of-use.md`
+- Footer component added to `ParentLayout` with Privacy Policy and Terms of Use links
+
+#### EULA flow
+
+- `EulaModal.jsx` — scroll-to-bottom gate. "Agree" button only activates after user scrolls to end. POSTs acceptance to `POST /api/consent`.
+- **Consent gate (post-login, not route-wrap):** `Login.jsx` queries `consent_log` immediately after `signInWithPassword` resolves. If no row exists, redirects to `/eula` carrying the intended destination in `location.state.from`. On acceptance, `EulaPage.jsx` navigates to the original destination.
+- `App.jsx`: `/eula` added as a public route; `EulaGate` wrapper removed from `RequireParentAuth` routes entirely (was an earlier approach, refactored out same day).
+- Backend: `POST /api/consent` — upsert, idempotent. Returns 200 on repeat calls.
+- Database: migration `012_consent_log_create.sql` — `consent_log` table with RLS. (Migration `009` was written earlier but never applied to production; `012` is the live version.)
+
+#### Additional migrations applied (May–June)
+- `010_cas_provenance.sql` — CAS fetch provenance tracking
+- `011_waitlist_source_consent.sql` — source field + consent timestamp on waitlist table
+
+---
 
 ---
 
@@ -101,6 +207,12 @@
 /signup                   Parent signup
 /login                    Parent login
 /verify-email             Holding page (currently bypassed for pilot)
+/eula                     EULA acceptance page (public, shown post-login if no consent_log row)
+/privacy                  Privacy Policy (public)
+/terms                    Terms of Use (public)
+/blog                     Blog index (public)
+/blog/:slug               Blog post (public)
+/tax-calculator           Tax savings calculator (public, no auth)
 /parent/onboarding        4-step wizard (Step 0 intro + Steps 1–3 data)
 /parent/dashboard         Main parent view
 /parent/portfolio         CAS import + fund tagging
@@ -323,6 +435,9 @@ Runs every Sunday in Supabase SQL editor. Returns `parent_open_days`, `child_ope
 
 | Date | Commit | Issue | Fix |
 |---|---|---|---|
+| 2026-06-14 | `42fdc64` | Netlify build failing — prerender step crashes if `@prerenderer/prerenderer` devDep not installed | Made prerender non-fatal: `vite build && (node prerender-run.mjs \|\| true)` in package.json. Vite build output is always published even if puppeteer is unavailable. |
+| 2026-05-31 | `38db39f` | EULA blocked all logins — wrong API URL and missing `consent_log` migration in production | Corrected `VITE_BACKEND_URL` usage in consent POST; applied migration `012_consent_log_create.sql` to production; tightened backend consent route. |
+| 2026-05-30 | `629f6b6` | `EulaGate` route-wrapper approach caused flicker and double-render on every parent route | Moved gate to post-login: `Login.jsx` checks `consent_log` once after sign-in and redirects to `/eula` if absent. No wrapper needed on authenticated routes. |
 | 2026-05-28 | `9a92908` | Curriculum stuck at Week 3 permanently on child and parent app | Removed 7-day gate (it deadlocked with the idempotent guard). Weeks now advance immediately on mark-done. `onWeekAdvanced` callback updates frontend state in-place without page reload. |
 | Earlier | `c84e8bd` | Mark-as-done button state not persisting across page reload | `week_completed_at` persisted to DB in Step 1 before any gate check. Frontend reads it on load to initialise button state. |
 | Earlier | `dc51170` | Child app showed wrong backend URL / API calls failed | `VITE_BACKEND_URL` added to `netlify.toml` build environment so Vite bakes the correct URL at deploy time. |

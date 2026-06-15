@@ -690,6 +690,10 @@
    Mobile — 960px breakpoint: stack to single column
    ══════════════════════════════════════════════════════════ */
 
+/* Desktop: show desktop assumptions, hide mobile assumptions + mobile tax cards */
+.landing-page .tc-assumptions--mobile { display: none; }
+.landing-page .tc-mobile-tax-cards    { display: none; }
+
 @media (max-width: 960px) {
   .landing-page .tc-hero {
     padding: 88px 0 20px;
@@ -737,12 +741,94 @@
     padding: 24px;
   }
 
-  .landing-page .tc-comparison-table {
-    font-size: 13px;
+  /* ── Issue 2: assumptions move below results on mobile ─── */
+  .landing-page .tc-assumptions--desktop { display: none; }
+  .landing-page .tc-assumptions--mobile  {
+    display: block;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-top: 8px;
   }
 
-  .landing-page .tc-comparison-table td:first-child {
-    padding-right: 8px;
+  /* ── Issue 3: replace 3-col table with stacked cards ───── */
+  .landing-page .tc-comparison-table--desktop { display: none; }
+  .landing-page .tc-mobile-tax-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .landing-page .tc-mobile-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  .landing-page .tc-mobile-card__heading {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 10px;
+  }
+
+  .landing-page .tc-mobile-card__divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0;
+  }
+
+  .landing-page .tc-mobile-card__divider--bold {
+    height: 2px;
+    background: var(--forest);
+    margin: 10px 0;
+  }
+
+  .landing-page .tc-mobile-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--forest);
+    padding: 5px 0;
+  }
+
+  .landing-page .tc-mobile-row span:first-child {
+    color: var(--sage);
+    flex: 1;
+  }
+
+  .landing-page .tc-mobile-row span:last-child {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* Exemption rows inside mobile cards */
+  .landing-page .tc-mobile-row--explain {
+    background: #F7F6F3;
+    border-left: 2.5px solid var(--leaf);
+    padding: 5px 8px;
+    margin: 2px 0;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .landing-page .tc-mobile-row--explain span:first-child {
+    font-size: 12px;
+  }
+
+  .landing-page .tc-mobile-row--explain span:last-child {
+    font-size: 12px;
+  }
+
+  /* You keep row */
+  .landing-page .tc-mobile-row--keep {
+    padding-top: 8px;
   }
 }
 
