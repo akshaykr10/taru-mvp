@@ -13,7 +13,7 @@ const prerenderer = new Prerenderer({
 })
 
 await prerenderer.initialize()
-const routes = await prerenderer.renderRoutes(['/'])
+const routes = await prerenderer.renderRoutes(['/', '/tax-calculator', '/calculator'])
 await prerenderer.destroy()
 
 for (const route of routes) {

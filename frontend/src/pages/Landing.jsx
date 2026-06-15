@@ -77,6 +77,7 @@ export default function Landing() {
           <a href="#" className="logo">taru<span className="dot">.</span></a>
           <div className="nav-links">
             <Link to="/tax-calculator" className="nav-tax-calc">Tax calculator</Link>
+            <a href="#calculator" className="nav-tax-calc">Milestone calculator</a>
             <Link to="/blog" className="nav-blogs">Blogs</Link>
             <a href="#cta" className="btn primary">Join waitlist</a>
           </div>
@@ -531,20 +532,20 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ══════════ TAX CALCULATOR BRIDGE ══════════ */}
-      <section className="why-section cream">
+      {/* ══════════ CALCULATOR BRIDGE ══════════ */}
+      <section className="why-section cream" id="calculator">
         <div className="wrap-narrow">
           <div className="tc-bridge reveal">
-            <span className="eyebrow">Free calculator</span>
             <h2 className="serif">
-              See what 18 years of investing <em className="italic-amber">builds</em>
+              How much do you need to invest for your child&apos;s future?
             </h2>
             <p>
-              A parent investing ₹5,000 a month from birth builds a corpus of over ₹60 lakhs by the
-              time their child turns 18 — ringfenced, compounding, and tax-efficient.
+              Tell us their age and what you&apos;re saving for — college,
+              marriage, or their first home. We&apos;ll show you the exact monthly
+              SIP to get there.
             </p>
-            <Link to="/tax-calculator" className="btn primary">
-              Calculate your child&apos;s corpus &rarr;
+            <Link to="/calculator" className="btn primary">
+              Calculate now &rarr;
             </Link>
           </div>
         </div>
@@ -603,6 +604,7 @@ export default function Landing() {
           <div className="fnav">
             <Link to="/blog">Blogs</Link>
             <Link to="/tax-calculator">Tax calculator</Link>
+            <a href="#calculator">Milestone calculator</a>
           </div>
           <div className="made-tag">
             <span className="flag-dot"></span>
