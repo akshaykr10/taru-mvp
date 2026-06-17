@@ -669,6 +669,428 @@
    Gullak tab
    ══════════════════════════════════════════════════════════════ */
 
+/* ── Hero card ─────────────────────────────────────────────── */
+.gullak-hero {
+  background: linear-gradient(145deg, var(--forest), var(--moss));
+  border-radius: var(--r-xl);
+  padding: var(--sp6) var(--sp6) var(--sp8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp2);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Subtle radial highlight — decorative only */
+.gullak-hero::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  pointer-events: none;
+}
+
+.gullak-hero__eyebrow {
+  font-family: var(--font-kid);
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(183, 228, 199, 0.9); /* --mint at 90% */
+  letter-spacing: 0.01em;
+}
+
+.gullak-hero__number {
+  font-family: var(--font-display);
+  font-size: 88px;
+  line-height: 1;
+  color: var(--amber-md);
+  letter-spacing: -2px;
+  animation: coinPop 0.45s var(--ease-bounce) both;
+}
+
+.gullak-hero__sub {
+  font-family: var(--font-kid);
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(183, 228, 199, 0.75);
+}
+
+/* ── Redeem button ──────────────────────────────────────────── */
+.gullak-redeem-btn {
+  width: 100%;
+  height: 52px;
+  background: var(--amber);
+  color: var(--surface);
+  border: none;
+  border-radius: var(--r-pill);
+  font-family: var(--font-kid);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--amber-dk);
+  transition: transform 0.12s, box-shadow 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp2);
+}
+
+.gullak-redeem-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--amber-dk);
+}
+
+.gullak-redeem-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ── Balance card ───────────────────────────────────────────── */
+.gullak-balance {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  overflow: hidden;
+}
+
+.gullak-balance__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp1);
+  padding: var(--sp4) var(--sp3);
+}
+
+.gullak-balance__col + .gullak-balance__col {
+  border-left: 1px solid var(--border);
+}
+
+.gullak-balance__label {
+  font-family: var(--font-kid);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-30);
+}
+
+.gullak-balance__value {
+  font-family: var(--font-kid);
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--leaf);
+}
+
+.gullak-balance__unit {
+  font-family: var(--font-kid);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-30);
+}
+
+/* ── Transaction list ───────────────────────────────────────── */
+.gullak-tx-section {}
+
+.gullak-tx-header {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--forest);
+  margin-bottom: var(--sp3);
+}
+
+.gullak-tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp2);
+}
+
+.gullak-tx-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp3) var(--sp4);
+}
+
+.gullak-tx-item__emoji {
+  font-size: 24px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.gullak-tx-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.gullak-tx-item__label {
+  font-family: var(--font-kid);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gullak-tx-item__date {
+  font-size: 12px;
+  color: var(--ink-30);
+  margin-top: 2px;
+}
+
+.gullak-tx-item__coins {
+  font-family: var(--font-kid);
+  font-size: 15px;
+  font-weight: 900;
+  flex-shrink: 0;
+  color: var(--leaf);
+}
+
+.gullak-tx-item__coins--negative {
+  color: var(--ink-30);
+}
+
+.gullak-tx-item__pending-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--amber-lt);
+  border: 1px solid var(--color-amber-border);
+  border-radius: var(--r-pill);
+  padding: 2px 10px;
+  font-family: var(--font-kid);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--amber-dk);
+  flex-shrink: 0;
+}
+
+.gullak-tx-view-more {
+  width: 100%;
+  margin-top: var(--sp3);
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-pill);
+  font-family: var(--font-kid);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-60);
+  padding: var(--sp2) var(--sp4);
+  min-height: var(--tap-target);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.gullak-tx-view-more:active {
+  background: var(--frost);
+  border-color: var(--mint);
+}
+
+/* ── Redeem section ─────────────────────────────────────────── */
+.gullak-redeem-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp4);
+}
+
+.gullak-redeem-section__back {
+  background: none;
+  border: none;
+  font-family: var(--font-kid);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-60);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp1);
+  min-height: var(--tap-target);
+}
+
+/* Choice cards */
+.gullak-choice-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: var(--sp6) var(--sp4);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp4);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  text-align: left;
+  width: 100%;
+}
+
+.gullak-choice-card:active,
+.gullak-choice-card--selected {
+  border-color: var(--leaf);
+  background: var(--frost);
+  box-shadow: 0 0 0 3px rgba(64, 145, 108, 0.12);
+}
+
+.gullak-choice-card__icon {
+  font-size: 32px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.gullak-choice-card__title {
+  font-family: var(--font-kid);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--forest);
+  margin-bottom: var(--sp1);
+}
+
+.gullak-choice-card__sub {
+  font-family: var(--font-kid);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-60);
+  line-height: 1.5;
+}
+
+/* Coin amount pills */
+.gullak-amount-label {
+  font-family: var(--font-kid);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-60);
+  margin-bottom: var(--sp2);
+}
+
+.gullak-pills {
+  display: flex;
+  gap: var(--sp2);
+  flex-wrap: wrap;
+}
+
+.gullak-pill {
+  flex: 1;
+  min-width: 60px;
+  height: 44px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--r-pill);
+  font-family: var(--font-kid);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gullak-pill--selected {
+  border-color: var(--leaf);
+  background: var(--leaf);
+  color: var(--surface);
+}
+
+.gullak-pill:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Custom pill in input mode — same size/shape as a pill button */
+.gullak-pill--input {
+  padding: 0 var(--sp2);
+  text-align: center;
+  cursor: text;
+  -moz-appearance: textfield;
+}
+
+.gullak-pill--input::-webkit-outer-spin-button,
+.gullak-pill--input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Confirm button inside redeem flow */
+.gullak-confirm-btn {
+  width: 100%;
+  height: 52px;
+  background: var(--forest);
+  color: var(--ds-white);
+  border: none;
+  border-radius: var(--r-pill);
+  font-family: var(--font-kid);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--moss);
+  transition: transform 0.12s, box-shadow 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp2);
+}
+
+.gullak-confirm-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--moss);
+}
+
+.gullak-confirm-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Success state */
+.gullak-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp4);
+  padding: var(--sp8) var(--sp4);
+  text-align: center;
+}
+
+.gullak-success__icon {
+  font-size: 64px;
+  line-height: 1;
+}
+
+.gullak-success__title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--forest);
+}
+
+.gullak-success__sub {
+  font-family: var(--font-kid);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-60);
+  line-height: 1.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gullak-hero__number { animation: none; }
+}
+
 /* Coin rain overlay */
 .coin-rain {
   position: fixed;

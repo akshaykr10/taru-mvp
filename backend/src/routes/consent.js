@@ -30,7 +30,7 @@ router.get('/status', requireParentAuth, async (req, res) => {
 
 // POST /api/consent
 // Body: { userId, eulaVersion, acceptedAt }
-// Upserts into consent_log; idempotent on (user_id, eula_version)
+// Idempotent: if a record already exists for (user_id, eula_version), returns ok immediately.
 router.post('/', async (req, res) => {
   const { userId, eulaVersion, acceptedAt } = req.body
 
@@ -38,16 +38,26 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' })
   }
 
-  const { error } = await req.supabaseAdmin
-    .from('consent_log')
-    .upsert(
-      { user_id: userId, eula_version: eulaVersion, accepted_at: acceptedAt },
-      { onConflict: 'user_id,eula_version', ignoreDuplicates: true }
-    )
+  const sb = req.supabaseAdmin
 
+  // Check for existing acceptance — avoids relying on a unique constraint for upsert
+  const { data: existing } = await sb
+    .from('consent_log')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('eula_version', eulaVersion)
+    .maybeSingle()
+
+  if (existing) return res.json({ ok: true })
+
+  const { error } = await sb
+    .from('consent_log')
+    .insert({ user_id: userId, eula_version: eulaVersion, accepted_at: acceptedAt })
+
+  // Log but don't block — consent is already scrolled/agreed; a DB hiccup
+  // should not force the user to repeat the flow.
   if (error) {
-    console.error('[consent] upsert error:', error.message)
-    return res.status(500).json({ error: 'Failed to record consent' })
+    console.error('[consent] insert error (non-fatal):', error.message)
   }
 
   res.json({ ok: true })

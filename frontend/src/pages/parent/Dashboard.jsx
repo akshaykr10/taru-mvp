@@ -148,8 +148,10 @@ export default function ParentDashboard() {
   const [loadingChild, setLoadingChild]     = useState(true)
   const [promptDone, setPromptDone]         = useState(false)
   const [currentWeek, setCurrentWeek]       = useState(1)
-  const [pendingApprovals, setPendingApprovals] = useState([])
-  const [actioning, setActioning]           = useState({}) // { completionId: 'approve'|'reject' }
+  const [pendingApprovals, setPendingApprovals]     = useState([])
+  const [pendingRedemptions, setPendingRedemptions] = useState([])
+  const [actioning, setActioning]                   = useState({}) // { completionId: 'approve'|'reject' }
+  const [completingRedemption, setCompletingRedemption] = useState({}) // { txId: true }
   const [dinnerPrompt, setDinnerPrompt]     = useState(null)  // conversation_log row | null
   const [dismissing, setDismissing]         = useState(false)
 
@@ -180,7 +182,37 @@ export default function ParentDashboard() {
     }
   }, [])
 
-  useEffect(() => { loadPending() }, [loadPending])
+  // Load pending coin redemptions
+  const loadRedemptions = useCallback(async () => {
+    const headers = await getAuthHeaders()
+    const res = await fetch(`${BACKEND_URL}/api/tasks/redemptions`, { headers })
+    if (res.ok) {
+      const data = await res.json()
+      setPendingRedemptions(data.redemptions || [])
+    }
+  }, [])
+
+  useEffect(() => { loadPending(); loadRedemptions() }, [loadPending, loadRedemptions])
+
+  async function handleCompleteRedemption(txId) {
+    setCompletingRedemption(s => ({ ...s, [txId]: true }))
+    // Optimistic remove
+    setPendingRedemptions(prev => prev.filter(r => r.id !== txId))
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/tasks/redemptions/${txId}/complete`, {
+        method:  'POST',
+        headers: await getAuthHeaders(),
+      })
+      if (!res.ok) {
+        // Restore on failure
+        loadRedemptions()
+      }
+    } catch {
+      loadRedemptions()
+    } finally {
+      setCompletingRedemption(s => { const next = { ...s }; delete next[txId]; return next })
+    }
+  }
 
   // Load the most recently completed dinner prompt for this parent
   const loadDinnerPrompt = useCallback(async () => {
@@ -455,6 +487,44 @@ export default function ParentDashboard() {
           </div>
         )
       })()}
+
+      {/* Pending coin redemptions — only shown when there's something to action */}
+      {pendingRedemptions.length > 0 && (
+        <>
+          <div className="section-header">
+            <span className="section-title">Coin redemptions</span>
+            <span style={{
+              fontSize: '12px', fontWeight: 600,
+              background: 'var(--color-gold)', color: 'var(--color-navy)',
+              borderRadius: 'var(--radius-full)', padding: '1px 8px',
+            }}>
+              {pendingRedemptions.length}
+            </span>
+          </div>
+          {pendingRedemptions.map(r => (
+            <div key={r.id} className="approval-card">
+              <div className="approval-card__body">
+                <div className="approval-card__task">
+                  {r.emoji} {r.label}
+                </div>
+                <div className="approval-card__meta">
+                  {r.child_name || 'Your child'} · {Math.abs(r.coins)} coins ·{' '}
+                  {new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                </div>
+              </div>
+              <div className="approval-card__actions">
+                <button
+                  className="ac-btn-approve"
+                  disabled={!!completingRedemption[r.id]}
+                  onClick={() => handleCompleteRedemption(r.id)}
+                >
+                  {completingRedemption[r.id] ? '…' : 'Done ✓'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
 
       {/* Pending task approvals */}
       <div className="section-header">

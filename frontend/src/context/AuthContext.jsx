@@ -8,16 +8,25 @@ export function AuthProvider({ children }) {
   const [user, setUser]       = useState(null)
 
   useEffect(() => {
-    // Get initial session (handles page reload + email confirmation redirect)
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session ?? null)
-      setUser(data.session?.user ?? null)
+    // Flag: onAuthStateChange has fired at least once (INITIAL_SESSION or SIGNED_IN).
+    // Prevents getSession().then() from overwriting a session that onAuthStateChange
+    // already set — the race condition that caused first-attempt login failures.
+    let authStateReceived = false
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      authStateReceived = true
+      setSession(session ?? null)
+      setUser(session?.user ?? null)
     })
 
-    // Keep session in sync across tabs and after email confirmation
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      setUser(session?.user ?? null)
+    // getSession() handles page-reload / email-confirmation redirect cases where
+    // onAuthStateChange may not fire before the first render. Only apply if
+    // onAuthStateChange hasn't already given us a definitive answer.
+    supabase.auth.getSession().then(({ data }) => {
+      if (!authStateReceived) {
+        setSession(data.session ?? null)
+        setUser(data.session?.user ?? null)
+      }
     })
 
     return () => subscription.unsubscribe()

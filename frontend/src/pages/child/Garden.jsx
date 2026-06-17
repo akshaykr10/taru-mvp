@@ -64,6 +64,10 @@ export default function ChildGarden() {
   const [submitting, setSubmitting] = useState({}) // { ruleId: true }
   const [submitMsg,  setSubmitMsg]  = useState({}) // { ruleId: 'sent'|'pending'|'error' }
 
+  // Gullak tab state — lazy loaded on first visit
+  const [gullakData,    setGullakData]    = useState(null)   // null = not yet loaded
+  const [gullakLoading, setGullakLoading] = useState(false)
+
   useEffect(() => {
     async function load() {
       if (!token) { setStatus('error'); setErrorMsg('No link token found.'); return }
@@ -102,6 +106,37 @@ export default function ChildGarden() {
 
     load()
   }, [token])
+
+  const fetchGullak = useCallback(async () => {
+    setGullakLoading(true)
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/child/gullak`, {
+        headers: { 'X-Child-Token': token },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setGullakData(data)
+      }
+    } catch {
+      // non-critical — gullak data will stay stale
+    } finally {
+      setGullakLoading(false)
+    }
+  }, [token])
+
+  async function handleRedeem(type, coins) {
+    const res = await fetch(`${BACKEND_URL}/api/child/gullak/redeem`, {
+      method:  'POST',
+      headers: { 'X-Child-Token': token, 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ type, coins }),
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err.error || 'Redemption failed')
+    }
+    // Refresh gullak data so balance and transactions update
+    await fetchGullak()
+  }
 
   const loadTasks = useCallback(async (tkn) => {
     try {
@@ -167,6 +202,9 @@ export default function ChildGarden() {
       section:    `child/${tabId}`,
       childToken: token,
     })
+    if (tabId === 'gullak' && !gullakData && !gullakLoading) {
+      fetchGullak()
+    }
   }
 
   // ── Loading ───────────────────────────────────────────────────
@@ -359,11 +397,20 @@ export default function ChildGarden() {
 
         {/* ── Gullak tab ─────────────────────────────────── */}
         {activeTab === 'gullak' && (
-          <Gullak
-            coinsTotal={learning_state?.coins_total ?? 0}
-            taggedTotal={tagged_total}
-            goalAmount={goalAmount}
-          />
+          gullakLoading || !gullakData ? (
+            <div className="child-loading">
+              <div className="child-loading__plant">🪙</div>
+              <div className="child-loading__text">Loading your gullak…</div>
+            </div>
+          ) : (
+            <Gullak
+              coinsTotal={gullakData.spendable}
+              lifetimeEarned={gullakData.lifetime_earned}
+              transactions={gullakData.transactions}
+              childName={child.name}
+              onRedeem={handleRedeem}
+            />
+          )
         )}
       </div>
 

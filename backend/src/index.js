@@ -9,6 +9,7 @@ const casRouter        = require('./routes/cas')
 const activityRouter   = require('./routes/activity')
 const childrenRouter   = require('./routes/children')
 const tasksRouter      = require('./routes/tasks')
+const gullakRouter     = require('./routes/gullak')
 const cronRouter       = require('./routes/cron')
 const waitlistRouter   = require('./routes/waitlist')
 const consentRouter    = require('./routes/consent')
@@ -61,6 +62,10 @@ app.use('/api/children', requireParentAuth, childrenRouter)
 // Tasks — mixed auth: child endpoints validate X-Child-Token internally;
 // parent endpoints require Supabase JWT (middleware applied per-route in router)
 app.use('/api/tasks', tasksRouter)
+
+// Gullak — coin wallet. Child endpoints (X-Child-Token) and parent endpoints
+// (requireParentAuth applied per-route in router) are mixed in one file.
+app.use('/api', gullakRouter)
 
 // Cron — protected by CRON_SECRET bearer token, no Supabase auth
 app.use('/api/cron', cronRouter)

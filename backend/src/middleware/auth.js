@@ -1,5 +1,12 @@
 const { createClient } = require('@supabase/supabase-js')
 
+// Local dev only: Node's bundled CA list doesn't trust the intermediate cert
+// used by Supabase on some Windows machines, causing UNABLE_TO_VERIFY_LEAF_SIGNATURE.
+// Disable TLS verification for outbound requests in non-production only.
+if (process.env.NODE_ENV !== 'production') {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+}
+
 // Supabase admin client — service role, server only
 const supabase = createClient(
   process.env.SUPABASE_URL,

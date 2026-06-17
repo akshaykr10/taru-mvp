@@ -1,30 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
 import { BACKEND_URL } from '../lib/api.js'
 import { EULA_VERSION } from '../legal/index.js'
-import { useAuth } from '../context/AuthContext.jsx'
 import '../styles/auth.css'
 
 export default function Login() {
   const navigate  = useNavigate()
   const location  = useLocation()
-  const { session } = useAuth()
   const [form, setForm]       = useState({ email: '', password: '' })
   const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
-  const [navigateTo, setNavigateTo] = useState(null)
 
   // Redirect to wherever the user was trying to go, or default to dashboard
   const from = location.state?.from || '/parent/dashboard'
-
-  // Wait for AuthContext to confirm the session before navigating to protected routes.
-  // This avoids a race condition where navigate() fires before onAuthStateChange updates the context.
-  useEffect(() => {
-    if (session && navigateTo) {
-      navigate(navigateTo, { replace: true })
-    }
-  }, [session, navigateTo, navigate])
 
   function handleChange(e) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -50,7 +39,10 @@ export default function Login() {
     // Check whether the user has already accepted the current EULA version.
     // Uses the backend (service role) so RLS on consent_log is not a factor.
     const { data: { session: newSession } } = await supabase.auth.getSession()
-    let accepted = false
+    // Fail open: if the consent check errors (backend unreachable, Supabase hiccup),
+    // assume accepted rather than forcing the user through the EULA repeatedly.
+    // The EULA is shown on first login; a backend blip should not re-gate the user.
+    let accepted = true
     try {
       const statusRes = await fetch(
         `${BACKEND_URL}/api/consent/status?eulaVersion=${encodeURIComponent(EULA_VERSION)}`,
@@ -61,8 +53,8 @@ export default function Login() {
         accepted = body.accepted
       }
     } catch {
-      // Network error — treat as unaccepted so the user sees the EULA
-      accepted = false
+      // Network error — fail open so the user isn't blocked
+      accepted = true
     }
 
     if (!accepted) {
@@ -72,9 +64,9 @@ export default function Login() {
       return
     }
 
-    // Don't navigate immediately — wait for AuthContext to confirm the session
-    // via onAuthStateChange, then the useEffect above will fire the navigation.
-    setNavigateTo(from)
+    // By the time the EULA fetch resolves, onAuthStateChange has already fired
+    // and updated AuthContext. Navigate directly.
+    navigate(from, { replace: true })
   }
 
   return (

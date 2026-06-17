@@ -343,7 +343,7 @@ router.post('/completions/:cid/approve', requireParentAuth, async (req, res) => 
   // Fetch completion + verify parent owns the rule
   const { data: comp, error: fetchErr } = await sb
     .from('task_completions')
-    .select(`id, approved_at, rejected_at, task_rule_id, task_rules!inner ( reward_coins, parent_id, child_id )`)
+    .select(`id, approved_at, rejected_at, task_rule_id, task_rules!inner ( task_name, reward_coins, parent_id, child_id )`)
     .eq('id', req.params.cid)
     .eq('task_rules.parent_id', req.parentId)
     .maybeSingle()
@@ -353,9 +353,10 @@ router.post('/completions/:cid/approve', requireParentAuth, async (req, res) => 
     return res.status(409).json({ error: 'Completion already actioned' })
   }
 
-  const rule    = comp.task_rules
-  const childId = rule.child_id
-  const coins   = rule.reward_coins
+  const rule     = comp.task_rules
+  const childId  = rule.child_id
+  const coins    = rule.reward_coins
+  const taskName = rule.task_name
 
   // Approve
   const { error: updateErr } = await sb
@@ -382,6 +383,19 @@ router.post('/completions/:cid/approve', requireParentAuth, async (req, res) => 
       .from('learning_state')
       .insert({ child_id: childId, coins_total: coins })
   }
+
+  // Fire-and-forget: record in coin_transactions (non-blocking)
+  sb.from('coin_transactions').insert({
+    child_id:  childId,
+    parent_id: req.parentId,
+    type:      'task_approved',
+    coins,
+    label:     taskName,
+    emoji:     '✅',
+    status:    'completed',
+  }).then(({ error: txErr }) => {
+    if (txErr) console.error('[tasks] coin_transactions insert failed — childId:', childId, '|', txErr.message)
+  })
 
   res.json({ ok: true, coins_awarded: coins })
 })
