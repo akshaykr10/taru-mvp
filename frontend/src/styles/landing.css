@@ -1281,6 +1281,10 @@
   .landing-page .hero                               { padding: 120px 0 64px; }
   .landing-page .quote-block                        { padding: 48px 28px; }
   .landing-page .quote-block .qmark                 { font-size: 140px; left: 14px; }
+  .landing-page .quote-block > div { flex-direction: column !important; }
+  .landing-page .quote-block > div > div:first-child { padding: 0 0 28px 0 !important; }
+  .landing-page .quote-block > div > div[style*="width: 1px"] { width: 100% !important; height: 1px !important; align-self: auto !important; }
+  .landing-page .quote-block > div > div:last-child  { padding: 28px 0 0 0 !important; }
   .landing-page .nav-links a:not(.btn):not(.nav-blogs):not(.nav-tax-calc) { display: none; }
   .landing-page footer .inner                       { flex-direction: column; text-align: center; }
   .landing-page .phone-stage                        { min-height: auto; }

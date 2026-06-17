@@ -1,10 +1,61 @@
 # Taru MVP — Project Status
 
-> Last updated: 14 June 2026. Reflects the live codebase on `main`. All architecture, security, and product decisions are as per `CLAUDE.md` (aligned with PRD v2.1).
+> Last updated: 17 June 2026. Reflects the live codebase on `main`. All architecture, security, and product decisions are as per `CLAUDE.md` (aligned with PRD v2.1).
 
 ---
 
 ## Changelog
+
+### 17 June 2026 — Gullak coin wallet + login race condition fix
+
+#### Gullak tab — full coin wallet UI
+
+Previously the Gullak tab was a placeholder. It is now a complete coin wallet with redeem flow.
+
+**New backend migration**
+- `013_coin_transactions.sql` — `coin_transactions` table with `type` CHECK (`task_approved | redeem_invest | redeem_cash | redeem_invest_done | redeem_cash_done`) and `status` CHECK (`completed | pending`). RLS enabled; parent SELECT policy; all writes via service role only.
+
+**New backend routes (`backend/src/routes/gullak.js`)**
+- `GET /api/child/gullak` — returns `{ spendable, lifetime_earned, transactions }`. `lifetime_earned = Math.max(coins_total, sumFromTxTable)` so existing users with no transaction history get the correct fallback.
+- `POST /api/child/gullak/redeem` — validates type/coins, checks balance, inserts a pending negative transaction, decrements `learning_state.coins_total`.
+- `GET /api/tasks/redemptions` — parent-authenticated; returns pending coin_transactions joined to `children.name`.
+- `POST /api/tasks/redemptions/:id/complete` — marks pending → completed; fire-and-forget confirmation transaction.
+
+**Task approval now writes coin_transactions** (`backend/src/routes/tasks.js`): on approve, a `task_approved` row is inserted into `coin_transactions` (fire-and-forget, non-fatal).
+
+**Gullak.jsx — full rewrite**
+- Hero card: child name eyebrow, large coin count, "ready to plant or spend" sub
+- Redeem flow (inline state machine): `null → choose → amount → success`
+  - Choose step: "Plant in my garden" (invest) or "Take as pocket money" (cash)
+  - Amount step: dynamic pills computed from balance (`⌊balance/3⌋` and `⌊balance/2⌋` rounded to nearest 100, only shown if ≥100 and distinct), Custom, All
+  - Custom pill transforms in-place into an `<input>` (no separate box), clamped to max balance
+  - Default selected pill: All
+  - Confirm button label: "Plant X coins →" or "Send X coins to parent →"
+- Balance card (hidden during redeem): Ready now / Lifetime earned
+- Recent transactions list with expand/collapse
+- Coin rain animation on mount (if coins > 0) and on coin increase
+- Back buttons are the first element in each redeem step (above Penny bubble)
+
+**Parent Dashboard** — redemption approval cards shown above task approvals. Optimistic UI removal on complete.
+
+**Child Garden integration** — Gullak data fetched lazily on first tab visit (`fetchGullak` on `tabId === 'gullak' && !gullakData`).
+
+#### Login first-attempt failure — root cause and fix
+
+**Root cause:** `AuthContext` called `supabase.auth.getSession()` on mount and stored the resulting Promise. If the user signed in before the `.then()` callback fired, `onAuthStateChange` correctly set `session = newSession` — but then the stale `.then()` resolved with `null` (the pre-login value) and **overwrote** it. `RequireParentAuth` saw `session = null` and redirected back to `/login`.
+
+**Fixes applied:**
+1. `frontend/src/context/AuthContext.jsx` — added `authStateReceived` flag. `getSession().then()` only calls `setSession` if `onAuthStateChange` hasn't already done so. This eliminates the overwrite race entirely.
+2. `frontend/src/pages/Login.jsx` — removed the `navigateTo` state and `useEffect` pattern. After the EULA check resolves (an async network call), `onAuthStateChange` is guaranteed to have fired. `navigate(from, { replace: true })` is called directly.
+
+#### EULA consent and TLS fixes (also in this deploy)
+
+- `backend/src/routes/consent.js` — changed from upsert to select-then-insert (no unique constraint existed); errors on insert are non-fatal (fail open).
+- `backend/src/middleware/auth.js` — `NODE_TLS_REJECT_UNAUTHORIZED = '0'` in non-production to fix `UNABLE_TO_VERIFY_LEAF_SIGNATURE` on Windows dev (Supabase TLS cert chain not trusted by Node's bundled CA list on Windows).
+
+**Deployed:** commit `a661696` on `main` → Netlify + Render auto-deploy.
+
+---
 
 ### 14 June 2026 — Tax Savings Calculator launch
 
@@ -138,7 +189,7 @@ Equity MF, Equity Hybrid MF, Direct Stocks, ULIP, Digital Gold, Debt MF, FD/RD
 | 8 | Child Money Garden — plant SVG, portfolio values, goal bar | ✅ Done |
 | 9 | Task rules + approval flow | ✅ Done |
 | 10 | Content cards — Penny copy, 48-week curriculum, trigger cards | ✅ Done |
-| 11 | Gullak — coin counter, milestone badges | ✅ Done (basic) |
+| 11 | Gullak — coin counter, coin-rain animation, redemption flow | ✅ Done |
 
 **All 11 build steps are complete. The app is in active pilot use.**
 
@@ -151,6 +202,7 @@ Equity MF, Equity Hybrid MF, Direct Stocks, ULIP, Digital Gold, Debt MF, FD/RD
 | File | Description |
 |---|---|
 | `001_initial_schema.sql` | All 8 core tables + RLS + indexes |
+| `013_coin_transactions.sql` | `coin_transactions` table + RLS (parent SELECT; all writes via service role) |
 | `002_auth_trigger.sql` | Auto-creates `parents` row on Supabase Auth signup |
 | `003_task_rules_created_at.sql` | Added `created_at` to `task_rules` |
 | `004_learning_module.sql` | Added `current_week_started_at`, `week_completed_at`, `dinner_prompted_at` to `learning_state`; added `child_id` to `conversation_log` + index |
@@ -177,6 +229,9 @@ Equity MF, Equity Hybrid MF, Direct Stocks, ULIP, Digital Gold, Debt MF, FD/RD
 - `cas_fetch_log` — one row per fetch attempt; rate-limit check uses only `status='success'` rows within 14-day window
 - `cas_portfolio` — full raw CASParser JSON snapshot per import
 - `cas_funds` — one row per `(user_id, isin, folio_number)`; `show_in_child_app` preserved across re-imports; `inception_nav` / `inception_date` set once and never overwritten
+
+**Gullak (from `013`)**
+- `coin_transactions` — append-only ledger. `type` in `task_approved | redeem_invest | redeem_cash | redeem_invest_done | redeem_cash_done`. `status` in `completed | pending`. Negative `coins` for redemptions. Parent can SELECT own rows; all writes via service role.
 
 **Additional (created outside migrations)**
 - `nav_history` — daily NAV snapshot per fund; written by the NAV update job; unique on `(user_id, isin, folio_number, nav_date)`
@@ -281,8 +336,18 @@ Equity MF, Equity Hybrid MF, Direct Stocks, ULIP, Digital Gold, Debt MF, FD/RD
 - 409 response shows "⏳ Pending Parent"; approved tasks award coins to `learning_state.coins_total`
 
 ### Gullak Tab
-- Displays `learning_state.coins_total`
-- Shows tagged portfolio total and goal amount
+- Hero card: child's coin balance (spendable), lifetime earned
+- Coin rain animation on mount (if coins > 0) and on balance increase
+- Redeem flow (null → choose → amount → success):
+  - **Choose step:** Plant in garden (invest) or Pocket money (cash)
+  - **Amount step:** Dynamic pills (`⌊balance/3⌋`, `⌊balance/2⌋` rounded to nearest 100), Custom (transforms in-place into an input clamped to max balance), All. Default: All.
+  - **Confirm:** "Plant X coins →" or "Send X coins to parent →". Parent receives a pending redemption card on their Dashboard.
+  - **Success step:** Confirmation with back-to-gullak action
+- Balance card (hidden during redeem steps): Ready now / Lifetime earned
+- Recent transactions list (up to 3 visible; expand/collapse for more)
+- Data fetched lazily on first Gullak tab visit
+- Backend: `GET /api/child/gullak`, `POST /api/child/gullak/redeem`
+- Parent: `GET /api/tasks/redemptions`, `POST /api/tasks/redemptions/:id/complete`
 
 ---
 
@@ -334,6 +399,14 @@ All `/parent/*` endpoints require `Authorization: Bearer <supabase-jwt>`. Child 
 |---|---|---|
 | GET | `/api/child/garden` | Token-gated. Returns child, tagged total, fund count, learning state. Only visible funds returned. |
 | POST | `/api/child/week-complete` | Mark week done → advance `current_week`. Idempotent (`already_done: true`) if `week_completed_at` already set. |
+
+### Gullak
+| Method | Route | Auth | Description |
+|---|---|---|---|
+| GET | `/api/child/gullak` | Child token | Coin balance (`spendable`, `lifetime_earned`) + recent transactions (up to 20) |
+| POST | `/api/child/gullak/redeem` | Child token | Submit redemption — inserts pending negative transaction, decrements `coins_total` |
+| GET | `/api/tasks/redemptions` | Parent JWT | Pending redemption requests with child name |
+| POST | `/api/tasks/redemptions/:id/complete` | Parent JWT | Mark redemption completed; fire-and-forget confirmation transaction |
 
 ### Activity
 | Method | Route | Description |
@@ -435,6 +508,9 @@ Runs every Sunday in Supabase SQL editor. Returns `parent_open_days`, `child_ope
 
 | Date | Commit | Issue | Fix |
 |---|---|---|---|
+| 2026-06-17 | `a661696` | Login first-attempt failure — `getSession().then()` resolved with stale `null` after `onAuthStateChange` had already set the new session, overwriting it and bouncing user to `/login` | `AuthContext`: `authStateReceived` flag prevents `getSession().then()` from overwriting a session `onAuthStateChange` already set. `Login.jsx`: navigate directly after EULA check instead of via `setNavigateTo` + useEffect. |
+| 2026-06-17 | `a661696` | EULA "Something went wrong" on login — `consent_log` upsert threw 409 (no unique constraint) | Changed to select-then-insert in `consent.js`; insert errors are non-fatal (fail open). |
+| 2026-06-17 | `a661696` | Child app "Penny can't find your garden" on Windows dev — `UNABLE_TO_VERIFY_LEAF_SIGNATURE` TLS error | Added `NODE_TLS_REJECT_UNAUTHORIZED = '0'` in `auth.js` when `NODE_ENV !== 'production'`. Production on Render is unaffected. |
 | 2026-06-14 | `42fdc64` | Netlify build failing — prerender step crashes if `@prerenderer/prerenderer` devDep not installed | Made prerender non-fatal: `vite build && (node prerender-run.mjs \|\| true)` in package.json. Vite build output is always published even if puppeteer is unavailable. |
 | 2026-05-31 | `38db39f` | EULA blocked all logins — wrong API URL and missing `consent_log` migration in production | Corrected `VITE_BACKEND_URL` usage in consent POST; applied migration `012_consent_log_create.sql` to production; tightened backend consent route. |
 | 2026-05-30 | `629f6b6` | `EulaGate` route-wrapper approach caused flicker and double-render on every parent route | Moved gate to post-login: `Login.jsx` checks `consent_log` once after sign-in and redirects to `/eula` if absent. No wrapper needed on authenticated routes. |

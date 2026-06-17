@@ -92,32 +92,18 @@ export default function Landing() {
             {/* Left copy */}
             <div className="reveal">
               <span className="pill badge-pill">
-                <span className="dot"></span>Built for Indian families
+                <span className="dot"></span>Mutual funds for your kids
               </span>
               <h1 className="hero-title serif">
-                <span className="l">Plant a future.</span>
-                <span className="l">Watch them</span>
-                <span className="l"><em className="italic-amber">grow</em> with it.</span>
+                Start early. Invest for your kid&apos;s goals.
               </h1>
               <p className="hero-sub">
-                Taru helps parents invest in mutual funds in their child&apos;s name &mdash; while
-                children watch a living garden grow alongside them. Real money. Real lessons.
-                One quiet ritual.
+                From school fees to college to their first home, Taru helps you invest in
+                mutual funds for your child. One portfolio. Every milestone.
               </p>
               <div className="hero-cta-row">
                 <a href="#cta" className="btn primary">Join the waitlist</a>
                 <Link to="/app/login" className="btn ghost">Try the MVP &rarr;</Link>
-              </div>
-              <div className="social-row">
-                <div className="avatars">
-                  <div className="av av-1">A</div>
-                  <div className="av av-2">R</div>
-                  <div className="av av-3">M</div>
-                  <div className="av av-4">+</div>
-                </div>
-                <div className="social-text">
-                  <b>35+ families</b> helped shape Taru. <b>5</b> are already growing their gardens.
-                </div>
               </div>
             </div>
 
@@ -230,44 +216,43 @@ export default function Landing() {
         </div>
       </header>
 
-      {/* ══════════ PROBLEM ══════════ */}
-      <section className="block dark" id="problem">
+      {/* ══════════ THE DIFFERENCE ══════════ */}
+      <section className="block white" id="difference">
         <div className="wrap">
           <div className="section-head reveal">
-            <span className="eyebrow">The opportunity</span>
-            <h2 className="serif">
-              Indians save fiercely.<br/>
-              They invest <em className="italic-amber">cautiously</em>.
-            </h2>
-            <p>
-              Most Indian parents start their child&apos;s investments late, in their own name, in
-              instruments that lose to inflation. The next generation should grow up watching
-              markets &mdash; not fearing them.
-            </p>
+            <span className="eyebrow">The difference</span>
+            <h2 className="serif">Why investing for them works <em className="italic-amber">better than investing for yourself</em>.</h2>
           </div>
+
           <div className="stat-row">
-            <div className="stat-card reveal">
-              <div className="v">&#8377;55L<span style={{ fontSize: '0.55em', marginLeft: '6px' }}>Cr</span></div>
-              <div className="d">
-                <b>Sitting in low-yield savings.</b> Household deposits parked at ~3% real
-                return while equities have averaged 12%+.
-              </div>
+            <div className="feature-card reveal">
+              <h3>Goals that don&apos;t drift</h3>
+              <p>
+                You set the goal today. The folio holds it until they&apos;re ready. No dipping in
+                for other priorities.
+              </p>
             </div>
-            <div className="stat-card reveal">
-              <div className="v">82%</div>
-              <div className="d">
-                <b>Of urban parents</b> say they want to invest for their child &mdash; but
-                feel it&apos;s too complex to start.
-              </div>
+            <div className="feature-card reveal">
+              <h3>Better tax treatment</h3>
+              <p>
+                When you withdraw after your child turns 18, they get the benefit of a clean tax
+                slate &mdash; one that most parents have already used up in their own name.
+              </p>
             </div>
-            <div className="stat-card reveal">
-              <div className="v">Age 8</div>
-              <div className="d">
-                <b>Is when financial habits set in</b>, per Cambridge research. India
-                hasn&apos;t built a single product for that window.
-              </div>
+            <div className="feature-card reveal">
+              <h3>The money stays put</h3>
+              <p>
+                Funds in your own account get used. In your child&apos;s name, withdrawal takes
+                intent. That friction is what turns a SIP into real wealth.
+              </p>
             </div>
           </div>
+
+          <p className="reveal" style={{ marginTop: '24px', fontFamily: 'var(--sans)', fontSize: '14px', color: 'var(--sage)' }}>
+            <Link to="/tax-calculator" style={{ color: 'var(--amber)', textDecoration: 'none', fontWeight: 500 }}>
+              See exactly how much tax you save &rarr;
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -276,23 +261,24 @@ export default function Landing() {
         <div className="wrap">
           <div className="section-head reveal">
             <span className="eyebrow">How Taru works</span>
-            <h2 className="serif">Two apps. One <em className="italic-amber">family ritual</em>.</h2>
-            <p>Parents handle the money. Children handle the wonder. Taru is the quiet bridge between the two.</p>
+            <h2 className="serif">Two apps. One <em className="italic-amber">habit that lasts</em>.</h2>
+            <p>Parents invest. Children watch it grow. The conversation happens on its own.</p>
           </div>
 
           <div className="two-cards">
             <div className="feature-card reveal">
               <span className="pill tag-amber">For parents</span>
-              <h3>A trusted home for your child&apos;s first portfolio.</h3>
+              <h3 style={{ fontSize: '32px' }}>Open your child&apos;s first mutual fund portfolio in minutes.</h3>
               <p>
                 Open a SEBI-compliant minor folio in your child&apos;s name in under four minutes.
-                Set a monthly SIP. Pause, top up, or gift in two taps. No paperwork, no jargon.
+                Set a monthly SIP. Your child&apos;s portfolio is legally theirs &mdash; not a mental
+                account in yours.
               </p>
               <ul className="bullets">
-                <li>Pick exactly which funds appear in your child&apos;s garden</li>
-                <li>Goal-linked baskets: college, first bike, a gap year</li>
-                <li>Grandparents can gift directly to the folio</li>
-                <li>Chore-based incentives &mdash; turn pocket money into seeds</li>
+                <li>Goal-linked baskets: college, first bike, MS from USA</li>
+                <li>Chore-based investing &mdash; turn pocket money into mutual fund seeds</li>
+                <li>Grandparents can gift directly into the folio</li>
+                <li>You choose exactly which funds appear in your child&apos;s garden</li>
               </ul>
             </div>
 
@@ -333,12 +319,12 @@ export default function Landing() {
             <div className="reveal">
               <span className="eyebrow">Meet Penny</span>
               <h2 className="serif">
-                The squirrel who <em className="italic-amber">explains the market</em> to your 8-year-old.
+                The reason your child will <em className="italic-amber">ask you about money</em> first.
               </h2>
               <p className="lead">
-                Penny is Taru&apos;s AI companion &mdash; built on a child-safe model, vetted by
-                educators, and incapable of selling anything. She answers exactly one kind of
-                question: <em>&ldquo;why?&rdquo;</em>
+                Penny is Taru&apos;s AI companion. She&apos;s built on a child-safe model, vetted by
+                educators, and hard-coded to never sell anything. Every week, she delivers one
+                financial concept &mdash; in language matched to your child&apos;s age.
               </p>
 
               <div className="trait">
@@ -349,7 +335,7 @@ export default function Landing() {
                 </div>
                 <div>
                   <div className="t-title">Talks like a children&apos;s-book author</div>
-                  <div className="t-desc">No jargon. No charts. Just clear, age-tiered explanations that a parent would actually approve of.</div>
+                  <div className="t-desc">No jargon. No charts. Just explanations a 9-year-old gets and a parent approves.</div>
                 </div>
               </div>
 
@@ -360,8 +346,8 @@ export default function Landing() {
                   </svg>
                 </div>
                 <div>
-                  <div className="t-title">Cannot give financial advice</div>
-                  <div className="t-desc">Penny is hard-coded to educate, never to recommend. A teacher in the room, not a broker.</div>
+                  <div className="t-title">Cannot give financial advice. Ever.</div>
+                  <div className="t-desc">Penny is a teacher, not a broker. She explains why markets move. She never tells anyone what to buy.</div>
                 </div>
               </div>
 
@@ -374,7 +360,7 @@ export default function Landing() {
                 </div>
                 <div>
                   <div className="t-title">One concept, once a week</div>
-                  <div className="t-desc">Penny appears once a week and delivers a single financial concept &mdash; in language matched to your child&apos;s age.</div>
+                  <div className="t-desc">Penny shows up once a week with a single idea &mdash; timed to what&apos;s happening in your child&apos;s portfolio right now.</div>
                 </div>
               </div>
             </div>
@@ -423,110 +409,35 @@ export default function Landing() {
       <section className="block white" id="signals">
         <div className="wrap">
           <div className="section-head reveal">
-            <span className="eyebrow">Early signals</span>
             <h2 className="serif">
-              Quiet conviction from <em className="italic-amber">the families we listen to</em>.
+              What parents are <em className="italic-amber">saying</em>.
             </h2>
           </div>
 
-          <div className="signals-stats">
-            <div className="signal-card reveal">
-              <div className="sv">35</div>
-              <div className="sd"><b>Families</b> in our private co-design group, all parents of 6&ndash;12 year olds.</div>
-            </div>
-            <div className="signal-card reveal">
-              <div className="sv">5</div>
-              <div className="sd"><b>Live folios</b> already growing &mdash; the very first Taru gardens.</div>
-            </div>
-            <div className="signal-card reveal">
-              <div className="sv">91%</div>
-              <div className="sd"><b>Of parents</b> who tried the MVP said they would set up a SIP for their child this quarter.</div>
-            </div>
-          </div>
+          <div className="quote-block reveal" style={{ textAlign: 'left' }}>
+            <div style={{ display: 'flex', alignItems: 'stretch', gap: '0' }}>
 
-          <div className="quote-block reveal">
-            <span className="qmark">&ldquo;</span>
-            <blockquote>
-              My daughter asked me, for the first time, what a mutual fund is. I have been trying
-              to start her SIP for two years. Taru got me to do it in one weekend &mdash; because
-              she wanted me to.
-            </blockquote>
-            <div className="attrib">&mdash; <b>Meera S.</b>, Bengaluru &middot; mother to Ananya, 9</div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════ WHY NOW ══════════ */}
-      <section className="why-section cream" id="why">
-        <div className="wrap">
-          <div className="why-head reveal">
-            <span className="eyebrow">Why now</span>
-            <h2>Four shifts that <em className="italic-amber">finally</em> make this possible.</h2>
-            <p>
-              Taru couldn&apos;t have existed five years ago. Four things had to be true at
-              once &mdash; and they finally are.
-            </p>
-          </div>
-
-          <div className="grid-2x2 reveal">
-            <div className="why-card">
-              <div className="why-top">
-                <span className="why-num">01</span>
-                <div className="ico-tile">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 21h18M5 21V8l7-5 7 5v13M9 12h6M9 16h6"/>
-                  </svg>
+              {/* Left column — stat */}
+              <div style={{ flex: '0 0 35%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 40px 0 0' }}>
+                <div style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(52px, 6vw, 80px)', fontWeight: 500, color: 'var(--forest)', lineHeight: 1, letterSpacing: '-0.02em' }}>91%</div>
+                <div style={{ fontFamily: 'var(--sans)', fontSize: '15px', color: 'var(--sage)', lineHeight: 1.55, marginTop: '16px' }}>
+                  <b style={{ color: 'var(--forest)', fontWeight: 600 }}>Of parents</b> who tried the MVP said they would set up a SIP for their child this quarter.
                 </div>
               </div>
-              <h4>SEBI&apos;s minor folio framework</h4>
-              <p>A digital-first KYC flow now opens a true in-the-child&apos;s-name folio in under five minutes. The rails are finally ready.</p>
-              <span className="why-meta"><b>2024</b> &middot; regulation went live</span>
-            </div>
 
-            <div className="why-card">
-              <div className="why-top">
-                <span className="why-num">02</span>
-                <div className="ico-tile">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>
-                  </svg>
-                </div>
-              </div>
-              <h4>Mutual fund penetration</h4>
-              <p>SIP accounts crossed 11 crore in 2025. A whole generation of parents is now market-comfortable &mdash; but their children still aren&apos;t.</p>
-              <span className="why-meta"><b>11Cr+</b> &middot; SIP accounts</span>
-            </div>
+              {/* Vertical divider */}
+              <div style={{ width: '1px', background: 'rgba(26,61,43,0.15)', flexShrink: 0, alignSelf: 'stretch' }} />
 
-            <div className="why-card">
-              <div className="why-top">
-                <span className="why-num">03</span>
-                <div className="ico-tile">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="14" rx="3"/>
-                    <path d="M8 20h8M12 18v2"/>
-                    <circle cx="9" cy="11" r="1"/>
-                    <circle cx="15" cy="11" r="1"/>
-                  </svg>
-                </div>
+              {/* Right column — quote */}
+              <div style={{ flex: '0 0 65%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 0 0 40px' }}>
+                <blockquote style={{ margin: 0 }}>
+                  My daughter asked me, for the first time, what a mutual fund is. I have been trying
+                  to start her SIP for two years. Taru got me to do it in one weekend &mdash; because
+                  she wanted me to.
+                </blockquote>
+                <div className="attrib" style={{ textAlign: 'left', marginTop: '20px' }}>&mdash; <b>Meera S.</b>, Bengaluru &middot; mother to Ananya, 9</div>
               </div>
-              <h4>Child-safe AI is finally good</h4>
-              <p>Smaller, supervised models can now hold a real conversation with a child &mdash; safely, with age-appropriate voice and guardrails.</p>
-              <span className="why-meta"><b>Now</b> &middot; on-device inference</span>
-            </div>
 
-            <div className="why-card">
-              <div className="why-top">
-                <span className="why-num">04</span>
-                <div className="ico-tile">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="6" y="2" width="12" height="20" rx="3"/>
-                    <path d="M11 18h2"/>
-                  </svg>
-                </div>
-              </div>
-              <h4>A smartphone-native generation</h4>
-              <p>Indian children under 12 spend 90+ minutes a day on a parent&apos;s phone. The question isn&apos;t whether they&apos;ll use a product. It&apos;s which one.</p>
-              <span className="why-meta"><b>90 min</b> &middot; daily screen time</span>
             </div>
           </div>
         </div>
@@ -554,14 +465,11 @@ export default function Landing() {
       {/* ══════════ CTA ══════════ */}
       <section className="block dark cta-section" id="cta">
         <div className="wrap-narrow reveal">
-          <span className="eyebrow">Early access</span>
           <h2>
-            We&apos;re building this <em className="italic-amber">for you</em>.<br/>
-            Be there from day one.
+            Your child&apos;s first portfolio <em className="italic-amber">is waiting</em>.
           </h2>
           <p className="cta-sub">
-            Taru is being shaped with parents who care about this exact problem. Join the waitlist
-            and we&apos;ll bring you in for early access the moment we go live in your city.
+            Join the waitlist and get early access the moment investments on Taru go live.
           </p>
 
           {submitted ? (
