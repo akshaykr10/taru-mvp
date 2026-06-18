@@ -1313,14 +1313,14 @@
    ══════════════════════════════════════════════════════════════ */
 
 .learn-week-card {
-  background: var(--sky-lt);
-  border: 1.5px solid var(--sky-md);
+  background: var(--surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--r-xl);
-  padding: var(--sp6);
+  padding: var(--sp4);
   display: flex;
   flex-direction: column;
-  gap: var(--sp4);
-  box-shadow: var(--shadow-md);
+  gap: var(--sp3);
+  box-shadow: var(--shadow-sm);
   position: relative;
 }
 
@@ -1337,11 +1337,16 @@
   flex-shrink: 0;
 }
 
+/* Squirrel in the teaser card header row — smaller to sit beside the week badge */
+.learn-week-card--teaser .learn-week-card__penny {
+  font-size: 24px;
+}
+
 .learn-week-card__title {
-  font-family: var(--font-kid);
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--forest);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-navy);
   line-height: 1.25;
 }
 
@@ -1442,6 +1447,29 @@
   padding: var(--sp3) var(--sp4);
 }
 
+/* ── Bridge quote — warm accent card above lesson card ───────── */
+
+.learn-lesson-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.learn-bridge-quote {
+  background: var(--cream);
+  border-left: 3px solid var(--color-gold);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+}
+
+.learn-bridge-quote__text {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
 .learn-bridge__text {
   font-family: var(--font-kid);
   font-size: 13px;
@@ -1513,4 +1541,605 @@
   color: var(--color-error);
   text-align: center;
   margin: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Lesson bottom sheet
+   ══════════════════════════════════════════════════════════════ */
+
+.lesson-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 43, 34, 0.48);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.lesson-sheet {
+  background: var(--surface);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  width: 100%;
+  max-width: 480px;
+  max-height: 88dvh;
+  display: flex;
+  flex-direction: column;
+  animation: sheetSlideUp 0.28s var(--ease-bounce) both;
+}
+
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson-sheet { animation: none; }
+}
+
+.lesson-sheet__handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border);
+  border-radius: var(--r-pill);
+  margin: 12px auto 4px;
+  flex-shrink: 0;
+}
+
+.lesson-sheet__scroll {
+  overflow-y: auto;
+  padding: var(--sp4) var(--sp6) var(--sp8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp4);
+}
+
+.lesson-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lesson-sheet__title {
+  font-family: var(--font-kid);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--forest);
+  line-height: 1.25;
+}
+
+.lesson-sheet__close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--ink-30);
+  cursor: pointer;
+  min-width: var(--tap-target);
+  min-height: var(--tap-target);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Lesson sheet sticky footer (XP button, shown for current week only) ── */
+
+.lesson-sheet__sticky-footer {
+  flex-shrink: 0;
+  padding: 12px 24px calc(24px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  position: relative;
+}
+
+/* ── Teaser card (collapsed week card — tappable) ─────────────── */
+
+.learn-week-card--teaser {
+  cursor: pointer;
+  gap: var(--sp3);
+  padding: var(--sp4);
+}
+
+.learn-week-card--teaser:active {
+  opacity: 0.88;
+}
+
+.learn-week-card__teaser-text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-60);
+  margin: 0;
+}
+
+.learn-week-card__tap-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.learn-week-card__tap-label {
+  font-family: var(--font-kid);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-gold);
+}
+
+.learn-week-card__tap-chevron {
+  font-size: 16px;
+  color: var(--color-gold);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Learning path rail
+   ══════════════════════════════════════════════════════════════ */
+
+.learn-path-rail-wrap {
+  position: relative;
+  /* fade edges */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 16px,
+    black calc(100% - 16px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 16px,
+    black calc(100% - 16px),
+    transparent 100%
+  );
+}
+
+.learn-path-rail {
+  display: flex;
+  gap: var(--sp2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: var(--sp2) var(--sp4);
+}
+
+.learn-path-rail::-webkit-scrollbar { display: none; }
+
+.learn-path-pill {
+  scroll-snap-align: center;
+  min-width: 64px;
+  max-width: 84px;
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  transition: box-shadow 0.15s;
+}
+
+.learn-path-pill__week {
+  font-family: var(--font-kid);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  white-space: nowrap;
+  color: var(--ink-30);
+}
+
+.learn-path-pill__topic {
+  font-family: var(--font-kid);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Done pill — light sage tint */
+.learn-path-pill--done {
+  background: var(--sage-lt);
+  border-color: #B8DCC8;
+}
+
+.learn-path-pill--done .learn-path-pill__week,
+.learn-path-pill--done .learn-path-pill__topic {
+  color: var(--color-success);
+}
+
+/* Active pill — gold border, white bg, pulsing dot */
+.learn-path-pill--active {
+  background: var(--surface);
+  border: 2px solid var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(249, 200, 74, 0.18);
+}
+
+.learn-path-pill--active .learn-path-pill__week,
+.learn-path-pill--active .learn-path-pill__topic {
+  color: var(--color-navy);
+  font-weight: 800;
+}
+
+.learn-path-pill__dot {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  animation: dotPulse 1s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { transform: scale(1);    opacity: 1;    }
+  50%       { transform: scale(1.45); opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .learn-path-pill__dot { animation: none; }
+}
+
+/* Upcoming pill — muted */
+.learn-path-pill--upcoming {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  cursor: default;
+}
+
+.learn-path-pill--upcoming .learn-path-pill__week,
+.learn-path-pill--upcoming .learn-path-pill__topic {
+  color: var(--color-text-secondary);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Money tools grid
+   ══════════════════════════════════════════════════════════════ */
+
+.learn-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.learn-tool-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp2);
+  cursor: pointer;
+  min-height: 80px;
+  text-align: left;
+  transition: box-shadow 0.15s;
+  position: relative;
+}
+
+.learn-tool-card:active {
+  box-shadow: 0 0 0 2px var(--color-gold);
+}
+
+.learn-tool-card--locked {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.learn-tool-card--locked:active {
+  box-shadow: none;
+}
+
+/* ── Penny nudge card — shown when no tools are unlocked yet ── */
+
+.learn-penny-nudge {
+  background: var(--cream);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.learn-penny-nudge__icon {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.learn-penny-nudge__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.learn-penny-nudge__text {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.learn-penny-nudge__hint {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-gold);
+  margin: 0;
+}
+
+.learn-tool-card__emoji {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.learn-tool-card__name {
+  font-family: var(--font-kid);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.learn-tool-card__lock-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #EFE9DA;
+  border-radius: var(--r-pill);
+  padding: 2px 8px;
+  font-family: var(--font-kid);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--amber-dk);
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Inline toast
+   ══════════════════════════════════════════════════════════════ */
+
+.learn-toast {
+  position: fixed;
+  bottom: calc(72px + env(safe-area-inset-bottom) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--forest);
+  color: var(--ds-white);
+  font-family: var(--font-kid);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  z-index: 150;
+  pointer-events: none;
+  animation: toastIn 0.2s ease both, toastOut 0.3s ease 1.9s both;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .learn-toast { animation: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Compounding Visualiser sheet content
+   ══════════════════════════════════════════════════════════════ */
+
+.learn-tool-sheet-title {
+  font-family: var(--font-kid);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--forest);
+}
+
+/* ── Sliders ─────────────────────────────────────────────────── */
+
+.compound-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp4);
+}
+
+.compound-input-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp2);
+}
+
+.compound-input-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-kid);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.compound-input-value {
+  font-family: var(--font-kid);
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--forest);
+}
+
+.compound-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border);
+  border-radius: var(--r-pill);
+  outline: none;
+  accent-color: var(--color-gold);
+  cursor: pointer;
+}
+
+.compound-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  border: 2px solid var(--surface);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.compound-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  border: 2px solid var(--surface);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.compound-disclaimer {
+  font-size: 11px;
+  color: var(--ink-30);
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+/* ── Output ──────────────────────────────────────────────────── */
+
+.compound-output {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp3);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp4);
+}
+
+.compound-output-numbers {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.compound-output-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.compound-output-divider {
+  width: 1px;
+  background: var(--border);
+  margin: 0 var(--sp3);
+  flex-shrink: 0;
+}
+
+.compound-output-label {
+  font-family: var(--font-kid);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-30);
+}
+
+.compound-output-value {
+  font-family: var(--font-kid);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.compound-output-value--gold {
+  color: var(--amber);
+}
+
+.compound-output-value--muted {
+  color: var(--ink-30);
+}
+
+/* Three-column output row — reduce font size so numbers fit */
+.compound-output-numbers--three .compound-output-value {
+  font-size: 16px;
+}
+
+.compound-free-growth {
+  font-family: var(--font-kid);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--leaf);
+  text-align: center;
+}
+
+/* ── Bar visual ──────────────────────────────────────────────── */
+
+.compound-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp1);
+}
+
+.compound-bars__track {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.compound-bars__segment {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.25s ease;
+}
+
+.compound-bars__segment--invested {
+  background: var(--color-navy);
+}
+
+.compound-bars__segment--growth {
+  background: var(--color-gold);
+}
+
+.compound-bars__segment--stepup {
+  background: var(--leaf);
+}
+
+.compound-bars__labels {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Three-label variant — space-around so middle label centres under gold bar */
+.compound-bars__labels--three {
+  justify-content: space-around;
+}
+
+.compound-bars__label {
+  font-family: var(--font-kid);
+  font-size: 11px;
+  color: var(--ink-30);
+  font-weight: 600;
 }

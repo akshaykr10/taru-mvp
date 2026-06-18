@@ -42,6 +42,8 @@
   --surface:   #FFFFFF;
   --bg:        #F4FAF6;
   --border:    rgba(26, 43, 34, 0.1);
+  --cream:     #FEF9EE;   /* warm ivory — bridge quote, nudge card */
+  --sage-lt:   #F0FAF4;   /* light sage — done pill background */
 
   /* ── SHADOWS ── */
   --shadow-sm: 0 1px 3px rgba(26, 43, 34, 0.08);

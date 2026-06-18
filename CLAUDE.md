@@ -391,7 +391,7 @@ Portfolio progress → plant stage (SVG + CSS animation):
 
 Do not build any of the following. If you find yourself starting on one, stop.
 
-- Hero tools (Compounding Visualiser, Goal Reverse Planner, SIP Step-Up Calculator, RCA Visualiser, Opportunity Cost Engine, Savings Rate Simulator)
+- Hero tools (Compounding Visualiser, SIP Step-Up Calculator) — NOW IN SCOPE for Phase 0. Build as bottom-sheet overlays launched from the Learn tab. Other tools (Goal Reverse Planner, RCA Visualiser, Opportunity Cost Engine, Savings Rate Simulator) remain out of scope.
 - Real MF folio creation (AMC API / NACH)
 - In-app payments / Razorpay
 - Automated push notifications
