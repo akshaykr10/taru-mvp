@@ -67,25 +67,29 @@ router.get('/child/gullak', async (req, res) => {
 
   if (txResult.error) {
     console.error('[gullak] GET transactions error:', txResult.error.message)
-    return res.status(500).json({ error: 'Failed to fetch transactions' })
+    // Non-fatal: continue with empty transactions rather than failing the whole request
   }
 
   const transactions = txResult.data || []
   const spendable    = lsResult.data?.coins_total ?? 0
 
   // lifetime_earned = sum of all positive coin entries for this child (all time, not just recent 20)
-  const { data: earnedRows, error: earnedErr } = await sb
-    .from('coin_transactions')
-    .select('coins')
-    .eq('child_id', actor.childId)
-    .gt('coins', 0)
+  let sumFromTx = 0
+  if (!txResult.error) {
+    const { data: earnedRows, error: earnedErr } = await sb
+      .from('coin_transactions')
+      .select('coins')
+      .eq('child_id', actor.childId)
+      .gt('coins', 0)
 
-  if (earnedErr) {
-    console.error('[gullak] GET lifetime_earned error:', earnedErr.message)
-    return res.status(500).json({ error: 'Failed to compute lifetime earned' })
+    if (earnedErr) {
+      console.error('[gullak] GET lifetime_earned error:', earnedErr.message)
+      // Non-fatal: fall back to spendable balance below
+    } else {
+      sumFromTx = (earnedRows || []).reduce((sum, r) => sum + r.coins, 0)
+    }
   }
 
-  const sumFromTx = (earnedRows || []).reduce((sum, r) => sum + r.coins, 0)
   // Fall back to coins_total when coin_transactions has no history yet (new table)
   const lifetime_earned = Math.max(spendable, sumFromTx)
 

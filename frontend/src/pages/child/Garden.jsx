@@ -67,6 +67,7 @@ export default function ChildGarden() {
   // Gullak tab state — lazy loaded on first visit
   const [gullakData,    setGullakData]    = useState(null)   // null = not yet loaded
   const [gullakLoading, setGullakLoading] = useState(false)
+  const [gullakError,   setGullakError]   = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -109,6 +110,7 @@ export default function ChildGarden() {
 
   const fetchGullak = useCallback(async () => {
     setGullakLoading(true)
+    setGullakError(false)
     try {
       const res = await fetch(`${BACKEND_URL}/api/child/gullak`, {
         headers: { 'X-Child-Token': token },
@@ -116,9 +118,11 @@ export default function ChildGarden() {
       if (res.ok) {
         const data = await res.json()
         setGullakData(data)
+      } else {
+        setGullakError(true)
       }
     } catch {
-      // non-critical — gullak data will stay stale
+      setGullakError(true)
     } finally {
       setGullakLoading(false)
     }
@@ -397,7 +401,23 @@ export default function ChildGarden() {
 
         {/* ── Gullak tab ─────────────────────────────────── */}
         {activeTab === 'gullak' && (
-          gullakLoading || !gullakData ? (
+          gullakLoading ? (
+            <div className="child-loading">
+              <div className="child-loading__plant">🪙</div>
+              <div className="child-loading__text">Loading your gullak…</div>
+            </div>
+          ) : gullakError ? (
+            <div className="child-loading">
+              <div className="child-loading__plant">🐿️</div>
+              <div className="child-loading__text">Couldn't load your gullak. Check your connection and try again.</div>
+              <button
+                style={{ marginTop: 16, padding: '8px 20px', background: 'var(--color-gold)', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 600, cursor: 'pointer' }}
+                onClick={fetchGullak}
+              >
+                Try again
+              </button>
+            </div>
+          ) : !gullakData ? (
             <div className="child-loading">
               <div className="child-loading__plant">🪙</div>
               <div className="child-loading__text">Loading your gullak…</div>
