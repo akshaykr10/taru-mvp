@@ -803,14 +803,6 @@ export default function ParentSettings() {
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-3)' }}>
               Share this link with {child.name}. Valid for 90 days — no login needed.
             </p>
-            <div style={{
-              background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-sm)', padding: 'var(--space-3) var(--space-4)',
-              fontSize: '12px', wordBreak: 'break-all', color: 'var(--color-navy)',
-              fontFamily: 'monospace', marginBottom: 'var(--space-3)', lineHeight: 1.5,
-            }}>
-              {gardenUrl}
-            </div>
             <button
               className="btn btn-gold"
               style={{ width: '100%', marginBottom: 'var(--space-3)' }}

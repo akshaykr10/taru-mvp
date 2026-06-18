@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { logActivity } from '../../lib/activity.js'
@@ -8,9 +8,6 @@ import { BACKEND_URL } from '../../lib/api.js'
 import { getWeekContent } from '../../data/weeklyContent.js'
 import { getParentWeekPrompt } from '../../data/parentWeeklyPrompts.js'
 import '../../styles/parent.css'
-import InvestComingSoon from '../../components/InvestComingSoon'
-import InvestmentApp from '../../investment/InvestmentApp'
-import { INVEST_CTA_PROMINENCE, INVESTMENT_ENABLED } from '../../config'
 
 async function getAuthHeaders() {
   const { data: { session } } = await supabase.auth.getSession()
@@ -142,6 +139,7 @@ function DinnerPromptCard({ row, childName, onDismiss, dismissing }) {
 }
 
 export default function ParentDashboard() {
+  const navigate = useNavigate()
   const { user, session } = useAuth()
   const [child, setChild]                   = useState(null)
   const [portfolioTotal, setPortfolioTotal] = useState(null)
@@ -149,6 +147,7 @@ export default function ParentDashboard() {
   const [promptDone, setPromptDone]         = useState(false)
   const [currentWeek, setCurrentWeek]       = useState(1)
   const [pendingApprovals, setPendingApprovals]     = useState([])
+  const [configuredTasks, setConfiguredTasks]       = useState([])
   const [pendingRedemptions, setPendingRedemptions] = useState([])
   const [actioning, setActioning]                   = useState({}) // { completionId: 'approve'|'reject' }
   const [completingRedemption, setCompletingRedemption] = useState({}) // { txId: true }
@@ -172,14 +171,17 @@ export default function ParentDashboard() {
     logActivity('parent', 'parent_app_open', { authToken: session.access_token })
   }, [session])
 
-  // Load pending task approvals
+  // Load pending task approvals + all configured tasks (to distinguish "no tasks" vs "no pending")
   const loadPending = useCallback(async () => {
     const headers = await getAuthHeaders()
-    const res = await fetch(`${BACKEND_URL}/api/tasks/pending`, { headers })
-    if (res.ok) {
-      const data = await res.json()
-      setPendingApprovals(data.completions || [])
-    }
+    const [pendingRes, tasksRes] = await Promise.all([
+      fetch(`${BACKEND_URL}/api/tasks/pending`, { headers }),
+      fetch(`${BACKEND_URL}/api/tasks`, { headers }),
+    ])
+    const pendingResult = pendingRes.ok ? await pendingRes.json() : null
+    const tasksResult   = tasksRes.ok   ? await tasksRes.json()   : null
+    if (pendingResult) setPendingApprovals(pendingResult.completions || [])
+    if (tasksResult)   setConfiguredTasks(tasksResult.rules || [])
   }, [])
 
   // Load pending coin redemptions
@@ -453,6 +455,59 @@ export default function ParentDashboard() {
         />
       )}
 
+      {/* Quick actions */}
+      <div style={{ display: 'flex', gap: 'var(--sp3)', marginBottom: 'var(--sp4)' }}>
+        {[
+          {
+            feature: 'invest',
+            label: 'Invest',
+            icon: (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <polyline points="2,18 8,12 13,15 22,5" stroke="var(--amber-md)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <polyline points="17,5 22,5 22,10" stroke="var(--amber-md)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ),
+          },
+          {
+            feature: 'protect',
+            label: 'Protect',
+            icon: (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M12 2L3 6v6c0 5.25 3.75 9 9 10.5C17.25 21 21 17.25 21 12V6l-9-4z" stroke="var(--amber-md)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <polyline points="8,12 11,15 16,9" stroke="var(--amber-md)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ),
+          },
+        ].map(({ feature, label, icon }) => (
+          <button
+            key={feature}
+            onClick={() => navigate(`/parent/coming-soon?feature=${feature}`)}
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 'var(--sp2)',
+              padding: '14px var(--sp4)',
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--r-lg)',
+              cursor: 'pointer',
+              minHeight: '44px',
+              position: 'relative',
+            }}
+          >
+            {icon}
+            <span style={{ fontFamily: 'var(--font-parent)', fontSize: '13px', fontWeight: 600, color: 'var(--ink)' }}>
+              {label}
+            </span>
+            <span style={{ fontFamily: 'var(--font-parent)', fontSize: '10px', fontWeight: 600, color: 'var(--amber-md)', letterSpacing: '0.03em' }}>
+              Coming soon
+            </span>
+          </button>
+        ))}
+      </div>
+
       {/* Weekly conversation prompt */}
       <div className="section-header">
         <span className="section-title">Weekly Learning</span>
@@ -462,9 +517,8 @@ export default function ParentDashboard() {
         const weekPrompt = getParentWeekPrompt(currentWeek)
         return (
           <div ref={promptCardRef} className="prompt-card">
-            <div className="prompt-card__week">Week {currentWeek}</div>
+            <div className="prompt-card__week">{weekPrompt.topic.toUpperCase()} · WEEK {currentWeek}</div>
             <p className="prompt-card__text">{weekPrompt.dinnerPrompt}</p>
-            <p className="prompt-card__topic">This week: {weekPrompt.topic}</p>
             {weekPrompt.portfolioStatus === 'REQUIRED' && (
               <div className="prompt-card__portfolio-nudge--required">
                 📈 Open your portfolio together — this week's prompt connects directly to what's happening there.
@@ -475,6 +529,9 @@ export default function ParentDashboard() {
                 📊 If you've been tracking your portfolio, this is a good week to look at it together.
               </p>
             )}
+            <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)' }}>
+              {child?.name || 'Your child'} is on Week {currentWeek}. Ask them about it — you might be surprised what they know.
+            </p>
             <div className="prompt-card__action">
               <button
                 className="btn btn-outline"
@@ -541,12 +598,29 @@ export default function ParentDashboard() {
       </div>
 
       {pendingApprovals.length === 0 ? (
-        <p className="approval-empty">
-          No pending approvals.{' '}
-          <Link to="/parent/settings" style={{ color: 'var(--forest)', fontWeight: 500 }}>
-            Set up assigned tasks →
-          </Link>
-        </p>
+        configuredTasks.length === 0 ? (
+          <p className="approval-empty">
+            No pending approvals.{' '}
+            <Link to="/parent/settings" style={{ color: 'var(--forest)', fontWeight: 500 }}>
+              Set up assigned tasks →
+            </Link>
+          </p>
+        ) : (
+          <>
+            <p className="approval-empty">No pending approvals.</p>
+            <div className="card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', gap: 'var(--sp4)' }}>
+              <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                {(() => {
+                  const activeCount = configuredTasks.filter(t => t.status === 'active').length || configuredTasks.length
+                  return `${child?.name || 'Your child'} has ${activeCount} active task${activeCount !== 1 ? 's' : ''} — check in to see how they're doing.`
+                })()}
+              </span>
+              <Link to="/parent/settings" style={{ fontSize: '13px', color: 'var(--forest)', fontWeight: 500, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                View tasks →
+              </Link>
+            </div>
+          </>
+        )
       ) : (
         pendingApprovals.map(comp => {
           const rule        = comp.task_rules
@@ -587,11 +661,6 @@ export default function ParentDashboard() {
         })
       )}
 
-      {/* Invest CTA — flag-gated: InvestmentApp when enabled, demand-capture surface when not */}
-      {INVESTMENT_ENABLED
-        ? <InvestmentApp />
-        : INVEST_CTA_PROMINENCE !== 'hidden' && <InvestComingSoon />
-      }
     </div>
   )
 }

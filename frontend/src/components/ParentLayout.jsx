@@ -20,10 +20,10 @@ export default function ParentLayout() {
   useEffect(() => {
     if (!session?.access_token) return
     logActivity('parent', 'parent_section_visit', {
-      section: location.pathname,
+      section: location.pathname + location.search,
       authToken: session.access_token,
     })
-  }, [location.pathname, session])
+  }, [location.pathname, location.search, session])
 
   async function handleSignOut() {
     await signOut()

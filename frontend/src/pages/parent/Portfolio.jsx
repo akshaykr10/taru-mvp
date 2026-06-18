@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { PortfolioConnect } from '@cas-parser/connect'
 import { supabase } from '../../lib/supabase.js'
 import { BACKEND_URL } from '../../lib/api.js'
@@ -28,6 +29,8 @@ function fmtDate(iso) {
 }
 
 export default function ParentPortfolio() {
+  const navigate = useNavigate()
+  const [segment, setSegment] = useState('investments')
   const [activeTab,    setActiveTab]    = useState('widget')
   const [funds,        setFunds]        = useState([])
   const [loadingFunds, setLoadingFunds] = useState(true)
@@ -260,6 +263,50 @@ export default function ParentPortfolio() {
   return (
     <div className="page">
       <h1 className="page-title">Portfolio</h1>
+
+      {/* Top segmented control */}
+      <div className="import-tabs" style={{ marginBottom: 'var(--space-6)' }}>
+        {[
+          { id: 'investments', label: 'Investments' },
+          { id: 'insurance',   label: 'Insurance'   },
+        ].map(seg => (
+          <button
+            key={seg.id}
+            className={`import-tab${segment === seg.id ? ' active' : ''}`}
+            onClick={() => setSegment(seg.id)}
+          >
+            {seg.label}
+          </button>
+        ))}
+      </div>
+
+      {segment === 'insurance' && (
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 'var(--space-4)', padding: 'var(--space-8) var(--space-6)' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 2L3 6v6c0 5.25 3.75 9 9 10.5C17.25 21 21 17.25 21 12V6l-9-4z" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <polyline points="8,12 11,15 16,9" stroke="var(--color-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <div>
+            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '18px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>
+              Family protection
+            </h2>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--color-text-secondary)', maxWidth: '260px', lineHeight: 1.6 }}>
+              See your term and child insurance policies in one place — with Dheera named as nominee.
+            </p>
+          </div>
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: '11px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-gold)', background: 'var(--color-amber-light)', borderRadius: 'var(--radius-full)', padding: '3px 10px' }}>
+            Coming soon
+          </span>
+          <button
+            className="btn btn-gold"
+            onClick={() => navigate('/parent/coming-soon?feature=protect')}
+          >
+            Notify me when live
+          </button>
+        </div>
+      )}
+
+      {segment === 'investments' && <>
 
       {/* Rate-limit banner */}
       {isRateLimited && (
@@ -496,6 +543,8 @@ export default function ParentPortfolio() {
       ) : (
         <FundTagList funds={funds} onUpdate={handleFundUpdate} />
       )}
+
+      </>}
     </div>
   )
 }

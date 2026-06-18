@@ -6,6 +6,69 @@
 
 ## Changelog
 
+### 19 June 2026 — Parent app investor view, UX fixes + child Learn tab redesign
+
+#### Coming Soon infrastructure
+- New page: `/parent/coming-soon` (`ComingSoon.jsx`) — reads `?feature=invest` or `?feature=protect` query param, renders matching icon/title/body, email capture pre-filled from auth session, POSTs to `/api/waitlist` with source `coming_soon_invest` or `coming_soon_protect`, inline success state on submit
+- Route added to App.jsx inside existing `RequireParentAuth` + `ParentLayout` wrapper
+
+#### Parent Home — Dashboard.jsx
+- Added Invest + Protect quick-action buttons above Weekly Learning section — equal width flex row, each navigates to `/parent/coming-soon?feature=invest` or `?feature=protect`, "Coming soon" badge on each
+- Removed redundant "Investing through Taru is coming" waitlist form from bottom of Dashboard
+- Weekly learning card: eyebrow changed from "WEEK N" to "TOPIC · WEEK N"; removed separate "This week: topic" line; updated supporting copy to "[Child name] is on Week [N]. Ask them about it — you might be surprised what they know."
+- Task approvals empty state: now conditional — if no tasks configured shows existing "Set up assigned tasks →" copy; if tasks exist but none pending shows nudge card with active task count and "View tasks →" link to `/parent/settings#tasks`
+- Fixed configuredTasks parsing: API returns `{ rules: Array }` — state now set to `tasksResult.rules || []`
+
+#### Parent Portfolio — Portfolio.jsx
+- Added Investments / Insurance segmented control at top of page
+- Investments segment: existing CAS upload and fund list, unchanged
+- Insurance segment: coming-soon card with shield icon, "Family protection" heading, body copy, "Coming soon" chip, "Notify me when live" → `/parent/coming-soon?feature=protect`
+
+#### Parent Settings — Settings.jsx
+- Removed raw URL display from "Dheera's Garden Link" section — only Copy Link and Regenerate Link buttons remain; copy functionality unchanged
+
+#### Activity tracking — ParentLayout.jsx
+- `parent_section_visit` now logs `location.pathname + location.search` instead of `location.pathname` only — `/parent/coming-soon?feature=invest` and `?feature=protect` are now distinguishable in the activity log
+
+#### Backend — tasks.js
+- One-time task auto-delete on approval: after approving a completion, if `task_rules.frequency === 'one-time'`, the rule is deleted fire-and-forget (non-fatal)
+- Added `frequency` to the `task_rules` select so it's available at approval time
+- Retroactive cleanup: one-time completed tasks already in DB removed via direct SQL in Supabase
+
+#### Child app — Learn tab redesign (Learn.jsx)
+
+##### Three-section structure
+- Section A — Lesson card: collapsed teaser showing week badge, squirrel emoji (top-right), topic headline, "Read this week →" in gold. Full lesson content in bottom sheet (Penny narrative, story block, app text, dinner prompt, sticky XP button). Bridge quote moved out of card into separate warm cream card (#FEF9EE, 3px gold left border, italic) sitting above the lesson card.
+- Section B — Path rail: windowed slice showing current_week - 2 through current_week + 3, clamped to 1–48 (max 6 pills). No section label, no scrollbar, fade edges via CSS mask-image. Pill states: done (#F0FAF4 bg, #B8DCC8 border, checkmark), active (white bg, 2px gold border, pulsing dot), upcoming (surface bg, muted).
+- Section C — Tools or Penny nudge: Compounding Visualiser unlocks when current_week > 3; SIP Step-Up Calculator unlocks when current_week > 6. Locked tools hidden completely — not greyed. If zero tools unlocked, Penny nudge card renders (#FEF9EE bg, 1px border, squirrel emoji inline). Nudge does not render when current_week > 6.
+
+##### Compounding Visualiser (fully wired)
+- Bottom sheet, same pattern as lesson sheet
+- 3 sliders: monthly SIP (500–10k, step 500), years (1–20), return (6–18%, step 1)
+- Mandatory disclaimer below return slider
+- Live output: "You put in" vs "It becomes" (gold), "Free growth" (sage)
+- Two-segment bar: navy (invested) + gold (growth), no chart library
+- Penny intro copy varies by age stage
+- Activity event on open: section = 'child/learn/compounding', scroll position preserved on close
+
+##### SIP Step-Up Calculator (fully wired)
+- Bottom sheet, same pattern
+- 4 sliders: starting amount, step-up % (5–30, step 5), years (5–20), return (6–18%)
+- Mandatory disclaimer below return slider
+- Year-by-year calculation loop in component
+- Live output: 3 numbers (invested, step-up total in gold, flat SIP muted); "Step-up earns ₹X.XX lakh extra" in sage
+- Three-segment bar: navy (invested), gold 60% opacity (flat growth), gold (step-up boost)
+- Penny intro copy varies by age stage
+- Activity event on open: section = 'child/learn/sip-stepup', no state bleed between tool sheets
+
+##### CLAUDE.md update
+- Compounding Visualiser and SIP Step-Up Calculator moved from out-of-scope to in-scope. Goal Reverse Planner, RCA Visualiser, Opportunity Cost Engine, Savings Rate Simulator remain out of scope.
+
+##### Known pending polish
+- Lesson bottom sheet Penny narrative box has a blue border — should be changed to var(--color-gold) at low opacity or a left accent to match warm color language elsewhere
+
+---
+
 ### 17 June 2026 — Gullak coin wallet + login race condition fix
 
 #### Gullak tab — full coin wallet UI

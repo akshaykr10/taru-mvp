@@ -28,6 +28,7 @@ import ParentOnboarding from './pages/parent/Onboarding.jsx'
 import ParentDashboard  from './pages/parent/Dashboard.jsx'
 import ParentPortfolio  from './pages/parent/Portfolio.jsx'
 import ParentSettings   from './pages/parent/Settings.jsx'
+import ParentComingSoon from './pages/parent/ComingSoon.jsx'
 
 // Child route (token-gated, no login)
 import ChildGarden from './pages/child/Garden.jsx'
@@ -91,6 +92,7 @@ export default function App() {
               <Route path="/parent/dashboard"      element={<ParentDashboard />} />
               <Route path="/parent/portfolio"      element={<ParentPortfolio />} />
               <Route path="/parent/settings"       element={<ParentSettings />} />
+              <Route path="/parent/coming-soon"    element={<ParentComingSoon />} />
               <Route path="/app/parent/dashboard"  element={<ParentDashboard />} />
               <Route path="/app/parent/portfolio"  element={<ParentPortfolio />} />
               <Route path="/app/parent/settings"   element={<ParentSettings />} />

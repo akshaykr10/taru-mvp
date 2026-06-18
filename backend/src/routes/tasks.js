@@ -343,7 +343,7 @@ router.post('/completions/:cid/approve', requireParentAuth, async (req, res) => 
   // Fetch completion + verify parent owns the rule
   const { data: comp, error: fetchErr } = await sb
     .from('task_completions')
-    .select(`id, approved_at, rejected_at, task_rule_id, task_rules!inner ( task_name, reward_coins, parent_id, child_id )`)
+    .select(`id, approved_at, rejected_at, task_rule_id, task_rules!inner ( task_name, reward_coins, frequency, parent_id, child_id )`)
     .eq('id', req.params.cid)
     .eq('task_rules.parent_id', req.parentId)
     .maybeSingle()
@@ -398,6 +398,13 @@ router.post('/completions/:cid/approve', requireParentAuth, async (req, res) => 
   })
 
   res.json({ ok: true, coins_awarded: coins })
+
+  // Fire-and-forget: delete one-time task rules after approval
+  if (rule.frequency === 'one-time') {
+    sb.from('task_rules').delete().eq('id', comp.task_rule_id).then(({ error: delErr }) => {
+      if (delErr) console.error('[tasks] one-time rule cleanup failed — ruleId:', comp.task_rule_id, '|', delErr.message)
+    })
+  }
 })
 
 // ── Parent: reject completion ─────────────────────────────────
