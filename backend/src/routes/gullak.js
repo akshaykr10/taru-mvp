@@ -47,7 +47,10 @@ async function resolveChildToken(req) {
 // ── Child: coin balance + recent transactions ─────────────────
 router.get('/child/gullak', async (req, res) => {
   const actor = await resolveChildToken(req)
-  if (!actor) return res.status(401).json({ error: 'Invalid or expired child token' })
+  if (!actor) {
+    console.error('[gullak] resolveChildToken failed — token header:', req.headers['x-child-token']?.slice(0, 20))
+    return res.status(401).json({ error: 'Invalid or expired child token' })
+  }
 
   const sb = req.supabaseAdmin
 
@@ -66,8 +69,11 @@ router.get('/child/gullak', async (req, res) => {
   ])
 
   if (txResult.error) {
-    console.error('[gullak] GET transactions error:', txResult.error.message)
+    console.error('[gullak] GET transactions error:', txResult.error.message, txResult.error.code)
     // Non-fatal: continue with empty transactions rather than failing the whole request
+  }
+  if (lsResult.error) {
+    console.error('[gullak] GET learning_state error:', lsResult.error.message, lsResult.error.code)
   }
 
   const transactions = txResult.data || []

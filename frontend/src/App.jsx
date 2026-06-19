@@ -9,7 +9,9 @@ import Landing from './pages/Landing.jsx'
 import Signup      from './pages/Signup.jsx'
 import Login       from './pages/Login.jsx'
 import VerifyEmail from './pages/VerifyEmail.jsx'
-import EulaPage    from './pages/EulaPage.jsx'
+import EulaPage       from './pages/EulaPage.jsx'
+import ForgotPassword from './pages/ForgotPassword.jsx'
+import ResetPassword  from './pages/ResetPassword.jsx'
 
 // Legal pages
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
@@ -75,7 +77,11 @@ export default function App() {
           <Route path="/app/verify-email" element={<VerifyEmail />} />
 
           {/* ── EULA acceptance — public (user is authed but hasn't agreed yet) */}
-          <Route path="/eula" element={<EulaPage />} />
+          <Route path="/eula"             element={<EulaPage />} />
+
+          {/* ── Password reset flow (public) ─────────────────────────── */}
+          <Route path="/forgot-password"  element={<ForgotPassword />} />
+          <Route path="/reset-password"   element={<ResetPassword />} />
 
           {/* ── Legal pages (public) ─────────────────────────────────── */}
           <Route path="/privacy" element={<PrivacyPolicy />} />

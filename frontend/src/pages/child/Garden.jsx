@@ -119,9 +119,12 @@ export default function ChildGarden() {
         const data = await res.json()
         setGullakData(data)
       } else {
+        const body = await res.text().catch(() => '')
+        console.error('[gullak] fetch failed:', res.status, body)
         setGullakError(true)
       }
-    } catch {
+    } catch (e) {
+      console.error('[gullak] fetch error:', e)
       setGullakError(true)
     } finally {
       setGullakLoading(false)

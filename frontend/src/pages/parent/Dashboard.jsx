@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+﻿import { useEffect, useState, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase.js'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -60,7 +60,7 @@ function ChildOverview({ child, portfolioTotal, pendingCount }) {
   if (!child) return null
 
   const goalAmount = child.goal_amount ? Number(child.goal_amount) : null
-  const saved      = portfolioTotal?.rupees ?? null
+  const saved      = portfolioTotal?.taggedRupees ?? null
   const pct        = (goalAmount && saved !== null)
     ? Math.min(Math.round((saved / goalAmount) * 100), 100)
     : 0
@@ -364,18 +364,19 @@ export default function ParentDashboard() {
           .maybeSingle(),
       ])
 
-      const allFunds    = fundsResult.data || []
+      const allFunds     = fundsResult.data || []
       const visibleFunds = allFunds.filter(f => f.show_in_child_app)
 
       if (allFunds.length === 0) {
-        setPortfolioTotal({ rupees: 0, count: 0, last_updated: null })
+        setPortfolioTotal({ totalRupees: 0, taggedRupees: 0, count: 0, last_updated: null })
         return
       }
 
-      const total      = visibleFunds.reduce((sum, f) => sum + (parseFloat(f.current_value) || 0), 0)
-      const lastUpdated = logResult.data?.fetched_at || null
+      const totalRupees  = allFunds.reduce((sum, f) => sum + (parseFloat(f.current_value) || 0), 0)
+      const taggedRupees = visibleFunds.reduce((sum, f) => sum + (parseFloat(f.current_value) || 0), 0)
+      const lastUpdated  = logResult.data?.fetched_at || null
 
-      setPortfolioTotal({ rupees: total, count: visibleFunds.length, last_updated: lastUpdated })
+      setPortfolioTotal({ totalRupees, taggedRupees, count: visibleFunds.length, last_updated: lastUpdated })
     }
 
     loadPortfolio()
@@ -405,33 +406,44 @@ export default function ParentDashboard() {
         />
       )}
 
-      {/* Portfolio card — premium empty state until a CAS is imported */}
-      {portfolioTotal === null ? (
-        <div className="card card--gold">
-          <div className="card__label">Tagged portfolio</div>
-          <div className="card__value">—</div>
-          <div className="card__sub">Loading…</div>
-        </div>
-      ) : portfolioTotal.count === 0 ? (
-        <PortfolioEmptyState />
-      ) : (
-        <div className="card card--gold">
-          <div className="card__label">Tagged portfolio</div>
-          <div className="card__value">
-            {portfolioTotal.rupees > 0
-              ? `₹\u00A0${portfolioTotal.rupees.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
-              : '₹ —'}
+      {/* Portfolio card */}
+      {(() => {
+        const totalVal = portfolioTotal?.totalRupees ?? null
+        const display  = (totalVal !== null && totalVal > 0)
+          ? `₹ ${totalVal.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
+          : portfolioTotal === null ? '—' : '₹ 0'
+        return (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: '#0d1f1a',
+              borderRadius: 'var(--r-lg)',
+              padding: '20px 20px',
+              marginBottom: 'var(--sp4)',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+            onClick={() => navigate('/parent/portfolio')}
+            role="link"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && navigate('/parent/portfolio')}
+          >
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', color: '#5DCAA5', textTransform: 'uppercase', marginBottom: '6px' }}>
+                Your portfolio
+              </div>
+              <div style={{ fontSize: '2.2rem', fontWeight: 600, letterSpacing: '-0.02em', color: '#ffffff', lineHeight: 1 }}>
+                {display}
+              </div>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M7.5 4.5L13 10l-5.5 5.5" stroke="#5DCAA5" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
-          <div className="card__sub">
-            {`${portfolioTotal.count} fund${portfolioTotal.count !== 1 ? 's' : ''} shared with ${child?.name || 'your child'}`}
-            {portfolioTotal.last_updated && (
-              <span style={{ display: 'block', fontSize: '11px', marginTop: '2px', opacity: 0.7 }}>
-                Updated {new Date(portfolioTotal.last_updated).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* Child overview */}
       {!loadingChild && !child && (
