@@ -77,7 +77,7 @@ export default function Landing() {
           <a href="#" className="logo">taru<span className="dot">.</span></a>
           <div className="nav-links">
             <Link to="/tax-calculator" className="nav-tax-calc">Tax calculator</Link>
-            <a href="#calculator" className="nav-tax-calc">Milestone calculator</a>
+            <Link to="/calculator" className="nav-tax-calc">Milestone calculator</Link>
             <Link to="/blog" className="nav-blogs">Blogs</Link>
             <a href="#cta" className="btn primary">Join waitlist</a>
           </div>
@@ -512,7 +512,7 @@ export default function Landing() {
           <div className="fnav">
             <Link to="/blog">Blogs</Link>
             <Link to="/tax-calculator">Tax calculator</Link>
-            <a href="#calculator">Milestone calculator</a>
+            <Link to="/calculator">Milestone calculator</Link>
           </div>
           <div className="made-tag">
             <span className="flag-dot"></span>
