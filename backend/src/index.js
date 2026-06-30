@@ -11,8 +11,9 @@ const childrenRouter   = require('./routes/children')
 const tasksRouter      = require('./routes/tasks')
 const gullakRouter     = require('./routes/gullak')
 const cronRouter       = require('./routes/cron')
-const waitlistRouter   = require('./routes/waitlist')
-const consentRouter    = require('./routes/consent')
+const waitlistRouter        = require('./routes/waitlist')
+const consentRouter         = require('./routes/consent')
+const calculatorLeadsRouter = require('./routes/calculatorLeads')
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -72,6 +73,9 @@ app.use('/api/cron', cronRouter)
 
 // Waitlist — public, no auth required
 app.use('/api/waitlist', waitlistRouter)
+
+// Calculator leads — public, no auth required
+app.use('/api/calculator-leads', calculatorLeadsRouter)
 
 // Consent — public POST (userId from request body, validated by service role)
 app.use('/api/consent', consentRouter)

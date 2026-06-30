@@ -14,19 +14,9 @@
  */
 
 const express = require('express')
+const { isValidEmail } = require('../lib/validate')
 
 const router = express.Router()
-
-// Very lightweight email sanity check (no external deps needed)
-function isValidEmail(value) {
-  if (typeof value !== 'string') return false
-  const trimmed = value.trim()
-  // Must contain exactly one @, something before it, a dot after the @
-  const parts = trimmed.split('@')
-  if (parts.length !== 2) return false
-  const [local, domain] = parts
-  return local.length > 0 && domain.includes('.') && domain.length > 3
-}
 
 router.post('/', async (req, res) => {
   const sb = req.supabaseAdmin   // attached in backend/src/index.js
