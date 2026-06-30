@@ -359,12 +359,10 @@ export default function TaruCalculator() {
       } else {
         setEmailError(data.error || "Something went wrong. Please try again.");
       }
-    } catch (err) {
-      if (err.name === "AbortError") {
-        setEmailError("Request timed out. Please try again.");
-      } else {
-        setEmailError("Could not connect. Please try again.");
-      }
+    } catch {
+      // Network failure — still unlock gated section so user sees their results.
+      // Lead capture is best-effort; don't block access on a connection error.
+      setEmailSubmitted(true);
     } finally {
       clearTimeout(timeout);
       setSubmitting(false);
@@ -801,8 +799,8 @@ export default function TaruCalculator() {
                 <p style={{ fontSize: 12, color: "var(--coral)", marginBottom: 10, marginTop: -4 }}>{emailError}</p>
               )}
               <button className="btn primary"
-                style={submitting || !emailValue ? { opacity: 0.4, pointerEvents: "none" } : {}}
-                disabled={submitting || !emailValue}
+                style={submitting || !emailValue || !consentGiven ? { opacity: 0.4, pointerEvents: "none" } : {}}
+                disabled={submitting || !emailValue || !consentGiven}
                 onClick={handleEmailSubmit}>
                 {submitting ? "Sending…" : "Show me the full plan →"}
               </button>
