@@ -756,10 +756,14 @@ export default function TaruCalculator() {
           {!emailSubmitted ? (
             <div style={{ background: "var(--frost)", border: "1px solid var(--leaf)", borderRadius: 14, padding: "22px 22px", marginBottom: 16 }}>
               <div style={{ fontSize: 14, fontWeight: 600, color: "var(--forest)", marginBottom: 6 }}>
-                See the exact monthly SIP to close this gap
+                {live.pct < 90
+                  ? "See the exact monthly SIP to close this gap"
+                  : "Confirm you're on track"}
               </div>
               <p style={{ fontSize: 13, color: "var(--moss)", marginBottom: 18, lineHeight: 1.6 }}>
-                We'll show you how much to invest — broken down by where your money should go.
+                {live.pct < 90
+                  ? "We'll show you how much to invest — broken down by where your money should go."
+                  : "We'll show you exactly how your savings and SIP are tracking, broken down by where your money is working."}
               </p>
               <input type="email" placeholder="your@email.com"
                 value={emailValue}
