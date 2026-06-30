@@ -71,15 +71,9 @@ export default function MilestoneCalculatorPage() {
 
       {/* ── Page hero ── */}
       <header className="tc-hero">
-        <div className="wrap">
-          <h1 className="tc-hero__title serif">
-            How much do you need to invest for your child&apos;s future?
-          </h1>
-          <p className="tc-hero__sub">
-            Tell us their age and what you&apos;re saving for — college, marriage, or their first home.
-            We&apos;ll show you the exact monthly SIP to get there.
-          </p>
-        </div>
+        <h1 className="tc-seo-text">
+          Child milestone savings calculator — Taru
+        </h1>
       </header>
 
       {/* ── Calculator ── */}

@@ -5,8 +5,7 @@
 /* ── Hero ─────────────────────────────────────────────────── */
 
 .landing-page .tc-hero {
-  padding: 100px 0 24px;
-  text-align: center;
+  padding: 0;
   background: var(--cream);
 }
 
@@ -40,7 +39,7 @@
 /* ── Section wrapper ──────────────────────────────────────── */
 
 .landing-page .tc-section {
-  padding: 56px 0 80px;
+  padding: 100px 0 80px;
   background: var(--cream);
 }
 
@@ -696,7 +695,7 @@
 
 @media (max-width: 960px) {
   .landing-page .tc-hero {
-    padding: 88px 0 20px;
+    padding: 0;
   }
 
   .landing-page .tc-hero__title {
