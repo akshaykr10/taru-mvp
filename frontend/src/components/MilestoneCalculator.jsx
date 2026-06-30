@@ -344,11 +344,14 @@ export default function TaruCalculator() {
       utm_campaign: params.get("utm_campaign") || undefined,
     };
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
     try {
       const res  = await fetch(`${BACKEND_URL}/api/calculator-leads`, {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify(body),
+        signal:  controller.signal,
       });
       const data = await res.json();
       if (res.ok || data.ok) {
@@ -356,9 +359,14 @@ export default function TaruCalculator() {
       } else {
         setEmailError(data.error || "Something went wrong. Please try again.");
       }
-    } catch {
-      setEmailError("Could not connect. Please try again.");
+    } catch (err) {
+      if (err.name === "AbortError") {
+        setEmailError("Request timed out. Please try again.");
+      } else {
+        setEmailError("Could not connect. Please try again.");
+      }
     } finally {
+      clearTimeout(timeout);
       setSubmitting(false);
     }
   }
