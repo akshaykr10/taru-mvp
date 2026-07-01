@@ -355,6 +355,9 @@ export default function TaruCalculator() {
       });
       const data = await res.json();
       if (res.ok || data.ok) {
+        if (typeof fbq !== "undefined") {
+          fbq("track", "Lead");
+        }
         setEmailSubmitted(true);
       } else {
         setEmailError(data.error || "Something went wrong. Please try again.");
