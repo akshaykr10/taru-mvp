@@ -358,6 +358,9 @@ export default function TaruCalculator() {
         if (typeof fbq !== "undefined") {
           fbq("track", "Lead");
         }
+        if (typeof gtag_report_conversion !== "undefined") {
+          gtag_report_conversion();
+        }
         setEmailSubmitted(true);
       } else {
         setEmailError(data.error || "Something went wrong. Please try again.");
