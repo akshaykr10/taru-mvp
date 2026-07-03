@@ -25,13 +25,18 @@ export default function Login() {
     setError('')
     setLoading(true)
 
+    const email = form.email.trim().toLowerCase()
     const { error: signInError } = await supabase.auth.signInWithPassword({
-      email:    form.email.trim().toLowerCase(),
+      email,
       password: form.password,
     })
     setLoading(false)
 
     if (signInError) {
+      if (signInError.code === 'email_not_confirmed') {
+        navigate('/verify-email', { state: { email } })
+        return
+      }
       setError('Incorrect email or password.')
       return
     }

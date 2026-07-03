@@ -18,14 +18,20 @@ export default function Signup() {
     e.preventDefault()
     setError('')
 
+    const email = form.email.trim().toLowerCase()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Please enter a valid email address.')
+      return
+    }
+
     if (form.password.length < 8) {
       setError('Password must be at least 8 characters.')
       return
     }
 
     setLoading(true)
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: form.email.trim().toLowerCase(),
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
       password: form.password,
       options: {
         // name is stored in user_metadata → picked up by the DB trigger
@@ -42,7 +48,15 @@ export default function Signup() {
     // Fire Google Ads sign-up conversion (fire-and-forget — don't block navigation)
     window.gtag?.('event', 'conversion', { send_to: 'AW-18172166013/aC8FCKyqn7YcEP3-lNlD' })
 
-    navigate('/parent/onboarding')
+    // signUp() only returns a session if email confirmation is disabled on the
+    // Supabase project. If confirmation is required (or gets re-enabled later),
+    // there's no session yet — send the user to the verify-email holding page
+    // instead of a protected route that will just bounce them to /login.
+    if (data.session) {
+      navigate('/parent/onboarding')
+    } else {
+      navigate('/verify-email', { state: { email } })
+    }
   }
 
   return (
