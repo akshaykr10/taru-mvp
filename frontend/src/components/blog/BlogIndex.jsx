@@ -1,18 +1,39 @@
+import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { blogs } from '../../data/blogs.js'
+import '../../styles/landing.css'
 import './blog.css'
 
 export default function BlogIndex() {
+  const navRef = useRef(null)
+
+  useEffect(() => {
+    function onScroll() {
+      if (!navRef.current) return
+      navRef.current.classList.toggle('scrolled', window.scrollY > 10)
+    }
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <>
+    <div className="landing-page">
       <Helmet>
         <title>Blog — Taru | Investing for Your Child's Future</title>
         <meta name="description" content="Practical guides for Indian parents on investing in their child's name — minor mutual fund accounts, SIP calculations, and how to get started." />
       </Helmet>
 
-      <nav className="blog-nav">
-        <Link to="/" className="blog-nav__logo">Taru</Link>
+      <nav className="top" ref={navRef}>
+        <div className="inner">
+          <Link to="/" className="logo">taru<span className="dot">.</span></Link>
+          <div className="nav-links">
+            <Link to="/tax-calculator">Tax calculator</Link>
+            <Link to="/calculator">Milestone calculator</Link>
+            <Link to="/blog" style={{ opacity: 1, fontWeight: 500 }}>Blogs</Link>
+            <Link to="/signup" className="btn primary">Get started</Link>
+          </div>
+        </div>
       </nav>
 
       <main className="blog-index">
@@ -37,14 +58,23 @@ export default function BlogIndex() {
         </section>
       </main>
 
-      <footer className="blog-footer">
-        <span className="blog-footer__brand">Taru</span>
-        <div className="blog-footer__links">
-          <Link to="/privacy">Privacy Policy</Link>
-          <span>·</span>
-          <Link to="/terms">Terms of Use</Link>
+      <footer>
+        <div className="inner">
+          <div className="f-left">
+            <Link to="/" className="logo">taru<span className="dot">.</span></Link>
+            <div className="copy">&copy; 2026 NextGenOS Financial Services Private Limited</div>
+          </div>
+          <div className="fnav">
+            <Link to="/blog">Blogs</Link>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+          </div>
+          <div className="made-tag">
+            <span className="flag-dot"></span>
+            Made in India, for India
+          </div>
         </div>
       </footer>
-    </>
+    </div>
   )
 }

@@ -1,6 +1,8 @@
-import { useNavigate } from 'react-router-dom'
+import { useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { termsContent } from '../legal/index.js'
+import '../styles/landing.css'
 
 function BracketHighlight({ children }) {
   if (typeof children !== 'string') return children
@@ -31,20 +33,53 @@ const mdComponents = {
 }
 
 export default function TermsOfUse() {
-  const navigate = useNavigate()
+  const navRef = useRef(null)
+
+  useEffect(() => {
+    function onScroll() {
+      if (!navRef.current) return
+      navRef.current.classList.toggle('scrolled', window.scrollY > 10)
+    }
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <div style={styles.page}>
-      <div style={styles.topBar}>
-        <button style={styles.backBtn} onClick={() => navigate(-1)} aria-label="Go back">
-          ← Back
-        </button>
-      </div>
+    <div className="landing-page" style={styles.page}>
+      <nav className="top" ref={navRef}>
+        <div className="inner">
+          <Link to="/" className="logo">taru<span className="dot">.</span></Link>
+          <div className="nav-links">
+            <Link to="/tax-calculator">Tax calculator</Link>
+            <Link to="/calculator">Milestone calculator</Link>
+            <Link to="/blog">Blogs</Link>
+            <Link to="/signup" className="btn primary">Get started</Link>
+          </div>
+        </div>
+      </nav>
 
       <div style={styles.content}>
         <h1 style={styles.pageTitle}>Terms of Use</h1>
         <ReactMarkdown components={mdComponents}>{termsContent}</ReactMarkdown>
       </div>
+
+      <footer>
+        <div className="inner">
+          <div className="f-left">
+            <Link to="/" className="logo">taru<span className="dot">.</span></Link>
+            <div className="copy">&copy; 2026 NextGenOS Financial Services Private Limited</div>
+          </div>
+          <div className="fnav">
+            <Link to="/blog">Blogs</Link>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+          </div>
+          <div className="made-tag">
+            <span className="flag-dot"></span>
+            Made in India, for India
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
@@ -52,43 +87,16 @@ export default function TermsOfUse() {
 const styles = {
   page: {
     minHeight: '100vh',
-    background: '#fff',
-    fontFamily: "'DM Sans', system-ui, sans-serif",
-    color: '#0B1628',
-  },
-  topBar: {
-    position: 'sticky',
-    top: 0,
-    background: '#fff',
-    borderBottom: '1px solid #E2E8F0',
-    padding: '12px 16px',
-    zIndex: 10,
-  },
-  backBtn: {
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    fontFamily: "'DM Sans', system-ui, sans-serif",
-    fontSize: '0.95rem',
-    color: '#0B1628',
-    padding: '6px 0',
-    minHeight: '44px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
   },
   content: {
     maxWidth: '720px',
     margin: '0 auto',
-    padding: '24px 16px 48px',
+    padding: 'calc(48px + 92px) 16px 48px',
     lineHeight: 1.7,
     fontSize: '0.95rem',
   },
   pageTitle: {
-    fontFamily: "'Cormorant Garamond', Georgia, serif",
-    fontWeight: 600,
     fontSize: '2rem',
-    color: '#1a2238',
     marginBottom: '24px',
   },
 }

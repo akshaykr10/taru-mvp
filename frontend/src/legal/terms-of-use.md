@@ -1,9 +1,5 @@
-# Terms of Use
-
 **Last updated: [DATE]**
 **Effective date: [DATE]**
-
-> **DRAFT FOR LEGAL REVIEW.** Must be reviewed by qualified Indian fintech/securities counsel before publication, particularly the pre-ARN service description, minor-folio clauses, and Section 2. Replace every **[bracketed]** placeholder.
 
 ---
 
@@ -98,11 +94,3 @@ We may amend these Terms. Continued use after changes take effect constitutes ac
 **NextGenOS Financial Services Private Limited**, A-1304 Romell Diva, Jamuna Bldg, Chincholli Bunder, Malad West, Malad, Mumbai, Maharashtra - 400064
 CIN: U66190MH2026PTC472911
 taru@taru.money | +91 8779695364
-
----
-
-### Placeholders to complete before publishing
-- Fee structure (free vs paid tiers)
-- Liability cap (counsel to set)
-- Grievance Officer details
-- Trigger reminder: the moment the ARN is granted, Sections 2, 5, 10, and 14 need a second revision to move from future to present tense, and the actual ARN number needs to be inserted throughout

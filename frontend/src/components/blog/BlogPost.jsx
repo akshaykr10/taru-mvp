@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { getBlogBySlug } from '../../data/blogs.js'
+import '../../styles/landing.css'
 import './blog.css'
 
 function renderInline(text) {
@@ -61,6 +62,16 @@ const CTA_BLOG4   = 'Skip the steps — open your child\'s account directly on T
 export default function BlogPost() {
   const { slug } = useParams()
   const blog = getBlogBySlug(slug)
+  const navRef = useRef(null)
+
+  useEffect(() => {
+    function onScroll() {
+      if (!navRef.current) return
+      navRef.current.classList.toggle('scrolled', window.scrollY > 10)
+    }
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     if (!blog) return
@@ -77,15 +88,22 @@ export default function BlogPost() {
   const ctaText = blog.ctaVariant === 'blog4' ? CTA_BLOG4 : CTA_DEFAULT
 
   return (
-    <>
+    <div className="landing-page">
       <Helmet>
         <title>{blog.title} — Taru</title>
         <meta name="description" content={blog.metaDescription} />
       </Helmet>
 
-      <nav className="blog-nav">
-        <Link to="/" className="blog-nav__logo">Taru</Link>
-        <Link to="/blog" className="blog-nav__back">← All articles</Link>
+      <nav className="top" ref={navRef}>
+        <div className="inner">
+          <Link to="/" className="logo">taru<span className="dot">.</span></Link>
+          <div className="nav-links">
+            <Link to="/tax-calculator">Tax calculator</Link>
+            <Link to="/calculator">Milestone calculator</Link>
+            <Link to="/blog" style={{ opacity: 1, fontWeight: 500 }}>Blogs</Link>
+            <Link to="/signup" className="btn primary">Get started</Link>
+          </div>
+        </div>
       </nav>
 
       <article className="blog-post">
@@ -109,15 +127,23 @@ export default function BlogPost() {
         </Link>
       </div>
 
-      <footer className="blog-footer">
-        <Link to="/blog" className="blog-footer__blog-link">← Back to all articles</Link>
-        <div className="blog-footer__links">
-          <Link to="/privacy">Privacy Policy</Link>
-          <span>·</span>
-          <Link to="/terms">Terms of Use</Link>
+      <footer className="blog-post-footer">
+        <div className="inner">
+          <div className="f-left">
+            <Link to="/" className="logo">taru<span className="dot">.</span></Link>
+            <div className="copy">&copy; 2026 NextGenOS Financial Services Private Limited</div>
+          </div>
+          <div className="fnav">
+            <Link to="/blog">← All articles</Link>
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+          </div>
+          <div className="made-tag">
+            <span className="flag-dot"></span>
+            Made in India, for India
+          </div>
         </div>
-        <span className="blog-footer__brand">Taru</span>
       </footer>
-    </>
+    </div>
   )
 }

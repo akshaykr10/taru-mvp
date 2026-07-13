@@ -18,14 +18,75 @@ const ASSET_CLASSES = [
   { id: 'ulip',          label: 'ULIP' },
 ]
 
-/* 12-month LTCG threshold: equity MF, equity hybrid MF, direct stocks */
-const LTCG_SPLIT = new Set(['equity_mf', 'hybrid_mf', 'direct_stocks'])
+/* 12-month LTCG threshold: equity MF, equity hybrid MF, direct stocks, ULIP (taxed like equity u/s 111A/112A) */
+const LTCG_SPLIT = new Set(['equity_mf', 'hybrid_mf', 'direct_stocks', 'ulip'])
 
 /* Show LTCG/STCG breakdown rows in table and corpus card chips */
 const SHOW_SPLIT_ROWS = new Set(['equity_mf', 'hybrid_mf', 'direct_stocks', 'digital_gold', 'ulip'])
 
 /* Asset classes not offered by Taru yet */
 const NON_MF_TYPES = new Set(['direct_stocks', 'digital_gold', 'fd_rd', 'ulip'])
+
+/* Child's basic exemption under the new tax regime, FY 2026-27 (₹0–4L @ nil).
+   Section 198 (erstwhile 112A) adds a further ₹1.25L LTCG-only exemption for
+   equity-type assets, on top of whatever's left of the ₹4L after STCG. */
+const CHILD_BASIC_EXEMPTION   = 400000
+const CHILD_112A_EXEMPTION    = 125000
+
+/* New tax regime slabs, FY 2026-27 — used for the child's own slab-rate income
+   (e.g. debt MF gains realised after they're no longer a minor). */
+const NEW_REGIME_SLABS = [
+  { upto: 400000,   rate: 0    },
+  { upto: 800000,   rate: 0.05 },
+  { upto: 1200000,  rate: 0.10 },
+  { upto: 1600000,  rate: 0.15 },
+  { upto: 2000000,  rate: 0.20 },
+  { upto: 2400000,  rate: 0.25 },
+  { upto: Infinity, rate: 0.30 },
+]
+
+/* Bracket-by-bracket slab computation, exposed for the "how is this
+   calculated" breakdown UI on debt MF and gold's STCG (both taxed as
+   ordinary slab-rate income for the child under the new-regime slabs +
+   Section 156 rebate — unlike equity's special-rate STCG/LTCG). */
+function slabTaxBreakdown(income) {
+  let prev = 0
+  const brackets = []
+  for (const { upto, rate } of NEW_REGIME_SLABS) {
+    if (income <= prev) break
+    const to      = Math.min(income, upto)
+    const taxable = to - prev
+    brackets.push({ from: prev, to, rate, taxable, tax: taxable * rate })
+    prev = upto
+  }
+  const grossTax = brackets.reduce((sum, b) => sum + b.tax, 0)
+  const rebate   = income <= 1200000 ? Math.min(grossTax, 60000) : 0
+  return { brackets, grossTax, rebate, netTax: grossTax - rebate }
+}
+
+/* Progressive slab tax with Section 156 (erstwhile 87A) rebate — nil tax up to ₹12L total income */
+function slabTaxWithRebate(income) {
+  return slabTaxBreakdown(income).netTax
+}
+
+/* Shared child-side tax for all equity-taxed assets (equity MF, hybrid MF,
+   direct stocks, ULIP) — STCG under Sec 196 (erstwhile 111A), LTCG under
+   Sec 198 (erstwhile 112A).
+   The child's ₹4L basic-exemption shortfall (they have no other income) is
+   applied FIRST against STCG — the first proviso to each section allows the
+   shortfall to offset that section's own gains, and applying it to the
+   20%-taxed STCG before the 12.5%-taxed LTCG minimises total tax, which is
+   both the economically rational choice and how ITR utilities sequence the
+   adjustment. Any leftover then reduces LTCG, on top of LTCG's own fixed
+   ₹1.25L Section 198 exemption (which is available regardless of income). */
+function equityStyleChildTax(stcgGains, ltcgGains) {
+  const stcgExemption   = Math.min(CHILD_BASIC_EXEMPTION, stcgGains)
+  const remainingBasic  = CHILD_BASIC_EXEMPTION - stcgExemption
+  const ltcgExemption   = Math.min(CHILD_112A_EXEMPTION + remainingBasic, ltcgGains)
+  const stcgTax         = (stcgGains - stcgExemption) * 0.20
+  const ltcgTax         = Math.max(0, ltcgGains - ltcgExemption) * 0.125
+  return { stcgExemption, ltcgExemption, stcgTax, ltcgTax, childTax: stcgTax + ltcgTax }
+}
 
 /* ─────────────────────────────────────────────────────────
    Core SIP formula
@@ -100,82 +161,107 @@ export function calculateTaxSavings(monthlyAmount, childAge, returnRate, assetCl
   let parentStcgTax      = 0, parentLtcgTax = 0
   let childStcgTax       = 0, childLtcgTax  = 0
   let childLtcgExemption = 0   // amount of LTCG shielded for child by exemption
+  let childStcgExemption = 0   // amount of STCG shielded for child by exemption
+  let childSlabBreakdown = null // bracket-by-bracket detail, debt MF / gold STCG only
   let explanation        = ''
   let noSavingReason     = ''
 
   switch (assetClass) {
-    case 'equity_mf':
-      parentStcgTax      = stcgGains * 0.20
-      parentLtcgTax      = ltcgGains * 0.125
-      parentTax          = parentStcgTax + parentLtcgTax
-      childStcgTax       = stcgGains * 0.20
-      childLtcgExemption = Math.min(425000, ltcgGains)
-      childLtcgTax       = Math.max(0, ltcgGains - 425000) * 0.125
-      childTax           = childStcgTax + childLtcgTax
-      explanation        = "Equity mutual funds use two tax rates: STCG at 20% for units held under 12 months, and LTCG at 12.5% for units held over 12 months. In a SIP redeemed at age 18, the last 12 monthly instalments qualify as STCG; all earlier instalments qualify as LTCG. In your child's name, their ₹4.25 lakh tax-free threshold (₹3L basic exemption + ₹1.25L LTCG exemption under Section 112A) applies to LTCG — both are fresh since the child has no other income. STCG is taxed at the same 20% rate in both names."
+    case 'equity_mf': {
+      parentStcgTax = stcgGains * 0.20
+      parentLtcgTax = ltcgGains * 0.125
+      parentTax     = parentStcgTax + parentLtcgTax
+      const c = equityStyleChildTax(stcgGains, ltcgGains)
+      childStcgTax = c.stcgTax; childLtcgTax = c.ltcgTax
+      childStcgExemption = c.stcgExemption; childLtcgExemption = c.ltcgExemption
+      childTax = c.childTax
+      explanation = "Equity mutual funds use two tax rates: STCG at 20% (Section 196) for units held under 12 months, and LTCG at 12.5% (Section 198) for units held over 12 months. In a SIP redeemed at age 18, the last 12 monthly instalments qualify as STCG; all earlier instalments qualify as LTCG. Your child has no other income, so their ₹4L basic exemption is unused — the law applies that shortfall to STCG first (taxed at the higher 20% rate, so shielding it saves more), then any leftover tops up LTCG's own fixed ₹1.25L exemption. Together that shields up to ₹5.25L combined, split across both gain types rather than dumped entirely on LTCG."
       break
+    }
 
-    case 'hybrid_mf':
-      parentStcgTax      = stcgGains * 0.20
-      parentLtcgTax      = ltcgGains * 0.125
-      parentTax          = parentStcgTax + parentLtcgTax
-      childStcgTax       = stcgGains * 0.20
-      childLtcgExemption = Math.min(425000, ltcgGains)
-      childLtcgTax       = Math.max(0, ltcgGains - 425000) * 0.125
-      childTax           = childStcgTax + childLtcgTax
-      explanation        = "Equity-oriented hybrid funds (more than 65% in equities) are taxed exactly like equity mutual funds — STCG at 20% and LTCG at 12.5%. In your child's name, their ₹4.25 lakh tax-free threshold (₹3L basic exemption + ₹1.25L LTCG exemption under Section 112A) applies to LTCG, both fresh since the child has no other income."
+    case 'hybrid_mf': {
+      parentStcgTax = stcgGains * 0.20
+      parentLtcgTax = ltcgGains * 0.125
+      parentTax     = parentStcgTax + parentLtcgTax
+      const c = equityStyleChildTax(stcgGains, ltcgGains)
+      childStcgTax = c.stcgTax; childLtcgTax = c.ltcgTax
+      childStcgExemption = c.stcgExemption; childLtcgExemption = c.ltcgExemption
+      childTax = c.childTax
+      explanation = "Equity-oriented hybrid funds (more than 65% in equities) are taxed exactly like equity mutual funds — STCG at 20% (Section 196) and LTCG at 12.5% (Section 198). Your child's unused ₹4L basic exemption is applied to STCG first, then any leftover tops up LTCG's own ₹1.25L exemption — together shielding up to ₹5.25L, since the child has no other income."
       break
+    }
 
-    case 'direct_stocks':
-      parentStcgTax      = stcgGains * 0.20
-      parentLtcgTax      = ltcgGains * 0.125
-      parentTax          = parentStcgTax + parentLtcgTax
-      childStcgTax       = stcgGains * 0.20
-      childLtcgExemption = Math.min(425000, ltcgGains)
-      childLtcgTax       = Math.max(0, ltcgGains - 425000) * 0.125
-      childTax           = childStcgTax + childLtcgTax
-      explanation        = "Listed equity shares follow the same STCG / LTCG rules as equity mutual funds — 20% for units held under 12 months, 12.5% for units held over 12 months. In your child's name, their ₹4.25 lakh tax-free threshold (₹3L basic exemption + ₹1.25L LTCG exemption) applies to LTCG, fresh since the child has no other income."
+    case 'direct_stocks': {
+      parentStcgTax = stcgGains * 0.20
+      parentLtcgTax = ltcgGains * 0.125
+      parentTax     = parentStcgTax + parentLtcgTax
+      const c = equityStyleChildTax(stcgGains, ltcgGains)
+      childStcgTax = c.stcgTax; childLtcgTax = c.ltcgTax
+      childStcgExemption = c.stcgExemption; childLtcgExemption = c.ltcgExemption
+      childTax = c.childTax
+      explanation = "Listed equity shares follow the same STCG / LTCG rules as equity mutual funds — 20% (Section 196) for units held under 12 months, 12.5% (Section 198) for units held over 12 months. Your child's unused ₹4L basic exemption is applied to STCG first, then any leftover tops up LTCG's own ₹1.25L exemption — together shielding up to ₹5.25L, fresh since the child has no other income."
       break
+    }
 
     case 'debt_mf':
+      // Redemption happens at your child's 18th birthday — after they're no
+      // longer a minor. Section 99 clubbing only applies to income earned
+      // BY a minor, so this one-time gain is taxed as the child's own income,
+      // not clubbed with yours. It's slab-rate income (Section 76, specified
+      // mutual fund), so it gets the child's progressive new-regime slabs +
+      // Section 156 rebate.
       parentTax      = gains * 0.30
-      childTax       = gains * 0.30
       parentLtcgTax  = parentTax
+      childSlabBreakdown = slabTaxBreakdown(gains)
+      childTax       = childSlabBreakdown.netTax
       childLtcgTax   = childTax
-      explanation    = "Debt mutual fund gains (purchased on or after April 1, 2023) are taxed at your income tax slab rate under Section 50AA — this applies whether the investment is in your name or your child's name, because of income tax clubbing rules that apply until your child turns 18. There is no tax advantage to investing debt funds in your child's name."
-      noSavingReason = "Income is clubbed with yours until your child turns 18"
+      explanation    = "Debt mutual fund gains (funds with more than 65% in debt/money-market instruments, per the FY 2025-26 redefinition of “specified mutual fund”) are taxed at slab rate under Section 76 (erstwhile Section 50AA) — there's no separate LTCG/STCG rate. Because the corpus is redeemed on your child's 18th birthday, i.e. after they're no longer a minor, this gain is NOT clubbed with your income — Section 99 (erstwhile 64(1A)) clubbing only applies to income a minor earns. It's taxed as your child's own income: assuming they have no other income, the new-regime slabs (nil up to ₹4L, then 5/10/15/20/25/30%) apply, and the Section 156 rebate (erstwhile 87A) makes tax nil up to ₹12L of total income, because this gain is ordinary slab-rate income, not a special-rate one. Your own tax is assumed at the 30% top slab."
       break
 
-    case 'digital_gold':
-      // STCG (last 24 months): slab rate 30% for both parent and child — no saving on STCG portion
-      // LTCG (held >24 months): 12.5% flat; child gets ₹3L basic exemption (not Section 112A)
-      parentStcgTax      = stcgGains * 0.30
-      parentLtcgTax      = ltcgGains * 0.125
-      parentTax          = parentStcgTax + parentLtcgTax
-      childStcgTax       = stcgGains * 0.30
-      childLtcgExemption = Math.min(300000, ltcgGains)
-      childLtcgTax       = Math.max(0, ltcgGains - 300000) * 0.125
-      childTax           = childStcgTax + childLtcgTax
-      explanation        = "Digital gold uses a 24-month holding threshold: SIP instalments held under 24 months qualify as STCG, taxed at the income tax slab rate (30% assumed here) — same rate for both parent and child. Instalments held over 24 months qualify as LTCG at 12.5% flat. In your child's name, their ₹3 lakh basic exemption shields the first ₹3 lakh of LTCG gains. Note: the ₹1.25L LTCG exemption under Section 112A applies only to equity assets — not gold."
+    case 'digital_gold': {
+      // STCG (last 24 months): ordinary slab-rate income for BOTH — parent assumed
+      // at a flat 30% top slab; child gets the progressive new-regime slabs +
+      // Section 156 rebate since they have no other income.
+      // LTCG (held >24 months): 12.5% flat under Section 197 (erstwhile 112); the
+      // child's basic-exemption shortfall (after whatever STCG already used of it)
+      // can reduce LTCG — gold gets no equivalent of equity's extra ₹1.25L (Sec 198).
+      parentStcgTax = stcgGains * 0.30
+      parentLtcgTax = ltcgGains * 0.125
+      parentTax     = parentStcgTax + parentLtcgTax
+
+      childSlabBreakdown = slabTaxBreakdown(stcgGains)
+      childStcgTax = childSlabBreakdown.netTax
+      const shortfall = Math.max(0, CHILD_BASIC_EXEMPTION - stcgGains)
+      childLtcgExemption = Math.min(shortfall, ltcgGains)
+      childLtcgTax  = Math.max(0, ltcgGains - childLtcgExemption) * 0.125
+      childTax      = childStcgTax + childLtcgTax
+      explanation   = "Digital gold uses a 24-month holding threshold. Instalments held under 24 months qualify as STCG — this is ordinary slab-rate income, not a concessional rate, so your child (with no other income) pays new-regime slab rates with the Section 156 rebate, while your own tax is assumed at the 30% top slab. Instalments held over 24 months qualify as LTCG, taxed at 12.5% flat under Section 197. Whatever's left of your child's ₹4L basic exemption after covering STCG can shield LTCG too. Note: the extra ₹1.25L exemption under Section 198 applies only to equity-type assets — not gold."
       break
+    }
 
     case 'fd_rd':
+      // Interest is taxed annually as it accrues, not just at maturity — so
+      // (unlike a redemption-based asset) almost all of it arises while your
+      // child is still a minor and gets clubbed with your income every year.
       parentTax      = gains * 0.30
       childTax       = gains * 0.30
       parentLtcgTax  = parentTax
       childLtcgTax   = childTax
-      explanation    = "Fixed deposit and recurring deposit interest is taxed annually as it accrues — not at redemption. During your child's minority, this interest is clubbed with your income and taxed at your slab rate regardless of whose name the FD is in. There is no tax advantage to FDs in your child's name."
-      noSavingReason = "Interest is taxed annually and clubbed with your income until age 18"
+      explanation    = "FD/RD interest is taxed annually as it's earned, not at maturity. Since the deposit runs from your child's current age until they turn 18, almost all of that interest accrues while they're still a minor — and under Section 99 (erstwhile 64(1A)), a minor's income is clubbed with the higher-earning parent's income and taxed at their slab rate, regardless of whose name the account is in. Only interest earned after your child turns 18 would be taxed in their own hands, and by then this investment has already matured. So there's effectively no tax advantage to FD/RD in your child's name."
+      noSavingReason = "Interest accrues annually and is clubbed with your income while your child is a minor"
       break
 
-    case 'ulip':
-      parentTax          = gains * 0.125
-      childLtcgExemption = Math.min(300000, ltcgGains)
-      childTax           = Math.max(0, gains - 300000) * 0.125
-      parentLtcgTax      = parentTax
-      childLtcgTax       = childTax
-      explanation        = "For ULIPs with annual premium above ₹2.5 lakh, gains are taxed as capital gains at 12.5%. In your child's name, their ₹3 lakh basic exemption shields the first ₹3 lakh of gains from tax."
+    case 'ulip': {
+      parentStcgTax = stcgGains * 0.20
+      parentLtcgTax = ltcgGains * 0.125
+      parentTax     = parentStcgTax + parentLtcgTax
+      const c = equityStyleChildTax(stcgGains, ltcgGains)
+      childStcgTax = c.stcgTax; childLtcgTax = c.ltcgTax
+      childStcgExemption = c.stcgExemption; childLtcgExemption = c.ltcgExemption
+      childTax = c.childTax
+      explanation = "For ULIPs with annual premium above ₹2.5 lakh, maturity proceeds lose the exemption under Schedule II, Clause 2 (erstwhile Section 10(10D)) and are instead taxed as capital gains under the same rules as equity mutual funds — STCG at 20% (Section 196) for units held under 12 months, LTCG at 12.5% (Section 198) for units held over 12 months. Your child's unused ₹4L basic exemption is applied to STCG first, then any leftover tops up LTCG's own ₹1.25L exemption — together shielding up to ₹5.25L, fresh since the child has no other income."
       break
+    }
 
     default:
       break
@@ -202,6 +288,8 @@ export function calculateTaxSavings(monthlyAmount, childAge, returnRate, assetCl
     parentNetCorpus:    corpus - parentTax,
     childNetCorpus:     corpus - childTax,
     childLtcgExemption,
+    childStcgExemption,
+    childSlabBreakdown,
     explanation,
     noSavingReason,
   }
@@ -250,11 +338,93 @@ function milestones(netCorpus) {
   ]
 }
 
+/* Small tap-to-toggle info affordance — deliberately not a hover tooltip,
+   since this product is mobile-first and hover doesn't exist on touch.
+   Scoped to the handful of exemption/rebate numbers that need context;
+   not a sitewide tooltip system. Takes open state + toggle as props so the
+   single "which note is open" slot lives in the parent component. */
+function InfoIcon({ open, onToggle, text }) {
+  return (
+    <span className="tc-info-wrap">
+      <button
+        type="button"
+        className="tc-info-icon"
+        aria-label="More info"
+        aria-expanded={open}
+        onClick={(e) => { e.stopPropagation(); onToggle() }}
+      >
+        i
+      </button>
+      {open && <span className="tc-info-note">{text}</span>}
+    </span>
+  )
+}
+
+/* Bracket-by-bracket rows for the child's slab computation — desktop
+   (3-column <tr>) and mobile (stacked <div>) variants. Parent column is
+   always a flat rate, so these only ever populate the child's numbers.
+   infoOpen/onInfoToggle are threaded through for the rebate row's InfoIcon. */
+function slabBreakdownDesktopRows(breakdown, infoOpen, onInfoToggle) {
+  if (!breakdown) return null
+  return (
+    <>
+      {breakdown.brackets.map((b, i) => (
+        <tr className="tc-row-explain" key={`slab-d-${i}`}>
+          <td>{fmt(b.from)}–{fmt(b.to)} @ {(b.rate * 100).toFixed(0)}%</td>
+          <td className="tc-expl-muted">—</td>
+          <td className="tc-col-child tc-expl-muted">{fmt(b.tax)}</td>
+        </tr>
+      ))}
+      {breakdown.rebate > 0 && (
+        <tr className="tc-row-explain" key="slab-d-rebate">
+          <td>
+            Less: Section 156 rebate (nil tax up to ₹12L)
+            <InfoIcon
+              open={infoOpen === 'rebate'}
+              onToggle={() => onInfoToggle('rebate')}
+              text="This zeroes out tax when your child's total income for the year is ₹12L or less. It only applies to ordinary slab-rate income like this — not to equity's STCG/LTCG, which are taxed at special rates."
+            />
+          </td>
+          <td className="tc-expl-muted">—</td>
+          <td className="tc-col-child tc-expl-exemption">−{fmt(breakdown.rebate)}</td>
+        </tr>
+      )}
+    </>
+  )
+}
+
+function slabBreakdownMobileRows(breakdown, infoOpen, onInfoToggle) {
+  if (!breakdown) return null
+  return (
+    <>
+      {breakdown.brackets.map((b, i) => (
+        <div className="tc-mobile-row tc-mobile-row--explain" key={`slab-m-${i}`}>
+          <span>{fmt(b.from)}–{fmt(b.to)} @ {(b.rate * 100).toFixed(0)}%</span>
+          <span>{fmt(b.tax)}</span>
+        </div>
+      ))}
+      {breakdown.rebate > 0 && (
+        <div className="tc-mobile-row tc-mobile-row--explain" key="slab-m-rebate">
+          <span>
+            Less: Section 156 rebate
+            <InfoIcon
+              open={infoOpen === 'rebate-m'}
+              onToggle={() => onInfoToggle('rebate-m')}
+              text="This zeroes out tax when your child's total income for the year is ₹12L or less. Only applies to ordinary slab-rate income like this — not equity's special-rate STCG/LTCG."
+            />
+          </span>
+          <span className="tc-expl-exemption">−{fmt(breakdown.rebate)}</span>
+        </div>
+      )}
+    </>
+  )
+}
+
 const EQUITY_TYPES = new Set(['equity_mf', 'hybrid_mf', 'direct_stocks', 'ulip'])
 
 function getAssumptions(assetClass) {
   const always = [
-    'Child has no other income at 18 — their full basic exemption (₹3L) is available.',
+    'Child has no other income at 18 — their full basic exemption (₹4L, new regime FY26-27) is available.',
     'Returns shown are assumed, not guaranteed — actual returns will vary.',
     'Tax laws are as per current Indian income tax rules and may change.',
   ]
@@ -262,13 +432,12 @@ function getAssumptions(assetClass) {
   const equityExtra = [
     'All SIP instalments held over 12 months qualify as LTCG; last 12 months qualify as STCG.',
     "Parent's ₹1.25L LTCG exemption is already used by their own investments.",
-    "Child's LTCG exemption: ₹1.25L under Section 112A, plus ₹3L basic exemption — total ₹4.25L shielded.",
+    "Child's unused ₹4L basic exemption is applied to STCG first (taxed at 20%, so it saves more there), then any leftover tops up LTCG's own fixed ₹1.25L exemption (Section 198) — up to ₹5.25L shielded in total.",
   ]
 
   switch (assetClass) {
     case 'equity_mf':
     case 'direct_stocks':
-    case 'ulip':
       return [...always, ...equityExtra]
 
     case 'hybrid_mf':
@@ -278,25 +447,32 @@ function getAssumptions(assetClass) {
         'Assumes fund has ≥65% equity exposure, qualifying it as equity-oriented. Conservative hybrid funds are taxed differently.',
       ]
 
+    case 'ulip':
+      return [
+        ...always,
+        ...equityExtra,
+        'Assumes annual premium exceeds ₹2.5L, so the policy loses its exemption under Schedule II, Clause 2 (erstwhile Section 10(10D)) and is taxed as capital gains instead.',
+      ]
+
     case 'digital_gold':
       return [
         ...always,
-        'SIP instalments held over 24 months qualify as LTCG at 12.5%; last 24 months qualify as STCG taxed at income tax slab rate.',
-        "Child's ₹3L basic exemption applies to LTCG gains. No separate Section 112A exemption — that is equity-only.",
+        'SIP instalments held over 24 months qualify as LTCG at 12.5% (Section 197); last 24 months qualify as STCG.',
+        "Gold's STCG is ordinary slab-rate income, not a concessional rate — the parent's is assumed at the 30% top slab, the child's uses progressive new-regime slabs. Whatever's left of the child's ₹4L basic exemption after covering STCG can shield LTCG too. No separate ₹1.25L exemption — that's equity-only (Section 198).",
       ]
 
     case 'debt_mf':
       return [
         ...always,
-        'Debt MF gains are taxed at your income tax slab rate under Section 50AA, regardless of holding period. This calculator assumes 30% slab.',
-        "Debt MF and FD/RD gains are clubbed with the parent's income during the child's minority — no tax benefit in child's name.",
+        'Debt MF gains are taxed at slab rate under Section 76 (erstwhile 50AA), regardless of holding period — this applies to funds with more than 65% in debt/money-market instruments. This calculator assumes you (the parent) are in the 30% bracket.',
+        "Because redemption happens at your child's 18th birthday — after they're no longer a minor — this gain is NOT clubbed with your income. It's taxed as the child's own income under new-regime slabs, tax-free up to ₹12L thanks to the Section 156 rebate (erstwhile 87A) — this gain is ordinary slab-rate income, so the rebate applies (unlike equity's special-rate gains).",
       ]
 
     case 'fd_rd':
       return [
         ...always,
-        'FD/RD interest is taxed at your income tax slab rate. This calculator assumes 30% slab.',
-        "Debt MF and FD/RD gains are clubbed with the parent's income during the child's minority — no tax benefit in child's name.",
+        'FD/RD interest is taxed annually as it accrues, at your income tax slab rate. This calculator assumes 30%.',
+        "Because interest is taxed each year (not just at maturity), almost all of it accrues while your child is still a minor and gets clubbed with your income under Section 99 (erstwhile 64(1A)) — so there's no tax benefit to FD/RD in your child's name.",
       ]
 
     default:
@@ -311,11 +487,15 @@ function getAssumptions(assetClass) {
 export default function TaxCalculator() {
   const navRef = useRef(null)
 
-  const [monthly,    setMonthly]    = useState(10000)
+  const [monthly,    setMonthly]    = useState(100000)
   const [childAge,   setChildAge]   = useState(5)
   const [returnRate, setReturnRate] = useState(12)
   const [assetClass, setAssetClass] = useState('equity_mf')
   const [explOpen,   setExplOpen]   = useState(false)
+  const [gainsOpen,  setGainsOpen]  = useState(false)
+  const [taxOpen,    setTaxOpen]    = useState(false)
+  const [infoOpen,   setInfoOpen]   = useState(null) // key of the currently-open info note, or null
+  const toggleInfo = (key) => setInfoOpen(o => (o === key ? null : key))
 
   const results       = calculateTaxSavings(monthly, childAge, returnRate, assetClass)
   const investYears   = 18 - childAge
@@ -324,18 +504,22 @@ export default function TaxCalculator() {
   const chips         = milestones(results.childNetCorpus)
   const showSplitRows = SHOW_SPLIT_ROWS.has(assetClass)
   const hasStcg       = results.stcgGains > 0
+  const isSlabAsset    = assetClass === 'debt_mf' // taxed as one slab-rate pool, no STCG/LTCG split
+  const hasTaxDetail   = showSplitRows || isSlabAsset // whether "Total tax on gains" can expand at all
   const assumptions   = getAssumptions(assetClass)
 
   const stcgRateLabel = assetClass === 'digital_gold'
-    ? 'STCG tax at slab rate (30%)'
+    ? 'STCG tax at slab rate'
     : 'STCG tax @ 20%'
   const ltcgRateLabel = 'LTCG tax @ 12.5%'
 
   // Equity types that show the two-row exemption explanation
   const EQUITY_EXEMPTION = new Set(['equity_mf', 'hybrid_mf', 'direct_stocks', 'ulip'])
   const showLtcgExemptionRows = EQUITY_EXEMPTION.has(assetClass) && results.childLtcgExemption > 0
+  const showStcgExemptionRows = EQUITY_EXEMPTION.has(assetClass) && results.childStcgExemption > 0
   const showGoldExemptionRow  = assetClass === 'digital_gold' && results.childLtcgExemption > 0
   const childLtcgTaxable      = Math.max(0, results.ltcgGains - results.childLtcgExemption)
+  const childStcgTaxable      = Math.max(0, results.stcgGains - results.childStcgExemption)
 
   const explanationPrefix = `At ${returnRate}% annual return over ${investYears} year${investYears !== 1 ? 's' : ''}, ₹${monthly.toLocaleString('en-IN')}/month grows to ${fmt(results.corpus)} — a ${growthMulti}× multiple on your investment. `
   const fullExplanation   = explanationPrefix + results.explanation
@@ -371,8 +555,9 @@ export default function TaxCalculator() {
         <div className="inner">
           <Link to="/" className="logo">taru<span className="dot">.</span></Link>
           <div className="nav-links">
-            <Link to="/blog">Blogs</Link>
             <Link to="/tax-calculator" style={{ opacity: 1, fontWeight: 500 }}>Tax calculator</Link>
+            <Link to="/calculator">Milestone calculator</Link>
+            <Link to="/blog">Blogs</Link>
             <Link to="/signup" className="btn primary">Get started</Link>
           </div>
         </div>
@@ -488,7 +673,7 @@ export default function TaxCalculator() {
                         key={ac.id}
                         type="button"
                         className={`tc-pill${assetClass === ac.id ? ' tc-pill--active' : ''}`}
-                        onClick={() => { setAssetClass(ac.id); setExplOpen(false) }}
+                        onClick={() => { setAssetClass(ac.id); setExplOpen(false); setGainsOpen(false); setTaxOpen(false); setInfoOpen(null) }}
                       >
                         {ac.label}
                       </button>
@@ -513,12 +698,18 @@ export default function TaxCalculator() {
             {/* ════ RIGHT PANEL — Three zones ════ */}
             <div className="tc-right-panel">
 
-              {/* ── ZONE A: Corpus card ── */}
+              {/* ── ZONE A: Tax saving hero card ── */}
               <div className="tc-corpus-card">
-                <div className="tc-corpus__label">Corpus at 18</div>
-                <div className="tc-corpus__big">{fmt(results.corpus)}</div>
+                <div className="tc-corpus__label">
+                  {results.taxSaving > 0 ? "Tax you save in your child's name" : 'Tax saving'}
+                </div>
+                <div className="tc-corpus__big">
+                  {results.taxSaving > 0 ? fmt(results.taxSaving) : '₹0'}
+                </div>
                 <div className="tc-corpus__sub">
-                  Invested {fmt(results.totalInvested)} over {investYears} yr{investYears !== 1 ? 's' : ''} · Grew {growthMulti}× at {returnRate}% p.a.
+                  {results.taxSaving > 0
+                    ? `On a ${fmt(results.corpus)} corpus at 18 — you keep ${fmt(results.childNetCorpus)} instead of ${fmt(results.parentNetCorpus)}`
+                    : `No tax saving for ${activeAsset?.label} in your child's name · corpus at 18 is ${fmt(results.corpus)}`}
                 </div>
 
                 {/* Invested → corpus stat row with gain chips grouped below arrow */}
@@ -542,8 +733,11 @@ export default function TaxCalculator() {
                   </div>
                   <span className="tc-corpus-stat-row__num">
                     {fmt(results.corpus)}
-                    <small>corpus</small>
+                    <small>corpus at 18</small>
                   </span>
+                </div>
+                <div className="tc-corpus__growth-note">
+                  Grew {growthMulti}× at {returnRate}% p.a. over {investYears} yr{investYears !== 1 ? 's' : ''}
                 </div>
               </div>
 
@@ -576,22 +770,60 @@ export default function TaxCalculator() {
                     <div key={card.heading} className="tc-mobile-card">
                       <div className="tc-mobile-card__heading">{card.heading}</div>
                       <div className="tc-mobile-card__divider" />
-                      {showSplitRows && (
+
+                      {/* Taxable gains — single row, expandable */}
+                      <div className="tc-mobile-row tc-mobile-row--toggle">
+                        {showSplitRows ? (
+                          <button type="button" className="tc-row-toggle" onClick={() => setGainsOpen(o => !o)} aria-expanded={gainsOpen}>
+                            Taxable gains
+                            <span className={`tc-row-chevron${gainsOpen ? ' tc-row-chevron--open' : ''}`}>▾</span>
+                          </button>
+                        ) : <span className="tc-row-toggle">Taxable gains</span>}
+                        <span>{fmt(results.gains)}</span>
+                      </div>
+
+                      {showSplitRows && gainsOpen && (
                         <>
                           {hasStcg && (
-                            <div className="tc-mobile-row">
+                            <div className="tc-mobile-row tc-mobile-row--explain">
                               <span>STCG gains</span>
                               <span>{fmt(results.stcgGains)}</span>
                             </div>
                           )}
-                          <div className="tc-mobile-row">
+                          {card.isChild && hasStcg && showStcgExemptionRows && (
+                            <>
+                              <div className="tc-mobile-row tc-mobile-row--explain">
+                                <span>
+                                  Less: exemption
+                                  <InfoIcon
+                                    open={infoOpen === 'stcg-exemption-m'}
+                                    onToggle={() => toggleInfo('stcg-exemption-m')}
+                                    text="Your child's unused ₹4L basic exemption is applied here first — STCG is taxed at 20% vs LTCG's 12.5%, so shielding STCG first saves more tax overall."
+                                  />
+                                </span>
+                                <span className="tc-expl-exemption">−{fmt(results.childStcgExemption)}</span>
+                              </div>
+                              <div className="tc-mobile-row tc-mobile-row--explain">
+                                <span>STCG taxable after exemption</span>
+                                <span className="tc-expl-muted">{fmt(childStcgTaxable)}</span>
+                              </div>
+                            </>
+                          )}
+                          <div className="tc-mobile-row tc-mobile-row--explain">
                             <span>LTCG gains</span>
                             <span>{fmt(results.ltcgGains)}</span>
                           </div>
                           {card.isChild && showLtcgExemptionRows && (
                             <>
                               <div className="tc-mobile-row tc-mobile-row--explain">
-                                <span>Less: exemption</span>
+                                <span>
+                                  Less: exemption
+                                  <InfoIcon
+                                    open={infoOpen === 'ltcg-exemption-m'}
+                                    onToggle={() => toggleInfo('ltcg-exemption-m')}
+                                    text="Includes the ₹1.25L exemption every investor gets on equity LTCG each year (Section 198), plus whatever's left of your child's ₹4L basic exemption after it's used against STCG."
+                                  />
+                                </span>
                                 <span className="tc-expl-exemption">−{fmt(results.childLtcgExemption)}</span>
                               </div>
                               <div className="tc-mobile-row tc-mobile-row--explain">
@@ -600,7 +832,7 @@ export default function TaxCalculator() {
                               </div>
                             </>
                           )}
-                          {!card.isChild && showLtcgExemptionRows && (
+                          {!card.isChild && (showLtcgExemptionRows || showStcgExemptionRows) && (
                             <div className="tc-mobile-row tc-mobile-row--explain">
                               <span>Less: exemption</span>
                               <span className="tc-expl-muted">— (already used)</span>
@@ -608,30 +840,60 @@ export default function TaxCalculator() {
                           )}
                           {card.isChild && showGoldExemptionRow && (
                             <div className="tc-mobile-row tc-mobile-row--explain">
-                              <span>Less: basic exemption</span>
+                              <span>
+                                Less: basic exemption
+                                <InfoIcon
+                                  open={infoOpen === 'gold-exemption-m'}
+                                  onToggle={() => toggleInfo('gold-exemption-m')}
+                                  text="Whatever's left of your child's ₹4L basic exemption after covering their STCG can shield LTCG here. Gold doesn't get the extra ₹1.25L that equity investments get."
+                                />
+                              </span>
                               <span className="tc-expl-exemption">−{fmt(results.childLtcgExemption)}</span>
                             </div>
                           )}
-                          {hasStcg && (
-                            <div className="tc-mobile-row">
-                              <span>{stcgRateLabel}</span>
-                              <span className={card.isChild ? '' : 'tc-tax-bad'}>{fmt(card.stcgTax)}</span>
-                            </div>
-                          )}
-                          <div className="tc-mobile-row">
-                            <span>{ltcgRateLabel}</span>
-                            <span className={card.isChild && results.taxSaving > 0 ? 'tc-tax-good' : (!card.isChild ? 'tc-tax-bad' : '')}>
-                              {fmt(card.ltcgTax)}
-                            </span>
-                          </div>
                         </>
                       )}
-                      <div className="tc-mobile-row">
-                        <span>Total tax on gains</span>
+
+                      {/* Total tax — single row, expandable */}
+                      <div className="tc-mobile-row tc-mobile-row--toggle">
+                        {hasTaxDetail ? (
+                          <button type="button" className="tc-row-toggle" onClick={() => setTaxOpen(o => !o)} aria-expanded={taxOpen}>
+                            <strong>Total tax on gains</strong>
+                            <span className={`tc-row-chevron${taxOpen ? ' tc-row-chevron--open' : ''}`}>▾</span>
+                          </button>
+                        ) : <span className="tc-row-toggle"><strong>Total tax on gains</strong></span>}
                         <span className={card.isChild && results.taxSaving > 0 ? 'tc-tax-good' : (!card.isChild ? 'tc-tax-bad' : '')}>
-                          {fmt(card.totalTax)}
+                          <strong>{fmt(card.totalTax)}</strong>
                         </span>
                       </div>
+
+                      {hasTaxDetail && taxOpen && (
+                        <>
+                          {showSplitRows && hasStcg && (
+                            <div className="tc-mobile-row tc-mobile-row--explain">
+                              <span>{stcgRateLabel}</span>
+                              <span>{fmt(card.stcgTax)}</span>
+                            </div>
+                          )}
+                          {showSplitRows && assetClass === 'digital_gold' && card.isChild &&
+                            slabBreakdownMobileRows(results.childSlabBreakdown, infoOpen, toggleInfo)}
+                          {showSplitRows && (
+                            <div className="tc-mobile-row tc-mobile-row--explain">
+                              <span>{ltcgRateLabel}</span>
+                              <span>{fmt(card.ltcgTax)}</span>
+                            </div>
+                          )}
+                          {isSlabAsset && !card.isChild && (
+                            <div className="tc-mobile-row tc-mobile-row--explain">
+                              <span>Flat 30% (assumed top slab)</span>
+                              <span>{fmt(card.totalTax)}</span>
+                            </div>
+                          )}
+                          {isSlabAsset && card.isChild &&
+                            slabBreakdownMobileRows(results.childSlabBreakdown, infoOpen, toggleInfo)}
+                        </>
+                      )}
+
                       <div className="tc-mobile-card__divider tc-mobile-card__divider--bold" />
                       <div className="tc-mobile-row tc-mobile-row--keep">
                         <span><strong>You keep</strong></span>
@@ -654,20 +916,54 @@ export default function TaxCalculator() {
                   </thead>
                   <tbody>
 
-                    {/* ROW GROUP 1 — Taxable gains [equity-type assets only] */}
-                    {showSplitRows && (
+                    {/* Taxable gains — single row, expandable for split assets */}
+                    <tr className="tc-row-summary">
+                      <td>
+                        {showSplitRows ? (
+                          <button type="button" className="tc-row-toggle" onClick={() => setGainsOpen(o => !o)} aria-expanded={gainsOpen}>
+                            Taxable gains
+                            <span className={`tc-row-chevron${gainsOpen ? ' tc-row-chevron--open' : ''}`}>▾</span>
+                          </button>
+                        ) : <span className="tc-row-toggle">Taxable gains</span>}
+                      </td>
+                      <td>{fmt(results.gains)}</td>
+                      <td className="tc-col-child">{fmt(results.gains)}</td>
+                    </tr>
+
+                    {showSplitRows && gainsOpen && (
                       <>
-                        <tr className="tc-group-header">
-                          <td colSpan={3}>Taxable gains</td>
-                        </tr>
                         {hasStcg && (
-                          <tr>
+                          <tr className="tc-row-explain">
                             <td>STCG gains</td>
                             <td>{fmt(results.stcgGains)}</td>
                             <td className="tc-col-child">{fmt(results.stcgGains)}</td>
                           </tr>
                         )}
-                        <tr>
+
+                        {/* Exemption explanation rows — STCG, equity / ulip only */}
+                        {hasStcg && showStcgExemptionRows && (
+                          <>
+                            <tr className="tc-row-explain">
+                              <td>
+                                Less: exemption
+                                <InfoIcon
+                                  open={infoOpen === 'stcg-exemption'}
+                                  onToggle={() => toggleInfo('stcg-exemption')}
+                                  text="Your child's unused ₹4L basic exemption is applied here first — STCG is taxed at 20% vs LTCG's 12.5%, so shielding STCG first saves more tax overall."
+                                />
+                              </td>
+                              <td className="tc-expl-muted">— (already used)</td>
+                              <td className="tc-col-child tc-expl-exemption">−{fmt(results.childStcgExemption)}</td>
+                            </tr>
+                            <tr className="tc-row-explain">
+                              <td>STCG taxable after exemption</td>
+                              <td className="tc-expl-muted">{fmt(results.stcgGains)}</td>
+                              <td className="tc-col-child tc-expl-muted">{fmt(childStcgTaxable)}</td>
+                            </tr>
+                          </>
+                        )}
+
+                        <tr className="tc-row-explain">
                           <td>LTCG gains</td>
                           <td>{fmt(results.ltcgGains)}</td>
                           <td className="tc-col-child">{fmt(results.ltcgGains)}</td>
@@ -677,7 +973,14 @@ export default function TaxCalculator() {
                         {showLtcgExemptionRows && (
                           <>
                             <tr className="tc-row-explain">
-                              <td>Less: exemption</td>
+                              <td>
+                                Less: exemption
+                                <InfoIcon
+                                  open={infoOpen === 'ltcg-exemption'}
+                                  onToggle={() => toggleInfo('ltcg-exemption')}
+                                  text="Includes the ₹1.25L exemption every investor gets on equity LTCG each year (Section 198), plus whatever's left of your child's ₹4L basic exemption after it's used against STCG."
+                                />
+                              </td>
                               <td className="tc-expl-muted">— (already used)</td>
                               <td className="tc-col-child tc-expl-exemption">−{fmt(results.childLtcgExemption)}</td>
                             </tr>
@@ -692,7 +995,14 @@ export default function TaxCalculator() {
                         {/* Exemption explanation row — digital gold (single row) */}
                         {showGoldExemptionRow && (
                           <tr className="tc-row-explain">
-                            <td>Less: basic exemption</td>
+                            <td>
+                              Less: basic exemption
+                              <InfoIcon
+                                open={infoOpen === 'gold-exemption'}
+                                onToggle={() => toggleInfo('gold-exemption')}
+                                text="Whatever's left of your child's ₹4L basic exemption after covering their STCG can shield LTCG here. Gold doesn't get the extra ₹1.25L that equity investments get — that's equity-only (Section 198)."
+                              />
+                            </td>
                             <td className="tc-expl-muted">—</td>
                             <td className="tc-col-child tc-expl-exemption">−{fmt(results.childLtcgExemption)}</td>
                           </tr>
@@ -700,39 +1010,53 @@ export default function TaxCalculator() {
                       </>
                     )}
 
-                    {/* ROW GROUP 2 — Tax applied */}
-                    {showSplitRows && (
-                      <>
-                        <tr className="tc-group-header tc-group-header--sep">
-                          <td colSpan={3}>Tax applied</td>
-                        </tr>
-                        {hasStcg && (
-                          <tr>
-                            <td>{stcgRateLabel}</td>
-                            <td className="tc-tax-bad">{fmt(results.parentStcgTax)}</td>
-                            <td className="tc-col-child">{fmt(results.childStcgTax)}</td>
-                          </tr>
-                        )}
-                        <tr>
-                          <td>{ltcgRateLabel}</td>
-                          <td className="tc-tax-bad">{fmt(results.parentLtcgTax)}</td>
-                          <td className={`tc-col-child${results.taxSaving > 0 ? ' tc-tax-good' : ''}`}>
-                            {fmt(results.childLtcgTax)}
-                          </td>
-                        </tr>
-                      </>
-                    )}
-
-                    {/* Total tax — end of group 2 for equity, only row for debt/fd */}
-                    <tr className={showSplitRows ? 'tc-row-total' : ''}>
-                      <td>Total tax on gains</td>
-                      <td className="tc-tax-bad">{fmt(results.parentTax)}</td>
+                    {/* Total tax on gains — single row, expandable for split + slab assets */}
+                    <tr className="tc-row-summary tc-row-total">
+                      <td>
+                        {hasTaxDetail ? (
+                          <button type="button" className="tc-row-toggle" onClick={() => setTaxOpen(o => !o)} aria-expanded={taxOpen}>
+                            <strong>Total tax on gains</strong>
+                            <span className={`tc-row-chevron${taxOpen ? ' tc-row-chevron--open' : ''}`}>▾</span>
+                          </button>
+                        ) : <span className="tc-row-toggle"><strong>Total tax on gains</strong></span>}
+                      </td>
+                      <td className="tc-tax-bad"><strong>{fmt(results.parentTax)}</strong></td>
                       <td className={`tc-col-child${results.taxSaving > 0 ? ' tc-tax-good' : ''}`}>
-                        {fmt(results.childTax)}
+                        <strong>{fmt(results.childTax)}</strong>
                       </td>
                     </tr>
 
-                    {/* ROW GROUP 3 — Result */}
+                    {hasTaxDetail && taxOpen && (
+                      <>
+                        {showSplitRows && hasStcg && (
+                          <tr className="tc-row-explain">
+                            <td>{stcgRateLabel}</td>
+                            <td>{fmt(results.parentStcgTax)}</td>
+                            <td className="tc-col-child">{fmt(results.childStcgTax)}</td>
+                          </tr>
+                        )}
+                        {showSplitRows && assetClass === 'digital_gold' &&
+                          slabBreakdownDesktopRows(results.childSlabBreakdown, infoOpen, toggleInfo)}
+                        {showSplitRows && (
+                          <tr className="tc-row-explain">
+                            <td>{ltcgRateLabel}</td>
+                            <td>{fmt(results.parentLtcgTax)}</td>
+                            <td className="tc-col-child">{fmt(results.childLtcgTax)}</td>
+                          </tr>
+                        )}
+                        {isSlabAsset && (
+                          <tr className="tc-row-explain">
+                            <td>Flat 30% (assumed top slab)</td>
+                            <td>{fmt(results.parentTax)}</td>
+                            <td className="tc-col-child tc-expl-muted">—</td>
+                          </tr>
+                        )}
+                        {isSlabAsset &&
+                          slabBreakdownDesktopRows(results.childSlabBreakdown, infoOpen, toggleInfo)}
+                      </>
+                    )}
+
+                    {/* Result */}
                     <tr className="tc-row-keep">
                       <td><strong>You keep</strong></td>
                       <td><strong>{fmt(results.parentNetCorpus)}</strong></td>
@@ -830,7 +1154,7 @@ export default function TaxCalculator() {
         <div className="inner">
           <div className="f-left">
             <Link to="/" className="logo">taru<span className="dot">.</span></Link>
-            <div className="copy">&copy; 2026 Taru Money Pvt. Ltd.</div>
+            <div className="copy">&copy; 2026 NextGenOS Financial Services Private Limited</div>
           </div>
           <div className="fnav">
             <Link to="/blog">Blogs</Link>
@@ -845,7 +1169,7 @@ export default function TaxCalculator() {
       </footer>
 
       <p className="tc-seo-text">
-        Investing in your child&apos;s name can significantly reduce your tax burden on capital gains. Under current Indian income tax rules, a child who has turned 18 gets a fresh ₹3 lakh basic exemption and ₹1.25 lakh LTCG exemption under Section 112A — savings that are unavailable when the same investment is held in a parent&apos;s name. This calculator shows you the exact difference across asset classes.
+        Investing in your child&apos;s name can significantly reduce your tax burden on capital gains. Under current Indian income tax rules, a child with no other income gets a fresh ₹4 lakh basic exemption plus a ₹1.25 lakh LTCG exemption under Section 198 (erstwhile Section 112A) — savings that are unavailable when the same investment is held in a parent&apos;s name. This calculator shows you the exact difference across asset classes.
       </p>
     </div>
   )

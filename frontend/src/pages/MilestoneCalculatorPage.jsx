@@ -62,8 +62,9 @@ export default function MilestoneCalculatorPage() {
         <div className="inner">
           <Link to="/" className="logo">taru<span className="dot">.</span></Link>
           <div className="nav-links">
-            <Link to="/blog">Blogs</Link>
             <Link to="/tax-calculator">Tax calculator</Link>
+            <Link to="/calculator" style={{ opacity: 1, fontWeight: 500 }}>Milestone calculator</Link>
+            <Link to="/blog">Blogs</Link>
             <Link to="/signup" className="btn primary">Get started</Link>
           </div>
         </div>
@@ -88,7 +89,7 @@ export default function MilestoneCalculatorPage() {
         <div className="inner">
           <div className="f-left">
             <Link to="/" className="logo">taru<span className="dot">.</span></Link>
-            <div className="copy">&copy; 2026 Taru Money Pvt. Ltd.</div>
+            <div className="copy">&copy; 2026 NextGenOS Financial Services Private Limited</div>
           </div>
           <div className="fnav">
             <Link to="/blog">Blogs</Link>

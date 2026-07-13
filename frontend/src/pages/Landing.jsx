@@ -507,7 +507,7 @@ export default function Landing() {
         <div className="inner">
           <div className="f-left">
             <a href="#" className="logo">taru<span className="dot">.</span></a>
-            <div className="copy">&copy; 2026 Taru Money Pvt. Ltd.</div>
+            <div className="copy">&copy; 2026 NextGenOS Financial Services Private Limited</div>
           </div>
           <div className="fnav">
             <Link to="/blog">Blogs</Link>

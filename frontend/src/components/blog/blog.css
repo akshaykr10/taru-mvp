@@ -1,42 +1,23 @@
 /* ══════════════════════════════════════════════════════════════
    Blog — shared styles for BlogIndex and BlogPost
-   All values reference design tokens from tokens.css
+   Colors/spacing/shadows reference tokens.css globals.
+   Nav/footer are shared .landing-page markup (see landing.css).
+   Typography is overridden below to match the rest of the
+   marketing site (Cormorant Garamond / Instrument Sans), since
+   --font-display/--font-parent from tokens.css are the parent-app
+   fonts (DM Serif Display / Plus Jakarta Sans), not the marketing
+   site's fonts.
    ══════════════════════════════════════════════════════════════ */
 
-/* ── Nav ── */
-.blog-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--sp4) var(--sp6);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+.blog-index,
+.blog-post {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-parent:  'Instrument Sans', system-ui, sans-serif;
 }
 
-.blog-nav__logo {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  color: var(--forest);
-  text-decoration: none;
-  font-weight: 400;
-}
-
-.blog-nav__back {
-  font-family: var(--font-parent);
-  font-size: 0.875rem;
-  color: var(--ink-60);
-  text-decoration: none;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-}
-
-.blog-nav__back:hover {
-  color: var(--forest);
+/* Extra clearance so the sticky CTA bar on blog posts never covers the footer */
+.landing-page footer.blog-post-footer {
+  padding-bottom: 108px;
 }
 
 /* ── Reading time badge ── */
@@ -58,7 +39,8 @@
 .blog-index {
   max-width: 900px;
   margin: 0 auto;
-  padding: var(--sp12) var(--sp6) 120px;
+  /* Top padding clears the fixed .landing-page nav.top */
+  padding: calc(var(--sp12) + 92px) var(--sp6) 120px;
 }
 
 .blog-index__hero {
@@ -151,7 +133,8 @@
 .blog-post {
   max-width: 680px;
   margin: 0 auto;
-  padding: var(--sp12) var(--sp6) 140px;
+  /* Top padding clears the fixed .landing-page nav.top */
+  padding: calc(var(--sp12) + 92px) var(--sp6) 140px;
 }
 
 /* ── Hero ── */
@@ -309,71 +292,10 @@
   color: var(--amber-md);
 }
 
-/* ── Footer ── */
-.blog-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sp2);
-  padding: var(--sp6) var(--sp6) var(--sp8);
-  border-top: 1px solid var(--border);
-  font-family: var(--font-parent);
-  font-size: 0.8125rem;
-  color: var(--ink-60);
-  /* Extra bottom padding on blog post to clear sticky CTA */
-  padding-bottom: calc(var(--sp8) + 72px);
-}
-
-.blog-index ~ .blog-footer,
-.blog-index + .blog-footer {
-  padding-bottom: var(--sp8);
-}
-
-.blog-footer__brand {
-  font-family: var(--font-display);
-  font-size: 1.125rem;
-  color: var(--forest);
-}
-
-.blog-footer__links {
-  display: flex;
-  align-items: center;
-  gap: var(--sp2);
-}
-
-.blog-footer__links a {
-  color: var(--ink-60);
-  text-decoration: none;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-}
-
-.blog-footer__links a:hover {
-  color: var(--forest);
-}
-
-.blog-footer__blog-link {
-  color: var(--moss);
-  text-decoration: none;
-  font-weight: 500;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-}
-
-.blog-footer__blog-link:hover {
-  color: var(--forest);
-}
-
 /* ── Mobile ── */
 @media (max-width: 480px) {
-  .blog-nav {
-    padding: var(--sp3) var(--sp4);
-  }
-
   .blog-index {
-    padding: var(--sp8) var(--sp4) 120px;
+    padding: calc(var(--sp8) + 72px) var(--sp4) 120px;
   }
 
   .blog-index__grid {
@@ -381,7 +303,11 @@
   }
 
   .blog-post {
-    padding: var(--sp8) var(--sp4) 140px;
+    padding: calc(var(--sp8) + 72px) var(--sp4) 140px;
+  }
+
+  .landing-page footer.blog-post-footer {
+    padding-bottom: 92px;
   }
 
   .blog-pull-quote {

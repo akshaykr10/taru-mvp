@@ -1,9 +1,5 @@
-# Privacy Policy
-
 **Last updated: [DATE]**
 **Effective date: [DATE]**
-
-> **DRAFT FOR LEGAL REVIEW.** Prepared to align with the Digital Personal Data Protection Act, 2023 ("DPDP Act") and the Digital Personal Data Protection Rules, 2025 ("DPDP Rules"). Must be reviewed by qualified Indian data-protection/fintech counsel before publication. Replace every **[bracketed]** placeholder with verified information.
 
 ---
 
@@ -131,10 +127,3 @@ We may update this Policy. Material changes — including the activation of dist
 **NextGenOS Financial Services Private Limited**
 A-1304 Romell Diva, Jamuna Bldg, Chincholli Bunder, Malad West, Malad, Mumbai, Maharashtra - 400064
 Grievance Officer: Akshay Kumar | taru@taru.money | +91 8779695364
-
----
-
-### Placeholders to complete before publishing
-- Confirmed list of data processors
-- Confirmation that the "no behavioural profiling of children" statements match actual product behaviour
-- Date and update trigger: this Policy needs a second revision the moment the ARN is actually granted, to move Section 4 items 6–7 from future to present tense
