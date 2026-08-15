@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { BACKEND_URL } from '../lib/api.js'
 import '../styles/landing.css'
 
@@ -70,6 +71,31 @@ export default function Landing() {
 
   return (
     <div className="landing-page">
+
+      <Helmet>
+        <title>Taru — Invest for Your Child's Future | Family Fintech India</title>
+        <meta name="description" content="Taru helps Indian parents invest in mutual funds for their children and teaches kids about money through a living garden. Start your child's financial journey today." />
+        <meta name="keywords" content="invest for child India, mutual fund for children, kids financial education, family fintech, SIP for child education, minor folio mutual fund" />
+        <link rel="canonical" href="https://taru.money/" />
+        <meta property="og:title" content="Taru — Invest for Your Child's Future" />
+        <meta property="og:description" content="Taru helps Indian parents invest in mutual funds for their children and teaches kids about money through a living garden. Start your child's financial journey today." />
+        <meta property="og:url" content="https://taru.money/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://taru.money/og-image.png" />
+        <meta name="twitter:title" content="Taru — Invest for Your Child's Future" />
+        <meta name="twitter:description" content="Taru helps Indian parents invest in mutual funds for their children and teaches kids about money through a living garden. Start your child's financial journey today." />
+        <meta name="twitter:image" content="https://taru.money/og-image.png" />
+
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Taru",
+          "legalName": "NextGenOS Financial Services Private Limited",
+          "url": "https://taru.money",
+          "logo": "https://taru.money/og-image.png",
+          "description": "Taru helps Indian parents invest in mutual funds for their children and teaches kids about money through a living garden.",
+        })}</script>
+      </Helmet>
 
       {/* ══════════ NAVBAR ══════════ */}
       <nav className="top" id="topnav" ref={navRef}>

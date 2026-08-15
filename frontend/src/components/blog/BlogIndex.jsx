@@ -22,6 +22,17 @@ export default function BlogIndex() {
       <Helmet>
         <title>Blog — Taru | Investing for Your Child's Future</title>
         <meta name="description" content="Practical guides for Indian parents on investing in their child's name — minor mutual fund accounts, SIP calculations, and how to get started." />
+        <link rel="canonical" href="https://taru.money/blog" />
+
+        <meta property="og:title" content="Blog — Taru | Investing for Your Child's Future" />
+        <meta property="og:description" content="Practical guides for Indian parents on investing in their child's name — minor mutual fund accounts, SIP calculations, and how to get started." />
+        <meta property="og:url" content="https://taru.money/blog" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://taru.money/og-image.png" />
+
+        <meta name="twitter:title" content="Blog — Taru | Investing for Your Child's Future" />
+        <meta name="twitter:description" content="Practical guides for Indian parents on investing in their child's name — minor mutual fund accounts, SIP calculations, and how to get started." />
+        <meta name="twitter:image" content="https://taru.money/og-image.png" />
       </Helmet>
 
       <nav className="top" ref={navRef}>

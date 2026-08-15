@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import ReactMarkdown from 'react-markdown'
 import { termsContent } from '../legal/index.js'
 import '../styles/landing.css'
@@ -46,6 +47,12 @@ export default function TermsOfUse() {
 
   return (
     <div className="landing-page" style={styles.page}>
+      <Helmet>
+        <title>Terms of Use — Taru</title>
+        <meta name="description" content="Taru's Terms of Use: the rules governing your access to and use of the Taru parent and child investing platform." />
+        <link rel="canonical" href="https://taru.money/terms" />
+      </Helmet>
+
       <nav className="top" ref={navRef}>
         <div className="inner">
           <Link to="/" className="logo">taru<span className="dot">.</span></Link>

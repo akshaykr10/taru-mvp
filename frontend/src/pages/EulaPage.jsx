@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import EulaModal from '../components/EulaModal.jsx'
 
 /**
@@ -16,5 +17,14 @@ export default function EulaPage() {
     navigate(destination, { replace: true })
   }
 
-  return <EulaModal onAccepted={handleAccepted} />
+  return (
+    <>
+      <Helmet>
+        <title>Accept Terms | Taru</title>
+        <meta name="description" content="Review and accept Taru's End User License Agreement to continue." />
+        <link rel="canonical" href="https://taru.money/eula" />
+      </Helmet>
+      <EulaModal onAccepted={handleAccepted} />
+    </>
+  )
 }

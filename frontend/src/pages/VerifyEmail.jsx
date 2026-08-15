@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase.js'
 import '../styles/auth.css'
 
@@ -26,6 +27,12 @@ export default function VerifyEmail() {
 
   return (
     <div className="auth-page">
+      <Helmet>
+        <title>Verify Your Email | Taru</title>
+        <meta name="description" content="Confirm your email address to activate your Taru account." />
+        <link rel="canonical" href="https://taru.money/verify-email" />
+      </Helmet>
+
       <div className="auth-card">
         <div className="auth-logo">Taru</div>
 

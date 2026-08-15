@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import ReactMarkdown from 'react-markdown'
 import { privacyContent } from '../legal/index.js'
 import '../styles/landing.css'
@@ -47,6 +48,12 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="landing-page" style={styles.page}>
+      <Helmet>
+        <title>Privacy Policy — Taru | How We Handle Your Data</title>
+        <meta name="description" content="Taru's Privacy Policy: how we collect, use, store, and protect your family's personal data on the Taru parent and child investing platform." />
+        <link rel="canonical" href="https://taru.money/privacy" />
+      </Helmet>
+
       <nav className="top" ref={navRef}>
         <div className="inner">
           <Link to="/" className="logo">taru<span className="dot">.</span></Link>

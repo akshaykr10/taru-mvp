@@ -92,6 +92,17 @@ export default function BlogPost() {
       <Helmet>
         <title>{blog.title} — Taru</title>
         <meta name="description" content={blog.metaDescription} />
+        <link rel="canonical" href={`https://taru.money/blog/${slug}`} />
+
+        <meta property="og:title" content={`${blog.title} — Taru`} />
+        <meta property="og:description" content={blog.metaDescription} />
+        <meta property="og:url" content={`https://taru.money/blog/${slug}`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content={blog.coverImage || 'https://taru.money/og-image.png'} />
+
+        <meta name="twitter:title" content={`${blog.title} — Taru`} />
+        <meta name="twitter:description" content={blog.metaDescription} />
+        <meta name="twitter:image" content={blog.coverImage || 'https://taru.money/og-image.png'} />
       </Helmet>
 
       <nav className="top" ref={navRef}>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase.js'
 import '../styles/auth.css'
 
@@ -61,6 +62,12 @@ export default function Signup() {
 
   return (
     <div className="auth-page">
+      <Helmet>
+        <title>Sign Up | Taru</title>
+        <meta name="description" content="Create your Taru account to start investing in your child's name." />
+        <link rel="canonical" href="https://taru.money/signup" />
+      </Helmet>
+
       <div className="auth-card">
         <div className="auth-logo">Taru</div>
         <div className="auth-tagline">Watch your family's money grow.</div>

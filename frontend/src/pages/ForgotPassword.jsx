@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabase.js'
 import '../styles/auth.css'
 
@@ -20,6 +21,12 @@ export default function ForgotPassword() {
 
   return (
     <div className="auth-page">
+      <Helmet>
+        <title>Forgot Password | Taru</title>
+        <meta name="description" content="Reset your Taru account password." />
+        <link rel="canonical" href="https://taru.money/forgot-password" />
+      </Helmet>
+
       <div className="auth-card">
         <div className="auth-logo">Taru</div>
         <div className="auth-tagline">Watch your family's money grow.</div>
