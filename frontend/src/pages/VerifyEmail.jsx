@@ -30,7 +30,7 @@ export default function VerifyEmail() {
       <Helmet>
         <title>Verify Your Email | Taru</title>
         <meta name="description" content="Confirm your email address to activate your Taru account." />
-        <link rel="canonical" href="https://taru.money/verify-email" />
+        <link rel="canonical" href="https://taru.money/verify-email/" />
       </Helmet>
 
       <div className="auth-card">

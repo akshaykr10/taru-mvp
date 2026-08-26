@@ -22,7 +22,7 @@ export default function EulaPage() {
       <Helmet>
         <title>Accept Terms | Taru</title>
         <meta name="description" content="Review and accept Taru's End User License Agreement to continue." />
-        <link rel="canonical" href="https://taru.money/eula" />
+        <link rel="canonical" href="https://taru.money/eula/" />
       </Helmet>
       <EulaModal onAccepted={handleAccepted} />
     </>

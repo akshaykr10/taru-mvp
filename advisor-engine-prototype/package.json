@@ -1,0 +1,10 @@
+{
+  "name": "advisor-engine-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Standalone prototype of the deterministic recommendation engine layer. Not wired into the Taru app. See README.md for scope and assumptions.",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test test/"
+  }
+}

@@ -80,7 +80,7 @@ export default function Login() {
       <Helmet>
         <title>Log In | Taru</title>
         <meta name="description" content="Log in to your Taru account to manage your child's investments." />
-        <link rel="canonical" href="https://taru.money/login" />
+        <link rel="canonical" href="https://taru.money/login/" />
       </Helmet>
 
       <div className="auth-card">

@@ -57,7 +57,7 @@ export default function ResetPassword() {
       <Helmet>
         <title>Reset Password | Taru</title>
         <meta name="description" content="Choose a new password for your Taru account." />
-        <link rel="canonical" href="https://taru.money/reset-password" />
+        <link rel="canonical" href="https://taru.money/reset-password/" />
       </Helmet>
 
       <div className="auth-card">
