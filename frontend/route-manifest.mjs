@@ -1,6 +1,5 @@
 // Single source of truth for which paths are real routes in the SPA
-// (src/App.jsx). (build-log-reproduction-check)
-// Consumed by:
+// (src/App.jsx). Consumed by:
 //   - prerender-run.mjs (build time — decides what to prerender)
 //   - netlify/edge-functions/known-routes.mjs (request time — decides what
 //     gets a genuine 404 instead of falling through to the SPA shell)
