@@ -3,3 +3,6 @@ node_modules
 .env.local
 dist
 .claude
+
+# Local Netlify folder
+.netlify

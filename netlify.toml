@@ -2,10 +2,11 @@
 # Vite app lives in /frontend; output goes to /frontend/dist.
 
 [build]
-  base    = "frontend"          # Netlify runs all commands from here
-  command = "npm run build"
-  publish = "dist"              # relative to base, so resolves to frontend/dist
-  timeout = 300
+  base           = "frontend"          # Netlify runs all commands from here
+  command        = "npm run build"
+  publish        = "dist"              # relative to base, so resolves to frontend/dist
+  edge_functions = "netlify/edge-functions"  # relative to base, so resolves to frontend/netlify/edge-functions
+  timeout        = 300
 
 [build.environment]
   NODE_VERSION     = "20"                                    # pin to LTS; Vite 8 requires Node ≥ 18

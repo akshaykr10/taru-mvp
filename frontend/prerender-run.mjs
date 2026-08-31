@@ -4,30 +4,16 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-// Public, non-auth-gated routes from src/App.jsx.
-// Excluded on purpose:
+// Public, non-auth-gated routes from src/App.jsx — sourced from the shared
+// manifest (also used by the known-routes edge function) so the two never
+// drift apart.
+// Excluded on purpose (see route-manifest.mjs for the full list):
 //   /app                      — client-side auth redirect, no static content to render
 //   /app/signup /app/login /app/verify-email — duplicate aliases of the canonical paths below
 //   /parent/* and /app/parent/* — behind RequireParentAuth (Supabase login required)
 //   /child/:token              — token-gated; no valid static token to render against
 //   *                          — catch-all redirect, not a real page
-const { blogs } = await import('./src/data/blogs.js')
-
-const routes = [
-  '/',
-  '/tax-calculator',
-  '/calculator',
-  '/blog',
-  ...blogs.map((b) => `/blog/${b.slug}`),
-  '/signup',
-  '/login',
-  '/verify-email',
-  '/eula',
-  '/forgot-password',
-  '/reset-password',
-  '/privacy',
-  '/terms',
-]
+const { prerenderedRoutes: routes } = await import('./route-manifest.mjs')
 
 let Prerenderer, PuppeteerRenderer
 
