@@ -92,7 +92,7 @@ export default function BlogPost() {
       <Helmet>
         <title>{blog.title} — Taru</title>
         <meta name="description" content={blog.metaDescription} />
-        <link rel="canonical" href={`https://taru.money/blog/${slug}`} />
+        <link rel="canonical" href={`https://taru.money/blog/${slug}/`} />
 
         <meta property="og:title" content={`${blog.title} — Taru`} />
         <meta property="og:description" content={blog.metaDescription} />

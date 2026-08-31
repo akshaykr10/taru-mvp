@@ -544,7 +544,7 @@ export default function TaxCalculator() {
       <Helmet>
         <title>Child Investment Tax Calculator — Save Tax by Investing in Your Child&apos;s Name | Taru</title>
         <meta name="description" content="Calculate how much tax you save by investing in your child's name vs your own. Compare Equity MF, Debt MF, Digital Gold and more. Free calculator, no signup needed." />
-        <link rel="canonical" href="https://taru.money/tax-calculator" />
+        <link rel="canonical" href="https://taru.money/tax-calculator/" />
         <meta property="og:title" content="The best investment you'll ever make is in your child's name." />
         <meta property="og:description" content="See your corpus, your tax bill, and exactly how much you save by investing in your child's name. Live, with your numbers." />
         <meta property="og:url" content="https://taru.money/tax-calculator" />

@@ -65,7 +65,7 @@ export default function Signup() {
       <Helmet>
         <title>Sign Up | Taru</title>
         <meta name="description" content="Create your Taru account to start investing in your child's name." />
-        <link rel="canonical" href="https://taru.money/signup" />
+        <link rel="canonical" href="https://taru.money/signup/" />
       </Helmet>
 
       <div className="auth-card">

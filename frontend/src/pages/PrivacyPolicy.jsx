@@ -51,7 +51,7 @@ export default function PrivacyPolicy() {
       <Helmet>
         <title>Privacy Policy — Taru | How We Handle Your Data</title>
         <meta name="description" content="Taru's Privacy Policy: how we collect, use, store, and protect your family's personal data on the Taru parent and child investing platform." />
-        <link rel="canonical" href="https://taru.money/privacy" />
+        <link rel="canonical" href="https://taru.money/privacy/" />
       </Helmet>
 
       <nav className="top" ref={navRef}>
