@@ -16,6 +16,23 @@ import { isKnownRoute } from '../../route-manifest.mjs'
 // or 404 it without us rewriting the status.
 const STATIC_ASSET_RE = /\.[a-zA-Z0-9]+$/
 
+// Matches /app itself and every /app/* alias (/app/login, /app/signup,
+// /app/verify-email, /app/parent/*, /app/child/*). These are unintentionally
+// crawlable duplicates of already-robots.txt-disallowed canonical routes
+// (/login, /signup, /parent/*, /child/*) — robots.txt Disallow alone only
+// stops crawling, it doesn't deindex a URL Google already has, so these get
+// an explicit noindex signal here too. X-Robots-Tag (not a <meta> tag) is
+// used deliberately: /app and its aliases are never prerendered, so a
+// client-side Helmet noindex tag wouldn't appear in the raw response until
+// after JS executes — this header is present on the very first byte.
+const APP_ALIAS_RE = /^\/app(\/|$)/
+
+function withNoindex(headers) {
+  const h = new Headers(headers)
+  h.set('X-Robots-Tag', 'noindex')
+  return h
+}
+
 export default async (request, context) => {
   const { pathname } = new URL(request.url)
 
@@ -23,16 +40,26 @@ export default async (request, context) => {
     return context.next()
   }
 
-  if (isKnownRoute(pathname)) {
-    return context.next()
+  const isAppAlias = APP_ALIAS_RE.test(pathname)
+  const response = await context.next()
+
+  if (!isKnownRoute(pathname)) {
+    return new Response(response.body, {
+      status: 404,
+      statusText: 'Not Found',
+      headers: isAppAlias ? withNoindex(response.headers) : response.headers,
+    })
   }
 
-  const response = await context.next()
-  return new Response(response.body, {
-    status: 404,
-    statusText: 'Not Found',
-    headers: response.headers,
-  })
+  if (isAppAlias) {
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: withNoindex(response.headers),
+    })
+  }
+
+  return response
 }
 
 export const config = { path: '/*' }
