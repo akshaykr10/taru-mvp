@@ -567,6 +567,11 @@ export default function TaxCalculator() {
           "applicationCategory": "FinanceApplication",
           "operatingSystem": "Any",
           "isAccessibleForFree": true,
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "INR",
+          },
         })}</script>
       </Helmet>
 
