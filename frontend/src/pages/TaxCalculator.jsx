@@ -554,6 +554,20 @@ export default function TaxCalculator() {
         <meta name="twitter:title" content="The best investment you'll ever make is in your child's name." />
         <meta name="twitter:description" content="See your corpus, your tax bill, and exactly how much you save by investing in your child's name. Live, with your numbers." />
         <meta name="twitter:image" content="https://taru.money/og-image.png" />
+
+        {/* No FAQPage schema — the page has expandable calculation
+            explanations and info tooltips, not actual Q&A-formatted
+            content, so FAQPage markup would misrepresent the page. */}
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "Child Investment Tax Calculator",
+          "url": "https://taru.money/tax-calculator",
+          "description": "Calculate how much tax you save by investing in your child's name vs your own, across Equity MF, Debt MF, Digital Gold and more.",
+          "applicationCategory": "FinanceApplication",
+          "operatingSystem": "Any",
+          "isAccessibleForFree": true,
+        })}</script>
       </Helmet>
 
       {/* ── Navbar ── */}

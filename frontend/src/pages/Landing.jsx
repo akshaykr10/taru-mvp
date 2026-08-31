@@ -95,6 +95,14 @@ export default function Landing() {
           "logo": "https://taru.money/og-image.png",
           "description": "Taru helps Indian parents invest in mutual funds for their children and teaches kids about money through a living garden.",
         })}</script>
+        {/* No internal search feature exists on the site — SearchAction/
+            sitelinks-searchbox markup deliberately omitted. */}
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Taru",
+          "url": "https://taru.money",
+        })}</script>
       </Helmet>
 
       {/* ══════════ NAVBAR ══════════ */}
