@@ -21,8 +21,26 @@ try {
   ;({ default: Prerenderer } = await import('@prerenderer/prerenderer'))
   ;({ default: PuppeteerRenderer } = await import('@prerenderer/renderer-puppeteer'))
 } catch (e) {
-  console.warn('[prerender] packages not available, skipping:', e.message)
-  process.exit(0)
+  console.error('[prerender] required packages failed to load:', e.stack)
+  process.exit(1)
+}
+
+// Netlify's Linux build image has no persisted cache for puppeteer's own
+// downloaded Chrome (that download also doesn't happen there — see
+// PUPPETEER_SKIP_DOWNLOAD in netlify.toml), which used to fail every build
+// silently. @sparticuz/chromium ships a compiled headless Chromium binary
+// as part of the npm package itself, so there's nothing to download or
+// cache between builds — point puppeteer at it directly.
+// Locally (Windows/macOS dev), @sparticuz/chromium only ships a Linux
+// binary, so fall back to puppeteer's own bundled Chrome as before.
+let launchOptions = {}
+if (process.platform === 'linux') {
+  const { default: chromium } = await import('@sparticuz/chromium')
+  launchOptions = {
+    executablePath: await chromium.executablePath(),
+    args: chromium.args,
+    headless: chromium.headless,
+  }
 }
 
 try {
@@ -37,12 +55,26 @@ try {
     // skipThirdPartyRequests aborts any request that isn't to the local static server —
     // without it, every prerender run actually loads gtag.js/Google Ads/Meta Pixel and
     // fires real conversion/pageview events from the headless browser.
-    renderer: new PuppeteerRenderer({ renderAfterTime: 2000, maxConcurrentRoutes: 1, skipThirdPartyRequests: true }),
+    renderer: new PuppeteerRenderer({
+      renderAfterTime: 2000,
+      maxConcurrentRoutes: 1,
+      skipThirdPartyRequests: true,
+      launchOptions,
+    }),
   })
 
   await prerenderer.initialize()
   const renderedRoutes = await prerenderer.renderRoutes(routes)
   await prerenderer.destroy()
+
+  // A prerenderer that silently returns fewer pages than requested is the
+  // same failure mode as the swallowed exception this replaces — catch it
+  // explicitly instead of letting a partial dist/ pass as success.
+  if (renderedRoutes.length !== routes.length) {
+    throw new Error(
+      `Expected ${routes.length} prerendered routes, got ${renderedRoutes.length}`
+    )
+  }
 
   for (const route of renderedRoutes) {
     const outputDir = join(__dirname, 'dist', route.route)
@@ -51,8 +83,11 @@ try {
     console.log(`Prerendered: ${route.route}`)
   }
 
-  console.log('Prerendering complete.')
+  console.log(`Prerendering complete: ${renderedRoutes.length} pages.`)
 } catch (e) {
-  console.warn('[prerender] failed, skipping:', e.message)
-  process.exit(0)
+  // A failed prerender means the deploy would silently ship the SPA shell
+  // for every route instead of real content — that must fail the build,
+  // not log a warning nobody reads and report success.
+  console.error('[prerender] failed:', e.stack)
+  process.exit(1)
 }

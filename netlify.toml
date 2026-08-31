@@ -9,9 +9,13 @@
   timeout        = 300
 
 [build.environment]
-  NODE_VERSION     = "20"                                    # pin to LTS; Vite 8 requires Node ≥ 18
+  NODE_VERSION     = "22"                                    # @sparticuz/chromium requires Node ^22.17.0 || >=24; Vite 8 requires Node ≥ 18
   VITE_BACKEND_URL = "https://taru-mvp-dr4o.onrender.com"   # Render backend URL baked at build time
   NPM_FLAGS        = "--include=dev"
+  # Prerendering launches @sparticuz/chromium's bundled binary (see prerender-run.mjs),
+  # not puppeteer's own Chrome — skip puppeteer's install-time download entirely so it
+  # can't be the thing that silently fails in this build image.
+  PUPPETEER_SKIP_DOWNLOAD = "true"
 
 # ── SPA redirect rule ─────────────────────────────────────────────
 # All routes (/, /app, /app/*, /child/:token, /parent/*, /login, etc.)
