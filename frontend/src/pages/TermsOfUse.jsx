@@ -50,7 +50,7 @@ export default function TermsOfUse() {
       <Helmet>
         <title>Terms of Use — Taru</title>
         <meta name="description" content="Taru's Terms of Use: the rules governing your access to and use of the Taru parent and child investing platform." />
-        <link rel="canonical" href="https://taru.money/terms" />
+        <link rel="canonical" href="https://taru.money/terms/" />
       </Helmet>
 
       <nav className="top" ref={navRef}>

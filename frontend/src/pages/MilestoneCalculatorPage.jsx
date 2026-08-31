@@ -23,7 +23,7 @@ export default function MilestoneCalculatorPage() {
         <title>Child Milestone Savings Calculator — Taru</title>
         <meta name="description" content="Calculate exactly how much you need to invest each month for your child's education, marriage, house, or startup. Free SIP planner for Indian parents. Powered by Taru." />
         <meta name="keywords" content="child education savings calculator India, SIP calculator for child, how much to save for child education, marriage savings calculator, mutual fund for children India, minor folio SIP planner" />
-        <link rel="canonical" href="https://taru.money/calculator" />
+        <link rel="canonical" href="https://taru.money/calculator/" />
 
         <meta property="og:title" content="Child Milestone Savings Calculator — Taru" />
         <meta property="og:description" content="Plan your child's financial future. Calculate the SIP needed for education, marriage, home, and more." />

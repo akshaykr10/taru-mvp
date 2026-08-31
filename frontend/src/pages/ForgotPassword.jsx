@@ -24,7 +24,7 @@ export default function ForgotPassword() {
       <Helmet>
         <title>Forgot Password | Taru</title>
         <meta name="description" content="Reset your Taru account password." />
-        <link rel="canonical" href="https://taru.money/forgot-password" />
+        <link rel="canonical" href="https://taru.money/forgot-password/" />
       </Helmet>
 
       <div className="auth-card">
