@@ -2,6 +2,7 @@ export const blogs = [
   {
     id: 1,
     slug: 'invest-in-childs-name',
+    datePublished: '2026-06-10T23:41:53+05:30',
     title: "I Wish Someone Had Told Me to Invest in My Child's Name",
     subtitle: 'Saving for them is not the same as saving in their name. Here\'s the difference that cost me ₹2.7 lakh.',
     readingTime: '5 min',
@@ -23,6 +24,7 @@ export const blogs = [
   {
     id: 2,
     slug: 'what-is-minor-mutual-fund',
+    datePublished: '2026-06-10T23:41:53+05:30',
     title: 'What Is a Minor Mutual Fund Account? (No Jargon)',
     subtitle: 'Guardian folios. Minor PAN. SEBI circulars. Let\'s cut through all of it in plain English.',
     readingTime: '5 min',
@@ -46,6 +48,7 @@ export const blogs = [
   {
     id: 3,
     slug: '500-a-month-18-years',
+    datePublished: '2026-06-10T23:41:53+05:30',
     title: '₹500 a Month. 18 Years. Here\'s What Happens.',
     subtitle: 'Less than a family dinner out. Here\'s the math on what it becomes.',
     readingTime: '4 min',
@@ -67,6 +70,7 @@ export const blogs = [
   {
     id: 4,
     slug: 'how-to-open-minor-mutual-fund',
+    datePublished: '2026-06-10T23:41:53+05:30',
     title: 'How to Open a Mutual Fund in Your Child\'s Name',
     subtitle: 'A step-by-step guide. No filler. In order.',
     readingTime: '6 min',
@@ -101,6 +105,7 @@ export const blogs = [
   {
     id: 5,
     slug: 'myths-that-delay-action',
+    datePublished: '2026-06-10T23:41:53+05:30',
     title: '"My FD Is Enough." And Other Things We Tell Ourselves.',
     subtitle: 'A few comfortable stories Indian parents tell themselves — and an honest look at what they actually cost.',
     readingTime: '5 min',
@@ -125,6 +130,7 @@ export const blogs = [
   {
     id: 6,
     slug: 'the-day-your-child-turns-18',
+    datePublished: '2026-06-10T23:41:53+05:30',
     title: 'The Day Your Child Turns 18',
     subtitle: 'Two versions of the same moment. Which one are you building toward?',
     readingTime: '4 min',

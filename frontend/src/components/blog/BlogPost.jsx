@@ -97,12 +97,45 @@ export default function BlogPost() {
         <meta property="og:title" content={`${blog.title} — Taru`} />
         <meta property="og:description" content={blog.metaDescription} />
         <meta property="og:url" content={`https://taru.money/blog/${slug}`} />
-        <meta property="og:type" content="website" />
+        <meta property="og:type" content="article" />
         <meta property="og:image" content={blog.coverImage || 'https://taru.money/og-image.png'} />
 
         <meta name="twitter:title" content={`${blog.title} — Taru`} />
         <meta name="twitter:description" content={blog.metaDescription} />
         <meta name="twitter:image" content={blog.coverImage || 'https://taru.money/og-image.png'} />
+
+        {/* No named author/byline exists anywhere on the site for these posts
+            (all first-person essays, none individually attributed) — author
+            is Taru the Organization, not a fabricated named Person. */}
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          "headline": blog.title,
+          "description": blog.metaDescription,
+          "url": `https://taru.money/blog/${slug}`,
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": `https://taru.money/blog/${slug}`,
+          },
+          "image": blog.coverImage || 'https://taru.money/og-image.png',
+          "datePublished": blog.datePublished,
+          "dateModified": blog.dateModified || blog.datePublished,
+          "author": {
+            "@type": "Organization",
+            "name": "Taru",
+            "url": "https://taru.money",
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Taru",
+            "legalName": "NextGenOS Financial Services Private Limited",
+            "url": "https://taru.money",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://taru.money/og-image.png",
+            },
+          },
+        })}</script>
       </Helmet>
 
       <nav className="top" ref={navRef}>
