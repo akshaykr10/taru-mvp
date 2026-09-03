@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { getBlogBySlug } from '../../data/blogs.js'
+import Footer from '../Footer.jsx'
 import '../../styles/landing.css'
 import './blog.css'
 
@@ -171,23 +172,7 @@ export default function BlogPost() {
         </Link>
       </div>
 
-      <footer className="blog-post-footer">
-        <div className="inner">
-          <div className="f-left">
-            <Link to="/" className="logo">taru<span className="dot">.</span></Link>
-            <div className="copy">&copy; 2026 NextGenOS Financial Services Private Limited</div>
-          </div>
-          <div className="fnav">
-            <Link to="/blog">← All articles</Link>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
-          </div>
-          <div className="made-tag">
-            <span className="flag-dot"></span>
-            Made in India, for India
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

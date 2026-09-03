@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import ReactMarkdown from 'react-markdown'
 import { termsContent } from '../legal/index.js'
+import Footer from '../components/Footer.jsx'
 import '../styles/landing.css'
 
 function BracketHighlight({ children }) {
@@ -70,23 +71,7 @@ export default function TermsOfUse() {
         <ReactMarkdown components={mdComponents}>{termsContent}</ReactMarkdown>
       </div>
 
-      <footer>
-        <div className="inner">
-          <div className="f-left">
-            <Link to="/" className="logo">taru<span className="dot">.</span></Link>
-            <div className="copy">&copy; 2026 NextGenOS Financial Services Private Limited</div>
-          </div>
-          <div className="fnav">
-            <Link to="/blog">Blogs</Link>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
-          </div>
-          <div className="made-tag">
-            <span className="flag-dot"></span>
-            Made in India, for India
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

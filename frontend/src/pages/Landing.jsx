@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { BACKEND_URL } from '../lib/api.js'
+import Footer from '../components/Footer.jsx'
 import '../styles/landing.css'
 
 export default function Landing() {
@@ -536,24 +537,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ══════════ FOOTER ══════════ */}
-      <footer>
-        <div className="inner">
-          <div className="f-left">
-            <a href="#" className="logo">taru<span className="dot">.</span></a>
-            <div className="copy">&copy; 2026 NextGenOS Financial Services Private Limited</div>
-          </div>
-          <div className="fnav">
-            <Link to="/blog">Blogs</Link>
-            <Link to="/tax-calculator">Tax calculator</Link>
-            <Link to="/calculator">Milestone calculator</Link>
-          </div>
-          <div className="made-tag">
-            <span className="flag-dot"></span>
-            Made in India, for India
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
     </div>
   )

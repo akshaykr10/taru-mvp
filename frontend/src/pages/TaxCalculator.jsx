@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
+import Footer from '../components/Footer.jsx'
 import '../styles/landing.css'
 import '../styles/taxcalculator.css'
 
@@ -1174,24 +1175,7 @@ export default function TaxCalculator() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer>
-        <div className="inner">
-          <div className="f-left">
-            <Link to="/" className="logo">taru<span className="dot">.</span></Link>
-            <div className="copy">&copy; 2026 NextGenOS Financial Services Private Limited</div>
-          </div>
-          <div className="fnav">
-            <Link to="/blog">Blogs</Link>
-            <Link to="/privacy">Privacy</Link>
-            <Link to="/terms">Terms</Link>
-          </div>
-          <div className="made-tag">
-            <span className="flag-dot"></span>
-            Made in India, for India
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <p className="tc-seo-text">
         Investing in your child&apos;s name can significantly reduce your tax burden on capital gains. Under current Indian income tax rules, a child with no other income gets a fresh ₹4 lakh basic exemption plus a ₹1.25 lakh LTCG exemption under Section 198 (erstwhile Section 112A) — savings that are unavailable when the same investment is held in a parent&apos;s name. This calculator shows you the exact difference across asset classes.
