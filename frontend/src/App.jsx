@@ -22,8 +22,8 @@ import BlogIndex     from './components/blog/BlogIndex.jsx'
 import BlogPost      from './components/blog/BlogPost.jsx'
 
 // Public tools
-import TaxCalculator          from './pages/TaxCalculator.jsx'
-import MilestoneCalculatorPage from './pages/MilestoneCalculatorPage.jsx'
+import TaxCalculator from './pages/TaxCalculator.jsx'
+import MilestoneTool  from './pages/MilestoneTool.jsx'
 
 // Parent routes (auth-gated)
 import ParentOnboarding from './pages/parent/Onboarding.jsx'
@@ -63,7 +63,7 @@ export default function App() {
 
           {/* ── Public tools ─────────────────────────────────────────── */}
           <Route path="/tax-calculator" element={<TaxCalculator />} />
-          <Route path="/calculator"     element={<MilestoneCalculatorPage />} />
+          <Route path="/calculator"     element={<MilestoneTool />} />
 
           {/* ── /app entry: auth-gate redirect ───────────────────────── */}
           <Route path="/app" element={<AppRedirect />} />

@@ -1,23 +1,12 @@
-import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { blogs } from '../../data/blogs.js'
 import Footer from '../Footer.jsx'
+import Header from '../Header.jsx'
 import '../../styles/landing.css'
 import './blog.css'
 
 export default function BlogIndex() {
-  const navRef = useRef(null)
-
-  useEffect(() => {
-    function onScroll() {
-      if (!navRef.current) return
-      navRef.current.classList.toggle('scrolled', window.scrollY > 10)
-    }
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
   return (
     <div className="landing-page">
       <Helmet>
@@ -36,17 +25,7 @@ export default function BlogIndex() {
         <meta name="twitter:image" content="https://taru.money/og-image.png" />
       </Helmet>
 
-      <nav className="top" ref={navRef}>
-        <div className="inner">
-          <Link to="/" className="logo">taru<span className="dot">.</span></Link>
-          <div className="nav-links">
-            <Link to="/tax-calculator">Tax calculator</Link>
-            <Link to="/calculator">Milestone calculator</Link>
-            <Link to="/blog" style={{ opacity: 1, fontWeight: 500 }}>Blogs</Link>
-            <Link to="/signup" className="btn primary">Get started</Link>
-          </div>
-        </div>
-      </nav>
+      <Header active="blog" scrolledThreshold={10} />
 
       <main className="blog-index">
         <header className="blog-index__hero">
@@ -54,23 +33,25 @@ export default function BlogIndex() {
           <p className="blog-index__subtitle">Guides on investing in your child's name — no jargon, real numbers.</p>
         </header>
 
-        <section className="blog-index__grid">
+        {/* Card layout ported verbatim from design-reference.html's .posts/
+            .post-card (whole card is the link, tag + read-time row, title,
+            dek). The bare <b> title in the mockup is kept as a real <h2>
+            here (see blog.css). */}
+        <section className="posts">
           {blogs.map(blog => (
-            <article key={blog.slug} className="blog-card">
-              <div className="blog-card__meta">
-                <span className="reading-time-badge">{blog.readingTime} read</span>
-              </div>
-              <h2 className="blog-card__title">{blog.title}</h2>
-              <p className="blog-card__subtitle">{blog.subtitle}</p>
-              <Link to={`/blog/${blog.slug}`} className="blog-card__cta">
-                Read article →
-              </Link>
-            </article>
+            <Link key={blog.slug} to={`/blog/${blog.slug}`} className="post-card">
+              <span className="card-top">
+                {blog.topic && <span className="tag">{blog.topic}</span>}
+                <span className="read">{blog.readingTime} read</span>
+              </span>
+              <h2>{blog.title}</h2>
+              <p>{blog.subtitle}</p>
+            </Link>
           ))}
         </section>
       </main>
 
-      <Footer />
+      <Footer showTaxCalculatorLink />
     </div>
   )
 }

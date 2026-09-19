@@ -1,3 +1,4 @@
+// Kept for reference — configures MilestoneCalculator.jsx, superseded by MilestoneTool.jsx. Not currently routed.
 export const DEGREE_TYPES = [
   { key: "ug",      label: "Undergraduate",       sub: "B.Tech / BA / BSc / B.Com",   startAge: 18, years: 4 },
   { key: "pg",      label: "Postgrad / MBA",       sub: "MA / MSc / MBA / PGDM",       startAge: 22, years: 2 },

@@ -71,7 +71,7 @@ export default function TermsOfUse() {
         <ReactMarkdown components={mdComponents}>{termsContent}</ReactMarkdown>
       </div>
 
-      <Footer />
+      <Footer showTaxCalculatorLink />
     </div>
   )
 }

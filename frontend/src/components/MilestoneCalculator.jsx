@@ -1,5 +1,7 @@
+// Kept for reference — superseded by MilestoneTool.jsx (pages/MilestoneTool.jsx). Not currently routed.
 import { useState, useEffect, useMemo } from "react";
 import { BACKEND_URL } from "../lib/api";
+import Button from "./Button.jsx";
 import {
   DEGREE_TYPES,
   EDU_COST_MATRIX,
@@ -434,12 +436,12 @@ export default function TaruCalculator() {
             ))}
           </div>
 
-          <button className="btn primary"
+          <Button variant="primary"
             style={!step1Ok ? { marginTop: 6, opacity: 0.4, pointerEvents: "none" } : { marginTop: 6 }}
             disabled={!step1Ok}
             onClick={() => setStep(2)}>
             Continue →
-          </button>
+          </Button>
         </StepWrap>
       )}
 
@@ -460,13 +462,13 @@ export default function TaruCalculator() {
               </div>
             ))}
           </div>
-          <button className="btn ghost" style={{ marginRight: 10, marginTop: 6 }} onClick={() => setStep(1)}>← Back</button>
-          <button className="btn primary"
+          <Button variant="ghost" style={{ marginRight: 10, marginTop: 6 }} onClick={() => setStep(1)}>← Back</Button>
+          <Button variant="primary"
             style={!degreeType ? { marginTop: 6, opacity: 0.4, pointerEvents: "none" } : { marginTop: 6 }}
             disabled={!degreeType}
             onClick={() => setStep(3)}>
             Continue →
-          </button>
+          </Button>
         </StepWrap>
       )}
 
@@ -575,13 +577,13 @@ export default function TaruCalculator() {
             </div>
           )}
 
-          <button className="btn ghost" style={{ marginRight: 10, marginTop: 6 }} onClick={() => setStep(1)}>← Back</button>
-          <button className="btn primary"
+          <Button variant="ghost" style={{ marginRight: 10, marginTop: 6 }} onClick={() => setStep(1)}>← Back</Button>
+          <Button variant="primary"
             style={!step2Ok ? { marginTop: 6, opacity: 0.4, pointerEvents: "none" } : { marginTop: 6 }}
             disabled={!step2Ok}
             onClick={() => setStep(4)}>
             Continue →
-          </button>
+          </Button>
         </StepWrap>
       )}
 
@@ -616,13 +618,13 @@ export default function TaruCalculator() {
             })}
           </div>
 
-          <button className="btn ghost" style={{ marginRight: 10, marginTop: 6 }} onClick={() => setStep(2)}>← Back</button>
-          <button className="btn primary"
+          <Button variant="ghost" style={{ marginRight: 10, marginTop: 6 }} onClick={() => setStep(2)}>← Back</Button>
+          <Button variant="primary"
             style={!step3Ok ? { marginTop: 6, opacity: 0.4, pointerEvents: "none" } : { marginTop: 6 }}
             disabled={!step3Ok}
             onClick={() => setStep(4)}>
             Continue →
-          </button>
+          </Button>
         </StepWrap>
       )}
 
@@ -711,12 +713,12 @@ export default function TaruCalculator() {
             )}
           </div>
 
-          <button className="btn ghost" style={{ marginRight: 10, marginTop: 6 }}
-            onClick={() => isEdu ? setStep(3) : setStep(2)}>← Back</button>
-          <button className="btn primary" style={{ marginTop: 6 }}
+          <Button variant="ghost" style={{ marginRight: 10, marginTop: 6 }}
+            onClick={() => isEdu ? setStep(3) : setStep(2)}>← Back</Button>
+          <Button variant="primary" style={{ marginTop: 6 }}
             onClick={() => setShowResults(true)}>
             See my results →
-          </button>
+          </Button>
         </StepWrap>
       )}
 
@@ -804,12 +806,13 @@ export default function TaruCalculator() {
               {emailError && (
                 <p style={{ fontSize: 12, color: "var(--coral)", marginBottom: 10, marginTop: -4 }}>{emailError}</p>
               )}
-              <button className="btn primary"
+              <Button variant="primary"
                 style={submitting || !emailValue || !consentGiven ? { opacity: 0.4, pointerEvents: "none" } : {}}
                 disabled={submitting || !emailValue || !consentGiven}
-                onClick={handleEmailSubmit}>
+                onClick={handleEmailSubmit}
+                data-testid="calculator-lead-submit-button">
                 {submitting ? "Sending…" : "Show me the full plan →"}
-              </button>
+              </Button>
             </div>
           ) : (
             /* ── GATED SECTION ──────────────────────────────────────── */
@@ -965,17 +968,17 @@ export default function TaruCalculator() {
 
           {/* Bottom actions */}
           <div style={{ display: "flex", gap: 8, marginBottom: 4, marginTop: 4 }}>
-            <button className="btn ghost" style={{ flex: 1, textAlign: "center" }}
+            <Button variant="ghost" style={{ flex: 1, textAlign: "center" }}
               onClick={() => {
                 setShowResults(false);
                 setEmailSubmitted(false);
                 setEmailValue(""); setEmailError(""); setConsentGiven(false);
               }}>
               ← Edit inputs
-            </button>
-            <button className="btn ghost" style={{ flex: 1, textAlign: "center" }} onClick={reset}>
+            </Button>
+            <Button variant="ghost" style={{ flex: 1, textAlign: "center" }} onClick={reset}>
               Start over
-            </button>
+            </Button>
           </div>
 
           <p style={{ fontSize: 11, color: "var(--ink-30)", marginTop: 16, lineHeight: 1.7 }}>

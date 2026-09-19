@@ -72,7 +72,7 @@ export default function PrivacyPolicy() {
         <ReactMarkdown components={mdComponents}>{privacyContent}</ReactMarkdown>
       </div>
 
-      <Footer />
+      <Footer showTaxCalculatorLink />
     </div>
   )
 }

@@ -1,22 +1,12 @@
-import { useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+// Kept for reference — superseded by MilestoneTool.jsx (pages/MilestoneTool.jsx). Not currently routed.
 import { Helmet } from 'react-helmet-async'
 import Footer from '../components/Footer.jsx'
+import Header from '../components/Header.jsx'
+import Hero from '../components/Hero.jsx'
 import '../styles/landing.css'
 import MilestoneCalculator from '../components/MilestoneCalculator'
 
 export default function MilestoneCalculatorPage() {
-  const navRef = useRef(null)
-
-  useEffect(() => {
-    function onScroll() {
-      if (!navRef.current) return
-      navRef.current.classList.toggle('scrolled', window.scrollY > 10)
-    }
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
   return (
     <div className="landing-page">
 
@@ -59,24 +49,10 @@ export default function MilestoneCalculatorPage() {
       </Helmet>
 
       {/* ── Navbar ── */}
-      <nav className="top" ref={navRef}>
-        <div className="inner">
-          <Link to="/" className="logo">taru<span className="dot">.</span></Link>
-          <div className="nav-links">
-            <Link to="/tax-calculator">Tax calculator</Link>
-            <Link to="/calculator" style={{ opacity: 1, fontWeight: 500 }}>Milestone calculator</Link>
-            <Link to="/blog">Blogs</Link>
-            <Link to="/signup" className="btn primary">Get started</Link>
-          </div>
-        </div>
-      </nav>
+      <Header active="calculator" scrolledThreshold={10} />
 
       {/* ── Page hero ── */}
-      <header className="tc-hero">
-        <h1 className="tc-seo-text">
-          Child milestone savings calculator — Taru
-        </h1>
-      </header>
+      <Hero srOnly title="Child milestone savings calculator — Taru" />
 
       {/* ── Calculator ── */}
       <section className="tc-section">
@@ -85,7 +61,7 @@ export default function MilestoneCalculatorPage() {
         </div>
       </section>
 
-      <Footer />
+      <Footer showTaxCalculatorLink />
 
     </div>
   )

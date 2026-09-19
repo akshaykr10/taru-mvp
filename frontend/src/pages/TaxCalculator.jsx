@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import Footer from '../components/Footer.jsx'
+import Header from '../components/Header.jsx'
+import Hero from '../components/Hero.jsx'
+import Button from '../components/Button.jsx'
 import '../styles/landing.css'
 import '../styles/taxcalculator.css'
 
@@ -486,8 +488,6 @@ function getAssumptions(assetClass) {
    ───────────────────────────────────────────────────────── */
 
 export default function TaxCalculator() {
-  const navRef = useRef(null)
-
   const [monthly,    setMonthly]    = useState(100000)
   const [childAge,   setChildAge]   = useState(5)
   const [returnRate, setReturnRate] = useState(12)
@@ -524,15 +524,6 @@ export default function TaxCalculator() {
 
   const explanationPrefix = `At ${returnRate}% annual return over ${investYears} year${investYears !== 1 ? 's' : ''}, ₹${monthly.toLocaleString('en-IN')}/month grows to ${fmt(results.corpus)} — a ${growthMulti}× multiple on your investment. `
   const fullExplanation   = explanationPrefix + results.explanation
-
-  useEffect(() => {
-    const nav = navRef.current
-    if (!nav) return
-    const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 24)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
   function handleMonthlyInput(e) {
     const raw = Number(e.target.value)
@@ -577,29 +568,13 @@ export default function TaxCalculator() {
       </Helmet>
 
       {/* ── Navbar ── */}
-      <nav className="top" ref={navRef}>
-        <div className="inner">
-          <Link to="/" className="logo">taru<span className="dot">.</span></Link>
-          <div className="nav-links">
-            <Link to="/tax-calculator" style={{ opacity: 1, fontWeight: 500 }}>Tax calculator</Link>
-            <Link to="/calculator">Milestone calculator</Link>
-            <Link to="/blog">Blogs</Link>
-            <Link to="/signup" className="btn primary">Get started</Link>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       {/* ── Page hero ── */}
-      <header className="tc-hero">
-        <div className="wrap">
-          <h1 className="tc-hero__title serif">
-            The best investment you&apos;ll ever make is in your child&apos;s name.
-          </h1>
-          <p className="tc-hero__sub">
-            See your corpus, your tax bill, and exactly how much you save by investing in your child&apos;s name. Live, with your numbers.
-          </p>
-        </div>
-      </header>
+      <Hero
+        title="The best investment you'll ever make is in your child's name."
+        subtitle="See your corpus, your tax bill, and exactly how much you save by investing in your child's name. Live, with your numbers."
+      />
 
       {/* ── Calculator body ── */}
       <section className="tc-section">
@@ -1126,7 +1101,7 @@ export default function TaxCalculator() {
               </div>
 
               {/* ── ZONE C: Milestones card ── */}
-              <div className="tc-milestone-card" style={{ '--amber-pale': '#FEF9EC' }}>
+              <div className="tc-milestone-card">
                 <div className="tc-milestone-card__header">What this corpus can fund</div>
                 <div className="tc-milestone-rows">
                   {chips.map((chip, i) => (
@@ -1146,9 +1121,9 @@ export default function TaxCalculator() {
               {/* ── CTA block ── */}
               <div className="tc-cta-block">
                 <h3 className="tc-cta-block__heading serif">Start building this corpus today</h3>
-                <Link to="/signup" className="btn primary tc-cta-block__btn">
+                <Button to="/signup" variant="primary" className="tc-cta-block__btn">
                   Open your child&apos;s investment account
-                </Link>
+                </Button>
                 {NON_MF_TYPES.has(assetClass) && (
                   <p className="tc-cta-block__coming-soon">
                     Taru offers mutual funds today. Gold, stocks, and more coming soon.
@@ -1175,7 +1150,7 @@ export default function TaxCalculator() {
         </div>
       </section>
 
-      <Footer />
+      <Footer showTaxCalculatorLink />
 
       <p className="tc-seo-text">
         Investing in your child&apos;s name can significantly reduce your tax burden on capital gains. Under current Indian income tax rules, a child with no other income gets a fresh ₹4 lakh basic exemption plus a ₹1.25 lakh LTCG exemption under Section 198 (erstwhile Section 112A) — savings that are unavailable when the same investment is held in a parent&apos;s name. This calculator shows you the exact difference across asset classes.
