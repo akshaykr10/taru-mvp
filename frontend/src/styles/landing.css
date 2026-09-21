@@ -196,6 +196,8 @@
 
 /* ── Button ── */
 .landing-page .btn {
+  appearance:      none;
+  -webkit-appearance: none;
   display:         inline-flex;
   align-items:     center;
   gap:             8px;
@@ -1075,6 +1077,8 @@
   padding: 1.125rem var(--gutter);
 }
 .landing-page .masthead .logo { font-size: 1.375rem; font-weight: 400; }
+.landing-page .masthead .logo--mark { display: flex; align-items: center; }
+.landing-page .masthead .logo--mark img { height: 28px; width: auto; display: block; }
 .landing-page .nav { display: flex; align-items: center; gap: 1.5rem; font-size: 0.9375rem; }
 .landing-page .nav .nav-link { color: var(--sage); text-decoration: none; font-family: var(--sans); opacity: 1; }
 .landing-page .nav .nav-link:hover { color: var(--ink); }
@@ -1191,6 +1195,10 @@
 }
 
 /* ── Signup form (waitlist bands) ── */
+/* Clears the fixed masthead (~81px) when scrolled to via #waitlist,
+   whether from an in-page "Join the waitlist" click or a cross-page
+   link landing here (see Landing.jsx's hash-scroll effect). */
+.landing-page #waitlist { scroll-margin-top: 96px; }
 .landing-page .signup { display: flex; gap: 0.5rem; flex-wrap: wrap; max-width: 27rem; margin-top: 1.5rem; }
 .landing-page .signup input {
   flex: 1 1 12rem; font: inherit; font-size: 1rem; padding: 0.75rem 0.875rem;

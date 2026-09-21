@@ -1,9 +1,8 @@
-import { useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import ReactMarkdown from 'react-markdown'
 import { termsContent } from '../legal/index.js'
 import Footer from '../components/Footer.jsx'
+import Header from '../components/Header.jsx'
 import '../styles/landing.css'
 
 function BracketHighlight({ children }) {
@@ -35,17 +34,6 @@ const mdComponents = {
 }
 
 export default function TermsOfUse() {
-  const navRef = useRef(null)
-
-  useEffect(() => {
-    function onScroll() {
-      if (!navRef.current) return
-      navRef.current.classList.toggle('scrolled', window.scrollY > 10)
-    }
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
   return (
     <div className="landing-page" style={styles.page}>
       <Helmet>
@@ -54,17 +42,7 @@ export default function TermsOfUse() {
         <link rel="canonical" href="https://taru.money/terms/" />
       </Helmet>
 
-      <nav className="top" ref={navRef}>
-        <div className="inner">
-          <Link to="/" className="logo">taru<span className="dot">.</span></Link>
-          <div className="nav-links">
-            <Link to="/tax-calculator">Tax calculator</Link>
-            <Link to="/calculator">Milestone calculator</Link>
-            <Link to="/blog">Blogs</Link>
-            <Link to="/signup" className="btn primary">Get started</Link>
-          </div>
-        </div>
-      </nav>
+      <Header scrolledThreshold={10} />
 
       <div style={styles.content}>
         <h1 style={styles.pageTitle}>Terms of Use</h1>

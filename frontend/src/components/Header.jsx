@@ -35,15 +35,15 @@ import IconSprite from './IconSprite.jsx'
    4. CTA label/target: the mockup uses "Join the waitlist" everywhere,
       hash-linked to a waitlist section present on every view of its
       single-page demo. Our non-home marketing pages have no on-page
-      waitlist section — their existing "Get started" -> /signup CTA is
-      the site's real, working signup entry point and has no equivalent
-      in the mockup's world (nothing there is actually live yet), so it's
-      kept for variant="standard" rather than replaced with a dead-end
-      "join waitlist" label.
-   5. Logo: mockup is plain "taru." text, one color, no two-tone dot.
-      Ported verbatim here. PrivacyPolicy.jsx/TermsOfUse.jsx (out of
-      scope) still hand-roll their own nav with the old dotted logo —
-      untouched, since they don't use this component. */
+      waitlist section, so variant="standard" links to the home page's
+      waitlist section ("/#waitlist") instead of a bare "#waitlist" hash
+      (which would be a no-op on a page other than Landing). The product
+      isn't live yet ("Going live soon" on the home hero), so every CTA
+      across the marketing site points at the waitlist, not /signup.
+   5. Logo: swapped from the mockup's plain "taru." text to the
+      taru.money wordmark lockup (tree mark + two-tone text), supplied
+      as a PNG at public/brand/taru-logo.png. Height is capped via CSS
+      to match the text logo's old visual weight in the masthead. */
 export default function Header({ variant = 'standard', active, scrolledThreshold = 24 }) {
   const navRef = useRef(null)
 
@@ -58,14 +58,16 @@ export default function Header({ variant = 'standard', active, scrolledThreshold
 
   const cta = variant === 'home'
     ? <Button href="#waitlist" variant="primary" className="btn--sm">Join the waitlist</Button>
-    : <Button to="/signup" variant="primary" className="btn--sm">Get started</Button>
+    : <Button href="/#waitlist" variant="primary" className="btn--sm">Join the waitlist</Button>
 
   return (
     <>
       <IconSprite />
       <div className="top" id={variant === 'home' ? 'topnav' : undefined} ref={navRef}>
         <header className="section-wrap masthead">
-          <Link to="/" className="logo">taru.</Link>
+          <Link to="/" className="logo logo--mark">
+            <img src="/brand/taru-logo.png" alt="taru.money" />
+          </Link>
           <nav className="nav">
             <Link to="/calculator" className="nav-link" aria-current={active === 'calculator' ? 'page' : undefined}>Tools</Link>
             <Link to="/blog" className="nav-link" aria-current={active === 'blog' ? 'page' : undefined}>Learn</Link>

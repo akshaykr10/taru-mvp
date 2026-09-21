@@ -42,6 +42,17 @@ export default function Landing() {
     return () => { document.body.style.overflowX = prev }
   }, [])
 
+  /* Cross-page "Join the waitlist" links (Header on non-home routes) do a
+     full navigation to "/#waitlist", not a client-side route change — the
+     browser's own scroll-to-fragment fires before this SPA has rendered
+     the #waitlist section, so it lands at the top of the page instead.
+     Re-run the scroll ourselves once the section actually exists. */
+  useEffect(() => {
+    if (window.location.hash !== '#waitlist') return
+    const el = document.getElementById('waitlist')
+    if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' })
+  }, [])
+
   async function handleSubmit(e) {
     e.preventDefault()
     if (!email || !email.includes('@')) return
