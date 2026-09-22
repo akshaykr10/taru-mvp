@@ -121,14 +121,14 @@ export default function Landing() {
             <svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-seed" /></svg>
             Mutual funds in your child&apos;s name
           </span>
-          <h1>Invest in your child&apos;s name, not just for them</h1>
-          <p>Open a mutual fund folio that belongs to your child. You manage it until they turn 18, and then it&apos;s theirs.</p>
+          <h1>Invest in mutual funds for your child&apos;s future.<br /><em className="italic-forest">In their name.</em></h1>
+          <p>Open a mutual fund folio in your child&apos;s name. You manage it until they turn 18.</p>
           <Button href="#waitlist" variant="primary">
             Join the waitlist
             <svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow" /></svg>
           </Button>
           <p className="hero-note">Going live soon. Waitlist members get access first.</p>
-          <p className="hero-micro">Mutual fund investments are market-linked and subject to applicable regulations. Taru does not guarantee returns.</p>
+          <p className="hero-trust"><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield-check" /></svg>AMFI-registered Mutual Fund Distributor · ARN 367667</p>
         </div>
         <div className="hero-art">
           <div className="phone" role="img" aria-label="Parent app screen showing a child's portfolio and goal progress">

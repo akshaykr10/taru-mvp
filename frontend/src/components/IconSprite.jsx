@@ -13,6 +13,7 @@ export default function IconSprite() {
         <g id="i-user"><circle cx="12" cy="8" r="3.5" /><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5" /></g>
         <g id="i-coin"><circle cx="12" cy="12" r="8" /><path d="M14.5 9.5A3 3 0 0 0 12 8.5c-1.4 0-2.5.8-2.5 1.9 0 2.4 5 1.3 5 3.7 0 1.1-1.1 1.9-2.5 1.9a3 3 0 0 1-2.5-1" /><path d="M12 7v10" /></g>
         <g id="i-check"><path d="M4.5 12.5 9 17l10.5-10.5" /></g>
+        <g id="i-shield-check"><path d="M12 3 18.5 5.5V11c0 4.8-3 8-6.5 9.5C8.5 19 5.5 15.8 5.5 11V5.5Z" /><path d="M9 12l2.2 2.2L15 9.8" /></g>
         <g id="i-arrow"><path d="M5 12h13" /><path d="M13 6.5 18.5 12 13 17.5" /></g>
         <g id="i-target"><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3.5" /></g>
         <g id="i-calendar"><rect x="4" y="5" width="16" height="16" rx="2" /><path d="M4 10h16M9 3v4M15 3v4" /></g>
