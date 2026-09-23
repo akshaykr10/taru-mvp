@@ -1214,12 +1214,14 @@
 }
 
 /* ── Apps band ── */
-.landing-page .app { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; margin-top: 2.5rem; }
+.landing-page .app { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; margin-top: 1.875rem; }
 .landing-page .app + .app { margin-top: 4rem; padding-top: 4rem; border-top: 1px solid var(--border); }
 .landing-page .app--flip .app-art { order: -1; }
 .landing-page .app-art { display: flex; justify-content: center; }
+.landing-page .app h2 { font-size: 1.5rem; }
 .landing-page .app-eyebrow { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; font-weight: 600; color: var(--forest); margin-bottom: 0.5rem; }
 .landing-page .app--kid .app-eyebrow { color: var(--amber); }
+.landing-page .app--kid .phone { transform: scale(1.04); }
 .landing-page .feat { list-style: none; margin-top: 1.25rem; }
 .landing-page .feat li { display: flex; gap: 0.75rem; padding: 0.6875rem 0; border-top: 1px solid var(--border); font-size: 0.9375rem; color: var(--sage); }
 .landing-page .feat .icon { flex: 0 0 auto; margin-top: 2px; color: var(--forest); }
@@ -1235,6 +1237,8 @@
 .landing-page .why li { display: flex; gap: 0.75rem; font-size: 0.9375rem; color: var(--sage); }
 .landing-page .why .icon { flex: 0 0 auto; margin-top: 2px; color: var(--forest); }
 .landing-page .why b { display: block; font-weight: 600; color: var(--ink); }
+.landing-page .why li.why--emphasis b { font-size: 1rem; }
+.landing-page .why li.why--emphasis .icon { color: var(--forest-dark); }
 
 /* ── Clarity / FAQ band ── */
 .landing-page .clarity { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 4rem; align-items: start; }

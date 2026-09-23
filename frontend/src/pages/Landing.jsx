@@ -208,7 +208,7 @@ export default function Landing() {
           <div className="app">
             <div>
               <div className="app-eyebrow"><svg className="icon" viewBox="0 0 24 24" style={{ width: 16, height: 16 }} aria-hidden="true"><use href="#i-user" /></svg>Your app</div>
-              <h2 style={{ fontSize: '1.5rem' }}>Open the folio, set the SIP</h2>
+              <h2>Open the folio. Set the SIP. Stay in control.</h2>
               <ul className="feat">
                 <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check" /></svg><span><b>No PAN needed for your child.</b> Their birth certificate and your KYC is enough.</span></li>
                 <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-target" /></svg><span><b>Pick a goal and an amount.</b> From ₹500 a month.</span></li>
@@ -253,12 +253,12 @@ export default function Landing() {
           <div className="app app--flip app--kid">
             <div>
               <div className="app-eyebrow"><svg className="icon" viewBox="0 0 24 24" style={{ width: 16, height: 16 }} aria-hidden="true"><use href="#i-coin" /></svg>Your child&apos;s app</div>
-              <h2 style={{ fontSize: '1.5rem' }}>Coins for chores, tasks and learning</h2>
+              <h2>They don&apos;t just see the money. They learn how it works.</h2>
               <ul className="feat">
                 <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-list" /></svg><span><b>Chores and tasks you set.</b> Finishing them earns coins.</span></li>
                 <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-book" /></svg><span><b>Short lessons, not a course.</b> How investing works, why money grows, how to think about spending.</span></li>
                 <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-coin" /></svg><span><b>Coins add up.</b> Effort becomes something they can see.</span></li>
-                <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart" /></svg><span><b>Their own view of the investments.</b> At the level of detail you&apos;ve chosen.</span></li>
+                <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart" /></svg><span><b>Their own view of the investment.</b> At the level of detail you&apos;ve chosen.</span></li>
               </ul>
             </div>
             <div className="app-art">
@@ -305,13 +305,14 @@ export default function Landing() {
       {/* ══════════ WHY ══════════ */}
       <section className="band band--sage reveal">
         <div className="section-wrap">
-          <h2>You could do this elsewhere. Here&apos;s what&apos;s different.</h2>
-          <p className="lede">Most apps let you open a minor folio. None are built around it.</p>
+          <span className="eyebrow">What makes Taru different</span>
+          <h2>More than a folio in your child&apos;s name.</h2>
+          <p className="lede">Taru is built around your child — their investment, their goals, and how they learn about money.</p>
           <ul className="why">
-            <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-user" /></svg><span><b>One child, not one more holding</b>Elsewhere your child&apos;s folio is a line item. Here it&apos;s the whole app.</span></li>
-            <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar" /></svg><span><b>Goals in your child&apos;s timeline</b>Not ₹10 lakh in 12 years. College, the year Aarav turns 18.</span></li>
-            <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gift" /></svg><span><b>Grandparents can add directly</b>No account of their own, no routing money through you.</span></li>
-            <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone" /></svg><span><b>Your child gets an app</b>Nobody else will build one. For us it&apos;s the whole business.</span></li>
+            <li className="why--emphasis"><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-seed" /></svg><span><b>Built around your child</b>Their investment isn&apos;t just another holding. It&apos;s the starting point for their financial journey.</span></li>
+            <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar" /></svg><span><b>Goals that grow with them</b>Plan around the milestones you&apos;re building towards — college, turning 18, and everything in between.</span></li>
+            <li><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gift" /></svg><span><b>Family can contribute directly</b>Grandparents can add to your child&apos;s folio without needing an account of their own.</span></li>
+            <li className="why--emphasis"><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone" /></svg><span><b>Their own financial experience</b>An app where they can learn about money, complete tasks, earn coins, and see their progress.</span></li>
           </ul>
         </div>
       </section>
