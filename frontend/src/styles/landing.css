@@ -1170,16 +1170,48 @@
 .landing-page .s-nav .on { color: var(--forest); }
 .landing-page .screen--kid .s-nav .on { color: var(--amber); }
 
-/* ── Compare band ── */
-.landing-page .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 2rem; }
-.landing-page .col { padding: 1.5rem; background: var(--cream); border: 1px solid var(--border); border-radius: 6px; }
-.landing-page .col--own { color: var(--sage); }
-.landing-page .col--theirs { border-color: var(--forest); border-left: 4px solid var(--forest); }
-.landing-page .col-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.875rem; font-size: 0.875rem; font-weight: 600; color: var(--ink-faint); }
-.landing-page .col--theirs .col-head { color: var(--forest-dark); }
-.landing-page .col ul { list-style: none; }
-.landing-page .col li { padding: 0.5625rem 0; border-top: 1px solid var(--rule-soft); font-size: 0.9375rem; }
-.landing-page .col li:first-child { border-top: 0; padding-top: 0; }
+/* ── Why-it-matters progression (Fold 2) ── */
+.landing-page .band .eyebrow { display: block; margin-bottom: 0.75rem; }
+.landing-page .fold-why { padding-bottom: 3.75rem; }
+.landing-page .progression {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--border);
+}
+.landing-page .progression-item {
+  padding-right: 2.5rem;
+  border-right: 1px solid var(--border);
+}
+.landing-page .progression-item:last-child { border-right: 0; padding-right: 0; }
+.landing-page .progression-num {
+  display: block;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.0625rem;
+  letter-spacing: 0.01em;
+  color: var(--forest);
+  margin-bottom: 0.75rem;
+}
+.landing-page .progression-label {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0 0 0.5rem;
+}
+.landing-page .progression-desc { font-size: 0.9375rem; line-height: 1.6; color: var(--sage); margin: 0; }
+@media (max-width: 820px) {
+  .landing-page .progression { grid-template-columns: 1fr; gap: 0; border-top: 0; padding-top: 0; }
+  .landing-page .progression-item {
+    padding: 1.5rem 0; border-right: 0; border-top: 1px solid var(--border);
+  }
+}
 
 /* ── Apps band ── */
 .landing-page .app { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; margin-top: 2.5rem; }

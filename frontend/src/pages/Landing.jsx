@@ -173,27 +173,27 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ══════════ COMPARE ══════════ */}
-      <section className="band band--wash reveal">
+      {/* ══════════ WHY IT MATTERS ══════════ */}
+      <section className="band band--wash reveal fold-why">
         <div className="section-wrap">
-          <h2>Where the money sits changes what happens to it</h2>
-          <p className="lede">The education fund in your own account is the easiest place to borrow from, because it&apos;s only an education fund in your head.</p>
-          <div className="compare">
-            <div className="col col--own">
-              <div className="col-head"><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-user" /></svg>In your name</div>
-              <ul>
-                <li>Gets borrowed from when something comes up</li>
-                <li>Sits in one pot with every other goal</li>
-                <li>Becomes theirs if you decide to give it</li>
-              </ul>
+          <span className="eyebrow">Why their name matters</span>
+          <h2>Give their future a place of its own.</h2>
+          <p className="lede">It&apos;s more than money set aside for their future. It&apos;s a financial start they can grow up with.</p>
+          <div className="progression">
+            <div className="progression-item">
+              <span className="progression-num">01</span>
+              <h3 className="progression-label">Their name</h3>
+              <p className="progression-desc">The investment is made in your child&apos;s name.</p>
             </div>
-            <div className="col col--theirs">
-              <div className="col-head"><svg className="icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-seed" /></svg>In their name</div>
-              <ul>
-                <li>Withdrawing takes a deliberate decision</li>
-                <li>Tied to one goal, for one person</li>
-                <li>Theirs from the first instalment</li>
-              </ul>
+            <div className="progression-item">
+              <span className="progression-num">02</span>
+              <h3 className="progression-label">Their future</h3>
+              <p className="progression-desc">A dedicated investment for the future you&apos;re helping them build.</p>
+            </div>
+            <div className="progression-item">
+              <span className="progression-num">03</span>
+              <h3 className="progression-label">Their story</h3>
+              <p className="progression-desc">As they grow, they can see it and learn from what you&apos;re building together.</p>
             </div>
           </div>
         </div>
