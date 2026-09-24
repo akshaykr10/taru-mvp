@@ -211,10 +211,10 @@ export default function About() {
       <Helmet>
         <title>About Taru — Why Taru Exists</title>
         <meta name="description" content={description} />
-        <link rel="canonical" href="https://taru.money/about" />
+        <link rel="canonical" href="https://taru.money/about/" />
         <meta property="og:title" content="About Taru — Why Taru Exists" />
         <meta property="og:description" content={description} />
-        <meta property="og:url" content="https://taru.money/about" />
+        <meta property="og:url" content="https://taru.money/about/" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://taru.money/og-image.png" />
       </Helmet>
