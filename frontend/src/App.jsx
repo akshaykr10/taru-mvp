@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 
 // Landing
 import Landing from './pages/Landing.jsx'
+import About   from './pages/About.jsx'
 
 // Public routes
 import Signup      from './pages/Signup.jsx'
@@ -56,6 +57,7 @@ export default function App() {
 
           {/* ── Landing page ─────────────────────────────────────────── */}
           <Route path="/" element={<Landing />} />
+          <Route path="/about" element={<About />} />
 
           {/* ── Blog (public, no auth) ───────────────────────────────── */}
           <Route path="/blog"           element={<BlogIndex />} />

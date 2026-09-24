@@ -12,6 +12,7 @@ import { blogs } from './src/data/blogs.js'
 // Public, non-auth-gated routes with real prerendered static HTML.
 export const prerenderedRoutes = [
   '/',
+  '/about',
   '/tax-calculator',
   '/calculator',
   '/blog',

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { SOCIAL_LINKS, CONTACT_EMAIL } from '../config/links.js'
 
 /* Footer is shared between marketing pages and the authenticated parent
    dashboard (rendered via ParentLayout.jsx, out of scope for this pass).
@@ -36,20 +37,66 @@ export default function Footer({ showTaxCalculatorLink = false }) {
           &copy; 2026 NextGenOS Financial Services Private Limited
         </p>
         <nav style={styles.links}>
+          <Link to="/about" style={styles.link}>About</Link>
           <Link to="/privacy" style={styles.link}>Privacy</Link>
           <Link to="/terms" style={styles.link}>Terms</Link>
           <Link to="/eula" style={styles.link}>EULA</Link>
           <Link to="/blog" style={styles.link}>Learn</Link>
           {showTaxCalculatorLink && <Link to="/tax-calculator" style={styles.link}>Tax Calculator</Link>}
+          <a href={`mailto:${CONTACT_EMAIL}`} style={styles.link}>Contact</a>
         </nav>
+        <ul style={styles.social} aria-label="Taru on social media">
+          {SOCIAL_LINKS.map(s => (
+            <li key={s.label}>
+              {/* url is null until the real profile URL is filled in
+                  (config/links.js) — renders as a placeholder <a>, not a guess. */}
+              <a
+                href={s.url || undefined}
+                aria-label={`Taru on ${s.label}`}
+                style={styles.socialLink}
+                {...(s.url ? { target: '_blank', rel: 'noopener noreferrer' } : { 'data-todo': 'url-missing' })}
+              >
+                <SocialIcon name={s.icon} />
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </footer>
   )
 }
 
+/* Outline glyphs drawn to match the marketing icon sprite (24px grid,
+   1.6 stroke, round caps). Inline rather than sprite refs because the
+   sprite only exists on marketing pages, and Footer also renders inside
+   the parent dashboard. */
+function SocialIcon({ name }) {
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      {name === 'instagram' && (<>
+        <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.1" cy="6.9" r="0.6" fill="currentColor" stroke="none" />
+      </>)}
+      {name === 'linkedin' && (<>
+        <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" />
+        <path d="M8 10.5V16" />
+        <circle cx="8" cy="7.6" r="0.6" fill="currentColor" stroke="none" />
+        <path d="M11.5 16v-5.5" />
+        <path d="M11.5 13a2.25 2.25 0 0 1 4.5 0v3" />
+      </>)}
+      {name === 'facebook' && (
+        <path d="M14.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.6-1.5h1.5V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.4H9.2v3h2.5V21" />
+      )}
+    </svg>
+  )
+}
+
 const styles = {
   footer: {
-    padding: '36px 32px 48px',
+    // Overridable so a page with its own grid (About) can line the footer
+    // up with it; unset everywhere else, so the fallbacks apply unchanged.
+    padding: '36px var(--footer-gutter, 32px) 48px',
     background: 'var(--color-bg, #FFFFFF)',
     borderTop: '1px solid var(--color-border, #E2E8F0)',
     fontFamily: "var(--sans, 'DM Sans', system-ui, sans-serif)",
@@ -63,7 +110,7 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'flex-start',
     gap: '8px',
-    maxWidth: '1200px',
+    maxWidth: 'var(--footer-max, 1200px)',
     margin: '0 auto',
   },
   line: {
@@ -84,5 +131,21 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     fontWeight: 600,
+  },
+  social: {
+    display: 'flex',
+    gap: '4px',
+    listStyle: 'none',
+    margin: 0,
+    padding: 0,
+    marginLeft: '-12px',
+  },
+  socialLink: {
+    color: 'var(--color-text-secondary, #64748B)',
+    width: '44px',
+    height: '44px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 }
