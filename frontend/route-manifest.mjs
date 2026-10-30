@@ -37,6 +37,7 @@ export const clientOnlyExactRoutes = [
   '/app/signup',
   '/app/login',
   '/app/verify-email',
+  '/app/eula',
   '/parent/onboarding',
   '/parent/dashboard',
   '/parent/portfolio',

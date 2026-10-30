@@ -65,8 +65,10 @@ export default function Login() {
 
     if (!accepted) {
       // No acceptance on record — show EULA before proceeding.
-      // /eula is not auth-protected so we can navigate immediately.
-      navigate('/eula', { replace: true, state: { from } })
+      // /app/eula is not auth-protected so we can navigate immediately.
+      // (/eula itself now 301s to nuberry.in, so the acceptance screen
+      // lives under /app/ where it stays on this domain.)
+      navigate('/app/eula', { replace: true, state: { from } })
       return
     }
 
