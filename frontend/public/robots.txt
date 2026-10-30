@@ -1,7 +1,8 @@
 User-agent: *
 Allow: /
 
-# Block authenticated/app routes from indexing
+# The marketing site moved to nuberry.in. Its old URLs here 301 there.
+# This domain now only serves the logged-in app, which stays out of search.
 Disallow: /parent/
 Disallow: /signup
 Disallow: /login
@@ -10,9 +11,6 @@ Disallow: /child/
 Disallow: /app$
 Disallow: /app/
 
-# Allow public routes
-Allow: /$
-Allow: /learn/
-Allow: /blog/
-
+# Temporary (Oct 2026): lists the old marketing URLs so Google recrawls
+# them and picks up the 301s to nuberry.in. Remove around Feb 2027.
 Sitemap: https://taru.money/sitemap.xml

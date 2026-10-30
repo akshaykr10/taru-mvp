@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { SOCIAL_LINKS, CONTACT_EMAIL } from '../config/links.js'
 
 /* Footer is shared between marketing pages and the authenticated parent
@@ -37,12 +36,12 @@ export default function Footer({ showTaxCalculatorLink = false }) {
           &copy; 2026 NextGenOS Financial Services Private Limited
         </p>
         <nav style={styles.links}>
-          <Link to="/about" style={styles.link}>About</Link>
-          <Link to="/privacy" style={styles.link}>Privacy</Link>
-          <Link to="/terms" style={styles.link}>Terms</Link>
-          <Link to="/eula" style={styles.link}>EULA</Link>
-          <Link to="/blog" style={styles.link}>Learn</Link>
-          {showTaxCalculatorLink && <Link to="/tax-calculator" style={styles.link}>Tax Calculator</Link>}
+          <a href="https://nuberry.in/about/" style={styles.link}>About</a>
+          <a href="https://nuberry.in/privacy/" style={styles.link}>Privacy</a>
+          <a href="https://nuberry.in/terms/" style={styles.link}>Terms</a>
+          <a href="https://nuberry.in/eula/" style={styles.link}>EULA</a>
+          <a href="https://nuberry.in/blog/" style={styles.link}>Learn</a>
+          {showTaxCalculatorLink && <a href="https://nuberry.in/tax-calculator/" style={styles.link}>Tax Calculator</a>}
           <a href={`mailto:${CONTACT_EMAIL}`} style={styles.link}>Contact</a>
         </nav>
         <ul style={styles.social} aria-label="Taru on social media">
