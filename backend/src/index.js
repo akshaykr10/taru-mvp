@@ -23,6 +23,9 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://taru.money',
   'https://www.taru.money',
+  // nuberry.in marketing site (Taru-Money/nuberry-web) posts to /api/waitlist
+  'https://nuberry.in',
+  'https://www.nuberry.in',
   'http://localhost:5173',
 ].filter(Boolean)
 
