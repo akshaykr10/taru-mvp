@@ -80,6 +80,7 @@ export default function App() {
 
           {/* ── EULA acceptance — public (user is authed but hasn't agreed yet) */}
           <Route path="/eula"             element={<EulaPage />} />
+          <Route path="/app/eula"         element={<EulaPage />} />
 
           {/* ── Password reset flow (public) ─────────────────────────── */}
           <Route path="/forgot-password"  element={<ForgotPassword />} />

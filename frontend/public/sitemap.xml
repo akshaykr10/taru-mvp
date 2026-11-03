@@ -1,21 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Temporary (Oct 2026): every old marketing URL, so Google recrawls them
+     and follows the 301s to nuberry.in. Remove around Feb 2027. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://taru.money/</loc>
-    <lastmod>2026-06-11</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
+    <lastmod>2026-10-31</lastmod>
   </url>
   <url>
     <loc>https://taru.money/about/</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/calculator/</loc>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/tax-calculator/</loc>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/blog/</loc>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/privacy/</loc>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/terms/</loc>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/eula/</loc>
+    <lastmod>2026-10-31</lastmod>
   </url>
   <url>
     <loc>https://taru.money/learn/</loc>
-    <lastmod>2026-06-11</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/blog/invest-in-childs-name/</loc>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/blog/what-is-minor-mutual-fund/</loc>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/blog/500-a-month-18-years/</loc>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/blog/how-to-open-minor-mutual-fund/</loc>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/blog/myths-that-delay-action/</loc>
+    <lastmod>2026-10-31</lastmod>
+  </url>
+  <url>
+    <loc>https://taru.money/blog/the-day-your-child-turns-18/</loc>
+    <lastmod>2026-10-31</lastmod>
   </url>
 </urlset>

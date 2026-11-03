@@ -27,6 +27,10 @@ const STATIC_ASSET_RE = /\.[a-zA-Z0-9]+$/
 // after JS executes — this header is present on the very first byte.
 const APP_ALIAS_RE = /^\/app(\/|$)/
 
+// Password-reset pages are prerendered and reachable by crawlers but have
+// no search value. Keep them out of the index with the same header.
+const NOINDEX_EXACT = new Set(['/forgot-password', '/reset-password'])
+
 function withNoindex(headers) {
   const h = new Headers(headers)
   h.set('X-Robots-Tag', 'noindex')
@@ -40,8 +44,16 @@ export default async (request, context) => {
     return context.next()
   }
 
-  const isAppAlias = APP_ALIAS_RE.test(pathname)
+  const bare = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
+  const isAppAlias = APP_ALIAS_RE.test(pathname) || NOINDEX_EXACT.has(bare)
   const response = await context.next()
+
+  // Redirects from netlify.toml (e.g. old marketing paths to nuberry.in)
+  // have already been applied by the time context.next() returns. Never
+  // rewrite those into a 404, even when the path isn't an SPA route.
+  if (response.status >= 300 && response.status < 400) {
+    return response
+  }
 
   if (!isKnownRoute(pathname)) {
     return new Response(response.body, {
