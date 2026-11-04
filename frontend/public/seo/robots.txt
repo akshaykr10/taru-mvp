@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# taru.money has moved to nuberry.in. Every page here 301s there, including
+# the retired app routes, so nothing is blocked: crawlers need to reach each
+# old URL to see its redirect.
+
+# Temporary (Oct 2026): lists the old marketing URLs so Google recrawls
+# them and picks up the 301s to nuberry.in. Remove around Feb 2027.
+Sitemap: https://taru.money/sitemap.xml

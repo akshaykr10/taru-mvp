@@ -143,6 +143,21 @@
   status = 301
   force = true
 
+# robots.txt and the old-URL sitemap must still be served here (200), not
+# redirected: Google reads taru.money's robots.txt before fetching any old
+# URL, and the sitemap is how it finds the old URLs to recrawl. The files
+# live in public/seo/ so these rewrites never point at their own path.
+[[redirects]]
+  from = "/robots.txt"
+  to = "/seo/robots.txt"
+  status = 200
+  force = true
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/seo/sitemap.xml"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/*"
   to = "https://nuberry.in/"
