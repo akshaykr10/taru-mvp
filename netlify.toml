@@ -21,11 +21,8 @@
 # The marketing site moved to nuberry.in (repo Taru-Money/nuberry-web).
 # Each old page 301s to the same page there, with the trailing slash
 # nuberry.in uses, so there is one hop and search rankings carry over.
-# App routes (/login, /signup, /verify-email, /forgot-password,
-# /reset-password, /parent/*, /child/*, /app/*, including the in-app EULA
-# acceptance screen at /app/eula) are deliberately NOT
-# redirected: the pilot app still lives here. Keep these above the SPA
-# catch-all below.
+# Keep these above the catch-all at the bottom, which sends every other
+# path (including the retired app routes) to the nuberry.in homepage.
 [[redirects]]
   from = "/"
   to = "https://nuberry.in/"
@@ -125,14 +122,32 @@
   status = 301
   force = true
 
-# ── SPA redirect rule ─────────────────────────────────────────────
-# All routes (/, /app, /app/*, /child/:token, /parent/*, /login, etc.)
-# must fall through to index.html so React Router handles them client-side.
-# Without this, a hard refresh on any sub-route returns a Netlify 404.
+# ── App retired (4 Nov 2026) ──────────────────────────────────────
+# The pilot app is closed. Every remaining path on taru.money, including the
+# old app routes (/login, /signup, /verify-email, /forgot-password,
+# /reset-password, /parent/*, /child/*, /app/*), now 301s to nuberry.in.
+# The page-to-page marketing redirects above still win because they come
+# first. This replaces the SPA catch-all that used to serve index.html.
 [[redirects]]
-  from   = "/*"
-  to     = "/index.html"
-  status = 200
+  from = "/app/eula"
+  to = "https://nuberry.in/eula/"
+  status = 301
+  force = true
+
+# www.taru.money: path-preserving 301. Only takes effect if www.taru.money
+# is attached to this Netlify site as a domain alias; if it is forwarded at
+# the registrar instead, fix it there (it currently answers with a 302).
+[[redirects]]
+  from = "https://www.taru.money/*"
+  to = "https://nuberry.in/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "https://nuberry.in/"
+  status = 301
+  force = true
 
 # ── Security headers ─────────────────────────────────────────────
 # Minimal hardening for Phase 0. Tighten before public launch.

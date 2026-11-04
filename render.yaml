@@ -1,4 +1,6 @@
 services:
+  # The pilot app was retired on 4 Nov 2026. Only the waitlist API remains,
+  # for nuberry.in. The taru-nav-update cron job was removed.
   # ── Backend web service ───────────────────────────────────────
   - type: web
     name: taru-backend
@@ -12,30 +14,4 @@ services:
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
-        sync: false
-      - key: CASPARSER_API_KEY
-        sync: false
-      - key: CHILD_TOKEN_SECRET
-        sync: false
-      - key: CRON_SECRET
-        sync: false
-      - key: FRONTEND_URL
-        sync: false
-
-  # ── Daily NAV update cron ─────────────────────────────────────
-  # 17:00 UTC = 22:30 IST. AMFI publishes NAVs after market close;
-  # this window ensures the feed is populated before families open the app.
-  - type: cron
-    name: taru-nav-update
-    runtime: node
-    rootDir: backend
-    schedule: "0 17 * * *"
-    buildCommand: npm install
-    startCommand: >-
-      curl -fsS -X POST "$BACKEND_URL/api/cron/update-navs"
-      -H "Authorization: Bearer $CRON_SECRET"
-    envVars:
-      - key: BACKEND_URL
-        sync: false
-      - key: CRON_SECRET
         sync: false

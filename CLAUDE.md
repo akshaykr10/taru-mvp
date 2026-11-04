@@ -1,5 +1,7 @@
 # Taru — Claude Code Project Context
 
+> **Retired 4 Nov 2026.** The pilot app is closed. Every taru.money path 301s to nuberry.in (`netlify.toml`), and the backend serves only `POST /api/waitlist` for the nuberry.in marketing site (repo Taru-Money/nuberry-web). Everything below describes the app as it was and is kept for reference only. Don't add features here.
+
 > Read this file before writing any code. It is the authoritative source for all architectural, design, and product decisions in this codebase. The full PRD is `Taru_MVP_PRD_v2.1.docx`. This file is the distilled version.
 
 ---
