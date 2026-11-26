@@ -4,8 +4,9 @@ name: Supabase Keep-Alive
 # This job runs a tiny read query every 3 days so the project stays awake.
 # It also matters for nuberry.in: the waitlist form writes to this database.
 #
-# One-time setup: add a repo secret named SUPABASE_ANON_KEY
-# (Supabase dashboard > Project Settings > API Keys > anon / public key).
+# One-time setup: add a repo secret named SUPABASE_PUBLISHABLE_KEY
+# (Supabase dashboard > Project Settings > API Keys > Publishable key,
+# starts with sb_publishable_). Never use the secret key here.
 
 on:
   schedule:
@@ -20,20 +21,19 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUPABASE_URL: https://wuokcezdgefykxctxdlu.supabase.co
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - name: Query the database
         run: |
-          if [ -z "$SUPABASE_ANON_KEY" ]; then
-            echo "::error::SUPABASE_ANON_KEY secret is missing. Add it under Settings > Secrets and variables > Actions."
+          if [ -z "$SUPABASE_KEY" ]; then
+            echo "::error::SUPABASE_PUBLISHABLE_KEY secret is missing. Add it under Settings > Secrets and variables > Actions."
             exit 1
           fi
           # A real SELECT through the REST API. Row-level security may return
           # an empty list, which is fine: the query still runs in Postgres.
           code=$(curl -sS -o body.txt -w "%{http_code}" \
             "$SUPABASE_URL/rest/v1/waitlist_emails?select=id&limit=1" \
-            -H "apikey: $SUPABASE_ANON_KEY" \
-            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+            -H "apikey: $SUPABASE_KEY")
           echo "HTTP $code"
           if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
             cat body.txt
