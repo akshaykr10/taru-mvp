@@ -1,0 +1,65 @@
+name: Supabase Keep-Alive
+
+# Supabase free projects pause after 7 days with no database activity.
+# This job runs a tiny read query every 3 days so the project stays awake.
+# It also matters for nuberry.in: the waitlist form writes to this database.
+#
+# One-time setup: add a repo secret named SUPABASE_ANON_KEY
+# (Supabase dashboard > Project Settings > API Keys > anon / public key).
+
+on:
+  schedule:
+    - cron: "17 3 */3 * *"   # every 3 days at 03:17 UTC (08:47 IST)
+  workflow_dispatch:          # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write             # needed only for the repo keep-alive commit below
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: https://wuokcezdgefykxctxdlu.supabase.co
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+    steps:
+      - name: Query the database
+        run: |
+          if [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::SUPABASE_ANON_KEY secret is missing. Add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          # A real SELECT through the REST API. Row-level security may return
+          # an empty list, which is fine: the query still runs in Postgres.
+          code=$(curl -sS -o body.txt -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/waitlist_emails?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "HTTP $code"
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+            cat body.txt
+            echo "::error::Supabase did not answer normally. The project may be paused."
+            exit 1
+          fi
+          echo "Supabase is awake."
+
+  # GitHub switches off scheduled jobs in public repos after 60 days with
+  # no commits. Since nobody pushes here any more, this adds an empty commit
+  # once the last one is older than 50 days. [skip ci] stops Netlify and
+  # other workflows from rebuilding for it.
+  repo-keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Empty commit if the repo has gone quiet
+        run: |
+          last=$(git log -1 --format=%ct)
+          age_days=$(( ( $(date +%s) - last ) / 86400 ))
+          echo "Last commit was $age_days days ago."
+          if [ "$age_days" -ge 50 ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit --allow-empty -m "chore: keep scheduled workflows alive [skip ci]"
+            git push
+          fi
